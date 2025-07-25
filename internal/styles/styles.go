@@ -1,0 +1,16 @@
+package styles
+
+import (
+	"github.com/NucleoFusion/cruise/internal/colors"
+	"github.com/charmbracelet/lipgloss"
+)
+
+func PageStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Background(colors.Load().Base).Foreground(colors.Load().Text).
+		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender)
+}
+
+func SubpageStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Background(colors.Load().Base).Foreground(colors.Load().Text).
+		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Overlay0)
+}
