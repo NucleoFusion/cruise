@@ -25,6 +25,6 @@ func (s Logs) Update(msg tea.Msg) (Logs, tea.Cmd) {
 }
 
 func (s Logs) View() string {
-	return styles.SubpageStyle().Render(lipgloss.Place(s.Width*2/3-1, s.Height/3-2,
+	return styles.SubpageStyle().Render(lipgloss.Place(s.Width*2/3, s.Height/3-2,
 		lipgloss.Center, lipgloss.Center, "Logs"))
 }

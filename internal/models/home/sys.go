@@ -66,7 +66,7 @@ func (s *SysRes) Update(msg tea.Msg) (*SysRes, tea.Cmd) {
 
 func (s *SysRes) View() string {
 	return styles.SubpageStyle().PaddingTop(1).PaddingLeft(4).Render(lipgloss.JoinVertical(lipgloss.Center,
-		"System Resources",
+		styles.TitleStyle().Render("System Resources"),
 		lipgloss.Place(s.Width*2/3-2, s.Height/3-4,
 			lipgloss.Left, lipgloss.Center, s.FormattedView())))
 }
@@ -82,7 +82,7 @@ func (s SysRes) FormattedView() string {
 	} else {
 		cpufilled := int((s.CPU.Usage / 100) * float64(50))
 		cpubar := strings.Repeat("█", cpufilled) + strings.Repeat(" ", 50-cpufilled-1)
-		cputext = fmt.Sprintf("CPU: [%s] %.1f%% | %.1fGhz - %dL/%dP Cores", cpubar, math.Round(s.CPU.Usage*10)/10, math.Round(s.CPU.Mhz/100)/10,
+		cputext = fmt.Sprintf("CPU:  [%s] %.1f%% | %.1fGhz - %dL/%dP Cores", cpubar, math.Round(s.CPU.Usage*10)/10, math.Round(s.CPU.Mhz/100)/10,
 			s.CPU.LogicCores, s.CPU.PhysicalCores)
 	}
 
@@ -92,7 +92,7 @@ func (s SysRes) FormattedView() string {
 	} else {
 		memfilled := int((s.Mem.Usage / 100) * float64(50))
 		membar := strings.Repeat("█", memfilled) + strings.Repeat(" ", 50-memfilled-1)
-		memtext = fmt.Sprintf("Mem: [%s] %.1f%% | %.1fGB / %.1fGB", membar, s.Mem.Usage, s.Mem.Used, s.Mem.Total)
+		memtext = fmt.Sprintf("Mem:  [%s] %.1f%% | %.1fGB / %.1fGB", membar, s.Mem.Usage, s.Mem.Used, s.Mem.Total)
 	}
 
 	disktext := ""
@@ -101,7 +101,7 @@ func (s SysRes) FormattedView() string {
 	} else {
 		diskfilled := int((s.Disk.Usage / 100) * float64(50))
 		diskbar := strings.Repeat("█", diskfilled) + strings.Repeat(" ", 50-diskfilled-1)
-		disktext = fmt.Sprintf("Mem: [%s] %.1f%% | %.1fGB / %.1fGB", diskbar, s.Disk.Usage, s.Disk.Used, s.Disk.Total)
+		disktext = fmt.Sprintf("Disk: [%s] %.1f%% | %.1fGB / %.1fGB", diskbar, s.Disk.Usage, s.Disk.Used, s.Disk.Total)
 	}
 
 	return fmt.Sprintf("%s\n\n%s\n\n%s", cputext, memtext, disktext)

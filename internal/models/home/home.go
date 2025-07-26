@@ -49,7 +49,7 @@ func (s *Home) Update(msg tea.Msg) (*Home, tea.Cmd) {
 
 func (s *Home) View() string {
 	logo := lipgloss.Place(s.Width-2, s.Height/3-2, // Accounting for the border
-		lipgloss.Center, lipgloss.Center, styles.TextStyle().Render(styles.LogoText))
+		lipgloss.Center, lipgloss.Center, styles.TitleStyle().Render(styles.LogoText))
 	sysres := s.SysRes.View()
 	daemon := s.Daemon.View()
 	stats := s.QuickStats.View()

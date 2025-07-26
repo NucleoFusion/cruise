@@ -12,5 +12,9 @@ func PageStyle() lipgloss.Style {
 
 func SubpageStyle() lipgloss.Style {
 	return lipgloss.NewStyle().Background(colors.Load().Base).Foreground(colors.Load().Text).
-		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Overlay0)
+		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Surface1)
+}
+
+func TitleStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Foreground(colors.Load().Sapphire)
 }
