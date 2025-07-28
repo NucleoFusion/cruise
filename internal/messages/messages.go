@@ -18,6 +18,11 @@ func TickDashboard() tea.Cmd {
 }
 
 type (
+	FzfSelection struct {
+		Selection string
+		Exited    bool
+	}
+
 	SysResReadyMsg struct {
 		CPU  *data.CPUInfo
 		Mem  *data.MemInfo

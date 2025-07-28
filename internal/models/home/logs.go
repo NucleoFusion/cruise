@@ -49,7 +49,7 @@ func (s *Logs) Update(msg tea.Msg) (*Logs, tea.Cmd) {
 		if len(s.Events) > s.Length {
 			s.Events = s.Events[len(s.Events)-s.Length:]
 		}
-		if s.IsLoading && len(s.Events) > 0 {
+		if s.IsLoading {
 			s.IsLoading = false
 		}
 
@@ -71,7 +71,11 @@ func (s Logs) View() string {
 
 func (s *Logs) FormattedView() string {
 	if s.IsLoading {
-		return "Loading"
+		return "Loading Logs....\n"
+	}
+
+	if len(s.Events) == 0 {
+		return "No Logs yet, waiting....\n"
 	}
 
 	text := ""
