@@ -28,17 +28,26 @@ func NewHome(w int, h int) *Home {
 }
 
 func (s *Home) Init() tea.Cmd {
-	return tea.Batch(s.SysRes.Init(), messages.TickDashboard())
+	return tea.Batch(s.SysRes.Init(), s.Logs.Init(), messages.TickDashboard())
 }
 
 func (s *Home) Update(msg tea.Msg) (*Home, tea.Cmd) {
 	switch msg := msg.(type) {
+
 	case messages.DashboardTick:
-		s.Refresh()
-		return s, messages.TickDashboard()
+		cmd := s.Refresh()
+		return s, tea.Batch(cmd, messages.TickDashboard())
 	case messages.SysResReadyMsg:
 		var cmd tea.Cmd
 		s.SysRes, cmd = s.SysRes.Update(msg)
+		return s, cmd
+	case messages.NewEvents:
+		var cmd tea.Cmd
+		s.Logs, cmd = s.Logs.Update(msg)
+		return s, cmd
+	case messages.LogsReadyMsg:
+		var cmd tea.Cmd
+		s.Logs, cmd = s.Logs.Update(msg)
 		return s, cmd
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -63,6 +72,6 @@ func (s *Home) View() string {
 	return view
 }
 
-func (s *Home) Refresh() {
-	s.SysRes.Refresh()
+func (s *Home) Refresh() tea.Cmd {
+	return tea.Batch(s.SysRes.Refresh())
 }

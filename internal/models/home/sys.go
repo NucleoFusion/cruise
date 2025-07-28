@@ -107,8 +107,24 @@ func (s SysRes) FormattedView() string {
 	return fmt.Sprintf("%s\n\n%s\n\n%s", cputext, memtext, disktext)
 }
 
-func (s *SysRes) Refresh() {
-	s.CPU = data.GetCPUInfo()
-	s.Mem = data.GetMemInfo()
-	s.Disk = data.GetDiskInfo()
+func (s *SysRes) Refresh() tea.Cmd {
+	return tea.Tick(0, func(t time.Time) tea.Msg {
+		cpuChan := make(chan *data.CPUInfo, 1)
+		memChan := make(chan *data.MemInfo, 1)
+		diskChan := make(chan *data.DiskInfo, 1)
+		go func() {
+			cpuChan <- data.GetCPUInfo()
+		}()
+		go func() {
+			memChan <- data.GetMemInfo()
+		}()
+		go func() {
+			diskChan <- data.GetDiskInfo()
+		}()
+		return messages.SysResReadyMsg{
+			CPU:  <-cpuChan,
+			Mem:  <-memChan,
+			Disk: <-diskChan,
+		}
+	})
 }

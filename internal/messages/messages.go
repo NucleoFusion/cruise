@@ -4,7 +4,9 @@ import (
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/data"
+	"github.com/NucleoFusion/cruise/internal/docker"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/docker/docker/api/types/events"
 )
 
 type DashboardTick time.Time
@@ -21,6 +23,15 @@ type (
 		Mem  *data.MemInfo
 		Disk *data.DiskInfo
 	}
+
+	LogsReadyMsg struct {
+		Info *docker.EventsInfo
+	}
+
+	NewEvents struct {
+		Events []*events.Message
+	}
+
 	DaemonReadyMsg struct {
 		Err error
 	}
