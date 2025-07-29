@@ -6,6 +6,7 @@ import (
 	"github.com/NucleoFusion/cruise/internal/data"
 	"github.com/NucleoFusion/cruise/internal/docker"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 )
 
@@ -18,6 +19,11 @@ func TickDashboard() tea.Cmd {
 }
 
 type (
+	ContainerReadyMsg struct {
+		Items []container.Summary
+		Err   error
+	}
+
 	FzfSelection struct {
 		Selection string
 		Exited    bool
