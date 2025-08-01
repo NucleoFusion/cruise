@@ -19,6 +19,14 @@ func TickDashboard() tea.Cmd {
 }
 
 type (
+	ErrorMsg struct {
+		Title string
+		Msg   string
+		Locn  string
+	}
+
+	CloseError struct{}
+
 	ContainerReadyMsg struct {
 		Items []container.Summary
 		Err   error

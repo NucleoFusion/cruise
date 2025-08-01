@@ -31,7 +31,7 @@ func (s *Home) Init() tea.Cmd {
 	return tea.Batch(s.SysRes.Init(), s.Logs.Init(), messages.TickDashboard())
 }
 
-func (s *Home) Update(msg tea.Msg) (*Home, tea.Cmd) {
+func (s *Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case messages.DashboardTick:
@@ -51,6 +51,14 @@ func (s *Home) Update(msg tea.Msg) (*Home, tea.Cmd) {
 		return s, cmd
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "e":
+			return s, func() tea.Msg {
+				return messages.ErrorMsg{
+					Title: "Test",
+					Locn:  "Home",
+					Msg:   "A Test ",
+				}
+			}
 		}
 	}
 	return s, nil

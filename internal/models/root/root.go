@@ -1,12 +1,16 @@
 package root
 
 import (
+	"time"
+
 	"github.com/NucleoFusion/cruise/internal/enums"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/models/containers"
+	errorpopup "github.com/NucleoFusion/cruise/internal/models/error"
 	"github.com/NucleoFusion/cruise/internal/models/fzf"
 	"github.com/NucleoFusion/cruise/internal/models/home"
 	tea "github.com/charmbracelet/bubbletea"
+	overlay "github.com/rmhubbert/bubbletea-overlay"
 )
 
 type Root struct {
@@ -14,17 +18,21 @@ type Root struct {
 	Height         int
 	CurrentPage    enums.PageType
 	IsLoading      bool
-	PageFzf        fzf.FuzzyFinder
 	PageItems      map[string]enums.PageType
 	IsChangingPage bool
+	IsShowingError bool
 	Home           *home.Home
 	Containers     *containers.Containers
+	ErrorPopup     *errorpopup.ErrorPopup
+	PageFzf        fzf.FuzzyFinder
+	Overlay        *overlay.Model
 }
 
 func NewRoot() *Root {
 	return &Root{
-		CurrentPage: enums.Home,
-		IsLoading:   true,
+		CurrentPage:    enums.Home,
+		IsLoading:      true,
+		IsShowingError: false,
 		PageItems: map[string]enums.PageType{
 			"Home":       enums.Home,
 			"Containers": enums.Containers,
@@ -36,9 +44,26 @@ func (s *Root) Init() tea.Cmd { return nil }
 
 func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case messages.CloseError:
+		s.IsShowingError = false
+		return s, nil
+	case messages.ErrorMsg:
+		s.IsShowingError = true
+		s.ErrorPopup = errorpopup.NewErrorPopup(s.Width, s.Height, msg.Msg, msg.Title, msg.Locn)
+
+		var curr tea.Model
+		switch s.CurrentPage {
+		case enums.Home:
+			curr = s.Home
+		case enums.Containers:
+			curr = s.Containers
+		}
+
+		s.Overlay = overlay.New(s.ErrorPopup, curr, overlay.Right, overlay.Top, 2, 2)
+		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg { return messages.CloseError{} })
 	case messages.ContainerReadyMsg:
-		var cmd tea.Cmd
-		s.Containers, cmd = s.Containers.Update(msg)
+		cnt, cmd := s.Containers.Update(msg)
+		s.Containers = cnt.(*containers.Containers)
 		return s, cmd
 	case messages.FzfSelection:
 		s.CurrentPage = s.PageItems[msg.Selection]
@@ -81,12 +106,12 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch s.CurrentPage {
 	case enums.Home:
-		var cmd tea.Cmd
-		s.Home, cmd = s.Home.Update(msg)
+		m, cmd := s.Home.Update(msg)
+		s.Home = m.(*home.Home)
 		return s, cmd
 	case enums.Containers:
-		var cmd tea.Cmd
-		s.Containers, cmd = s.Containers.Update(msg)
+		cnt, cmd := s.Containers.Update(msg)
+		s.Containers = cnt.(*containers.Containers)
 		return s, cmd
 	}
 
@@ -96,6 +121,10 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (s *Root) View() string {
 	if s.IsLoading {
 		return "\nLoading..."
+	}
+
+	if s.IsShowingError {
+		return s.Overlay.View()
 	}
 
 	if s.IsChangingPage {

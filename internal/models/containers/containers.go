@@ -29,7 +29,7 @@ func (s *Containers) Init() tea.Cmd {
 	return s.List.Init()
 }
 
-func (s *Containers) Update(msg tea.Msg) (*Containers, tea.Cmd) {
+func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.ContainerReadyMsg:
 		s.IsLoading = false
