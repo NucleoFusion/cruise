@@ -43,7 +43,14 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.FzfSelection:
 		s.CurrentPage = s.PageItems[msg.Selection]
 		s.IsChangingPage = false
-		return s, nil
+		var cmd tea.Cmd
+		switch s.CurrentPage {
+		case enums.Home:
+			cmd = s.Home.Init()
+		case enums.Containers:
+			cmd = s.Containers.Init()
+		}
+		return s, cmd
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC:

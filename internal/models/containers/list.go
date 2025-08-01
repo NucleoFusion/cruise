@@ -1,6 +1,7 @@
 package containers
 
 import (
+	"sort"
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/colors"
@@ -8,9 +9,11 @@ import (
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/charmbracelet/bubbles/textinput"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/docker/docker/api/types/container"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 type ContainerList struct {
@@ -21,6 +24,7 @@ type ContainerList struct {
 	FilteredItems []container.Summary
 	SelectedIndex int
 	Ti            textinput.Model
+	Vp            viewport.Model
 }
 
 func NewContainerList(w int, h int) *ContainerList {
@@ -31,12 +35,18 @@ func NewContainerList(w int, h int) *ContainerList {
 
 	ti.PromptStyle = lipgloss.NewStyle().Foreground(colors.Load().Lavender)
 	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().Surface2)
+	ti.TextStyle = styles.TextStyle()
+
+	vp := viewport.New(w+3, h+1)
+	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).
+		Padding(1).Foreground(colors.Load().Text)
 
 	return &ContainerList{
 		Width:         w,
 		Height:        h,
 		Ti:            ti,
 		SelectedIndex: 0,
+		Vp:            vp,
 	}
 }
 
@@ -65,11 +75,32 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 			}
 			var cmd tea.Cmd
 			s.Ti, cmd = s.Ti.Update(msg)
+			s.Filter(s.Ti.Value())
+			s.UpdateList()
 			return s, cmd
 		}
 		switch msg.String() {
 		case "/":
 			s.Ti.Focus()
+			return s, nil
+		case "down":
+			if len(s.FilteredItems)-1 > s.SelectedIndex {
+				s.SelectedIndex += 1
+			}
+			if s.SelectedIndex > s.Vp.Height+s.Vp.YOffset-3 { // -2 for border and sosething else, idk breaks otherwise
+				s.Vp.YOffset += 1
+			}
+			s.UpdateList()
+			return s, nil
+		case "up":
+			if 0 < s.SelectedIndex {
+				s.SelectedIndex -= 1
+			}
+			if s.SelectedIndex < s.Vp.YOffset {
+				s.Vp.YOffset -= 1
+			}
+			s.UpdateList()
+			return s, nil
 		}
 	}
 	return s, nil
@@ -86,13 +117,14 @@ func (s *ContainerList) View() string {
 
 	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender)
 
+	s.UpdateList()
+
 	return lipgloss.JoinVertical(lipgloss.Center,
 		style.Render(s.Ti.View()),
-		style.Padding(1).Foreground(colors.Load().Text).Render(lipgloss.Place(s.Width-1, s.Height-4,
-			lipgloss.Center, lipgloss.Top, s.GetListText())))
+		s.Vp.View())
 }
 
-func (s *ContainerList) GetListText() string {
+func (s *ContainerList) UpdateList() {
 	w := (s.Width)/9 - 1
 
 	text := lipgloss.NewStyle().Bold(true).Render(docker.SummaryHeaders(w)+"\n") + "\n"
@@ -109,5 +141,32 @@ func (s *ContainerList) GetListText() string {
 		text += line + "\n"
 	}
 
-	return text
+	s.Vp.SetContent(text)
+}
+
+func (s *ContainerList) Filter(val string) {
+	w := (s.Width)/9 - 1
+
+	formatted := make([]string, len(s.Items))
+	originals := make([]container.Summary, len(s.Items))
+
+	for i, v := range s.Items {
+		str := docker.FormattedSummary(v, w)
+		formatted[i] = str
+		originals[i] = v
+	}
+
+	ranked := fuzzy.RankFindFold(val, formatted)
+	sort.Sort(ranked) // Best matches first
+
+	result := make([]container.Summary, len(ranked))
+	for i, r := range ranked {
+		result[i] = originals[r.OriginalIndex]
+	}
+
+	s.FilteredItems = result // <- You’ll need to define this as []container.Summary
+
+	if len(s.FilteredItems) <= s.SelectedIndex {
+		s.SelectedIndex = len(s.FilteredItems) - 1
+	}
 }

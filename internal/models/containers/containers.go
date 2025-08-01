@@ -38,7 +38,10 @@ func (s *Containers) Update(msg tea.Msg) (*Containers, tea.Cmd) {
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
 	}
-	return s, nil
+
+	var cmd tea.Cmd
+	s.List, cmd = s.List.Update(msg)
+	return s, cmd
 }
 
 func (s *Containers) View() string {

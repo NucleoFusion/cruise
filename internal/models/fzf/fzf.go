@@ -50,7 +50,7 @@ func (m *FuzzyFinder) Update(msg tea.Msg) (FuzzyFinder, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.Keymap.StartWriting):
-			m.Ti.Placeholder = "Search for Diary Entries..."
+			m.Ti.Placeholder = "Search..."
 			m.Ti.Focus()
 		case key.Matches(msg, m.Keymap.Down):
 			if len(m.Filtered)-1 > m.SelectedIndex {
