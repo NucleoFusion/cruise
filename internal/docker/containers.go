@@ -67,3 +67,48 @@ func SummaryHeaders(width int) string {
 		"Size",
 	)
 }
+
+func StartContainer(ID string) error {
+	err := cli.ContainerStart(context.Background(), ID, container.StartOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RestartContainer(ID string) error {
+	err := cli.ContainerStop(context.Background(), ID, container.StopOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RemoveContainer(ID string) error {
+	err := cli.ContainerRemove(context.Background(), ID, container.RemoveOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func PauseContainer(ID string) error {
+	err := cli.ContainerPause(context.Background(), ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func StopContainer(ID string) error {
+	err := cli.ContainerStop(context.Background(), ID, container.StopOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

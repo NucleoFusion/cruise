@@ -66,7 +66,14 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 		s.Items = msg.Items
 		s.FilteredItems = msg.Items
 		s.Err = msg.Err
-		return s, nil
+		return s, tea.Tick(5*time.Second, func(_ time.Time) tea.Msg {
+			items, err := docker.GetContainers()
+			return messages.ContainerReadyMsg{
+				Items: items,
+				Err:   err,
+			}
+		})
+
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
 			if msg.String() == "esc" {
@@ -169,4 +176,8 @@ func (s *ContainerList) Filter(val string) {
 	if len(s.FilteredItems) <= s.SelectedIndex {
 		s.SelectedIndex = len(s.FilteredItems) - 1
 	}
+}
+
+func (s *ContainerList) GetCurrentItem() container.Summary {
+	return s.FilteredItems[s.SelectedIndex]
 }
