@@ -1,6 +1,8 @@
 package containers
 
 import (
+	"fmt"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -47,6 +49,11 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
 	case tea.KeyMsg:
+		if s.List.Ti.Focused() {
+			var cmd tea.Cmd
+			s.List, cmd = s.List.Update(msg)
+			return s, cmd
+		}
 		switch {
 		case key.Matches(msg, s.Keymap.Start):
 			err := docker.StartContainer(s.List.GetCurrentItem().ID)
@@ -66,6 +73,18 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return s, func() tea.Msg {
 					return messages.ErrorMsg{
 						Title: "Error Pausing Container",
+						Msg:   err.Error(),
+						Locn:  "Containers Page",
+					}
+				}
+			}
+			return s, nil
+		case key.Matches(msg, s.Keymap.Unpause):
+			err := docker.UnpauseContainer(s.List.GetCurrentItem().ID)
+			if err != nil {
+				return s, func() tea.Msg {
+					return messages.ErrorMsg{
+						Title: "Error Unpausing Container",
 						Msg:   err.Error(),
 						Locn:  "Containers Page",
 					}
@@ -106,7 +125,25 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						Locn:  "Containers Page",
 					}
 				}
-			} // TODO: Unpause & Exec -it
+			}
+			return s, nil
+		case key.Matches(msg, s.Keymap.Exec):
+			cmd := exec.Command("ghostty", "-e", fmt.Sprintf("docker exec -it %s %s", s.List.GetCurrentItem().ID, "sh"))
+			cmd.Stdin = nil
+			cmd.Stdout = nil
+			cmd.Stderr = nil
+
+			err := cmd.Start()
+			if err != nil {
+				return s, func() tea.Msg {
+					return messages.ErrorMsg{
+						Title: "Error Execing into Container",
+						Msg:   err.Error(),
+						Locn:  "Containers Page",
+					}
+				}
+			}
+
 			return s, nil
 		}
 	}

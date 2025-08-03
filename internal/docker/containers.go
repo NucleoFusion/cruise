@@ -78,7 +78,7 @@ func StartContainer(ID string) error {
 }
 
 func RestartContainer(ID string) error {
-	err := cli.ContainerStop(context.Background(), ID, container.StopOptions{})
+	err := cli.ContainerRestart(context.Background(), ID, container.StopOptions{})
 	if err != nil {
 		return err
 	}
@@ -97,6 +97,15 @@ func RemoveContainer(ID string) error {
 
 func PauseContainer(ID string) error {
 	err := cli.ContainerPause(context.Background(), ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UnpauseContainer(ID string) error {
+	err := cli.ContainerUnpause(context.Background(), ID)
 	if err != nil {
 		return err
 	}

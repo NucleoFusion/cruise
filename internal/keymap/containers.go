@@ -13,6 +13,7 @@ type ContainersMap struct {
 	Stop    key.Binding
 	Remove  key.Binding
 	Pause   key.Binding
+	Unpause key.Binding
 }
 
 func NewContainersMap() ContainersMap {
@@ -32,6 +33,10 @@ func NewContainersMap() ContainersMap {
 		Pause: key.NewBinding(
 			key.WithKeys("p"),
 			key.WithHelp("p", "pause"),
+		),
+		Unpause: key.NewBinding(
+			key.WithKeys("u"),
+			key.WithHelp("u", "unpause"),
 		),
 		Restart: key.NewBinding(
 			key.WithKeys("r"),

@@ -23,6 +23,8 @@ type ContainerList struct {
 	Err           error
 	FilteredItems []container.Summary
 	SelectedIndex int
+	IsExpanded    bool
+	ExpandedIndex int
 	Ti            textinput.Model
 	Vp            viewport.Model
 }
@@ -46,6 +48,8 @@ func NewContainerList(w int, h int) *ContainerList {
 		Height:        h,
 		Ti:            ti,
 		SelectedIndex: 0,
+		IsExpanded:    false,
+		ExpandedIndex: 0,
 		Vp:            vp,
 	}
 }
@@ -66,7 +70,7 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 		s.Items = msg.Items
 		s.FilteredItems = msg.Items
 		s.Err = msg.Err
-		return s, tea.Tick(5*time.Second, func(_ time.Time) tea.Msg {
+		return s, tea.Tick(2*time.Second, func(_ time.Time) tea.Msg {
 			items, err := docker.GetContainers()
 			return messages.ContainerReadyMsg{
 				Items: items,
@@ -108,6 +112,20 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 			}
 			s.UpdateList()
 			return s, nil
+		case "enter":
+			if s.IsExpanded {
+				if s.SelectedIndex == s.ExpandedIndex {
+					s.IsExpanded = false
+					return s, nil
+				}
+
+				s.ExpandedIndex = s.SelectedIndex
+				return s, nil
+			}
+
+			s.ExpandedIndex = s.SelectedIndex
+			s.IsExpanded = true
+			return s, nil
 		}
 	}
 	return s, nil
@@ -143,6 +161,10 @@ func (s *ContainerList) UpdateList() {
 			line = lipgloss.NewStyle().Background(colors.Load().Lavender).Foreground(colors.Load().Base).Render(line)
 		} else {
 			line = styles.TextStyle().Render(line)
+		}
+
+		if s.IsExpanded && k == s.ExpandedIndex {
+			line += "\n\n\n\n\n"
 		}
 
 		text += line + "\n"
