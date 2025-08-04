@@ -45,10 +45,6 @@ func (s *Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		s.Logs, cmd = s.Logs.Update(msg)
 		return s, cmd
-	case messages.LogsReadyMsg:
-		var cmd tea.Cmd
-		s.Logs, cmd = s.Logs.Update(msg)
-		return s, cmd
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "e":

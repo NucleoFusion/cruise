@@ -1,10 +1,10 @@
 package messages
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/data"
-	"github.com/NucleoFusion/cruise/internal/docker"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
@@ -27,6 +27,11 @@ type (
 
 	CloseError struct{}
 
+	NewContainerDetails struct {
+		Stats   container.StatsResponseReader
+		Decoder *json.Decoder
+	}
+
 	ContainerReadyMsg struct {
 		Items []container.Summary
 		Err   error
@@ -41,10 +46,6 @@ type (
 		CPU  *data.CPUInfo
 		Mem  *data.MemInfo
 		Disk *data.DiskInfo
-	}
-
-	LogsReadyMsg struct {
-		Info *docker.EventsInfo
 	}
 
 	NewEvents struct {

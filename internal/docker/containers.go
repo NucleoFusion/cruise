@@ -7,7 +7,17 @@ import (
 
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/events"
 )
+
+type Details struct {
+	IsLoading   bool
+	CPU         float64
+	Mem         float64
+	Size        float64
+	Logs        []string
+	EventStream chan *events.Message
+}
 
 func GetNumContainers() int {
 	containers, err := cli.ContainerList(context.Background(), container.ListOptions{All: true})
@@ -27,6 +37,11 @@ func GetContainers() ([]container.Summary, error) {
 	}
 
 	return containers, nil
+}
+
+// Gives a realtime updater
+func GetContainerStats(id string) (container.StatsResponseReader, error) {
+	return cli.ContainerStats(context.Background(), id, true)
 }
 
 func FormattedSummary(item container.Summary, width int) string {

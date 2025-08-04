@@ -1,7 +1,10 @@
 package containers
 
 import (
+	"encoding/json"
+	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/colors"
@@ -17,16 +20,20 @@ import (
 )
 
 type ContainerList struct {
-	Width         int
-	Height        int
-	Items         []container.Summary
-	Err           error
-	FilteredItems []container.Summary
-	SelectedIndex int
-	IsExpanded    bool
-	ExpandedIndex int
-	Ti            textinput.Model
-	Vp            viewport.Model
+	Width            int
+	Height           int
+	Items            []container.Summary
+	Err              error
+	FilteredItems    []container.Summary
+	SelectedIndex    int
+	IsExpanded       bool
+	ExpandedIndex    int
+	IsDetailsLoading bool
+	StatsReader      container.StatsResponseReader
+	Stats            container.StatsResponse
+	Decoder          *json.Decoder
+	Ti               textinput.Model
+	Vp               viewport.Model
 }
 
 func NewContainerList(w int, h int) *ContainerList {
@@ -44,13 +51,14 @@ func NewContainerList(w int, h int) *ContainerList {
 		Padding(1).Foreground(colors.Load().Text)
 
 	return &ContainerList{
-		Width:         w,
-		Height:        h,
-		Ti:            ti,
-		SelectedIndex: 0,
-		IsExpanded:    false,
-		ExpandedIndex: 0,
-		Vp:            vp,
+		Width:            w,
+		Height:           h,
+		Ti:               ti,
+		SelectedIndex:    0,
+		IsExpanded:       false,
+		ExpandedIndex:    0,
+		Vp:               vp,
+		IsDetailsLoading: true,
 	}
 }
 
@@ -77,6 +85,16 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 				Err:   err,
 			}
 		})
+	case messages.NewContainerDetails:
+		s.IsDetailsLoading = false
+		s.StatsReader = msg.Stats
+		s.Decoder = msg.Decoder
+
+		var m container.StatsResponse
+		s.Decoder.Decode(&m)
+		s.Stats = m
+
+		return s, nil
 
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
@@ -119,13 +137,17 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 					return s, nil
 				}
 
+				s.IsDetailsLoading = true
+
 				s.ExpandedIndex = s.SelectedIndex
-				return s, nil
+				return s, s.NewStats()
 			}
+
+			s.IsDetailsLoading = true
 
 			s.ExpandedIndex = s.SelectedIndex
 			s.IsExpanded = true
-			return s, nil
+			return s, s.NewStats()
 		}
 	}
 	return s, nil
@@ -164,7 +186,26 @@ func (s *ContainerList) UpdateList() {
 		}
 
 		if s.IsExpanded && k == s.ExpandedIndex {
-			line += "\n\n\n\n\n"
+			dropdown := ""
+			if s.IsDetailsLoading {
+				dropdown += lipgloss.Place(s.Width-14, 6, lipgloss.Center, lipgloss.Center, "Loading")
+			} else {
+				var totalRxBytes, totalTxBytes uint64
+
+				for _, netStats := range s.Stats.Networks {
+					totalRxBytes += netStats.RxBytes
+					totalTxBytes += netStats.TxBytes
+				}
+
+				dropdown += fmt.Sprintf(" %s | [CPU%%: %d | Mem: %d | Network: %.2fMB Rx / %.2fMB Tx ]\n",
+					strings.Trim(s.Stats.Name, "/"), s.Stats.CPUStats.CPUUsage.TotalUsage, s.Stats.MemoryStats.Usage, float64(totalRxBytes)/(1024*1024), float64(totalTxBytes)/(1024*1024))
+
+				dropdown += strings.Repeat("─", s.Width-14)
+
+				dropdown += "\n\n\n"
+			}
+
+			line += lipgloss.NewStyle().MarginLeft(3).Border(styles.DropdownBorder()).Render(dropdown)
 		}
 
 		text += line + "\n"
@@ -186,14 +227,14 @@ func (s *ContainerList) Filter(val string) {
 	}
 
 	ranked := fuzzy.RankFindFold(val, formatted)
-	sort.Sort(ranked) // Best matches first
+	sort.Sort(ranked)
 
 	result := make([]container.Summary, len(ranked))
 	for i, r := range ranked {
 		result[i] = originals[r.OriginalIndex]
 	}
 
-	s.FilteredItems = result // <- You’ll need to define this as []container.Summary
+	s.FilteredItems = result
 
 	if len(s.FilteredItems) <= s.SelectedIndex {
 		s.SelectedIndex = len(s.FilteredItems) - 1
@@ -202,4 +243,23 @@ func (s *ContainerList) Filter(val string) {
 
 func (s *ContainerList) GetCurrentItem() container.Summary {
 	return s.FilteredItems[s.SelectedIndex]
+}
+
+func (s *ContainerList) NewStats() tea.Cmd {
+	return tea.Tick(0, func(_ time.Time) tea.Msg {
+		stats, err := docker.GetContainerStats(s.GetCurrentItem().ID)
+		if err != nil {
+			return messages.ErrorMsg{
+				Title: "Error Querying Stats",
+				Locn:  "Container Page",
+				Msg:   err.Error(),
+			}
+		}
+		decoder := json.NewDecoder(stats.Body)
+
+		return messages.NewContainerDetails{
+			Stats:   stats,
+			Decoder: decoder,
+		}
+	})
 }

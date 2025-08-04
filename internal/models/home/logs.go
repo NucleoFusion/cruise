@@ -14,7 +14,6 @@ import (
 type Logs struct {
 	Width     int
 	Height    int
-	Info      *docker.EventsInfo
 	Events    []*events.Message
 	EventChan chan *events.Message
 	IsLoading bool
@@ -54,10 +53,6 @@ func (s *Logs) Update(msg tea.Msg) (*Logs, tea.Cmd) {
 		}
 
 		return s, s.Sub()
-	case messages.LogsReadyMsg:
-		s.Info = msg.Info
-		s.IsLoading = false
-		return s, nil
 	}
 	return s, nil
 }
@@ -106,11 +101,3 @@ func (s *Logs) PollEvents() tea.Cmd {
 		}
 	}
 }
-
-// func (s *Logs) Refresh() tea.Cmd {
-// 	return tea.Tick(0, func(t time.Time) tea.Msg {
-// 		return messages.LogsReadyMsg{
-// 			Info: docker.GetRecentEvents(s.Length),
-// 		}
-// 	})
-// }

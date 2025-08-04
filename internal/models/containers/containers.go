@@ -42,6 +42,10 @@ func (s *Containers) Init() tea.Cmd {
 
 func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case messages.NewContainerDetails:
+		var cmd tea.Cmd
+		s.List, cmd = s.List.Update(msg)
+		return s, cmd
 	case messages.ContainerReadyMsg:
 		s.IsLoading = false
 
