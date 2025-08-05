@@ -67,3 +67,26 @@ func Shorten(s string, max int) string {
 	}
 	return s[:max-3] + "..."
 }
+
+func CalculateCPUPercent(stats container.StatsResponse) float64 {
+	cpuDelta := float64(stats.CPUStats.CPUUsage.TotalUsage - stats.PreCPUStats.CPUUsage.TotalUsage)
+	systemDelta := float64(stats.CPUStats.SystemUsage - stats.PreCPUStats.SystemUsage)
+	onlineCPUs := float64(stats.CPUStats.OnlineCPUs)
+	if onlineCPUs == 0 {
+		onlineCPUs = float64(len(stats.CPUStats.CPUUsage.PercpuUsage)) // Fallback
+	}
+
+	if systemDelta > 0.0 && cpuDelta > 0.0 {
+		return (cpuDelta / systemDelta) * onlineCPUs * 100.0
+	}
+	return 0.0
+}
+
+func CalculateMemoryPercent(stats container.StatsResponse) float64 {
+	used := float64(stats.MemoryStats.Usage - stats.MemoryStats.Stats["cache"])
+	total := float64(stats.MemoryStats.Limit)
+
+	percent := (used / total) * 100.0
+
+	return percent
+}

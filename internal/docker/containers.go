@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/NucleoFusion/cruise/internal/utils"
@@ -42,6 +43,18 @@ func GetContainers() ([]container.Summary, error) {
 // Gives a realtime updater
 func GetContainerStats(id string) (container.StatsResponseReader, error) {
 	return cli.ContainerStats(context.Background(), id, true)
+}
+
+// Stream of logs
+func GetContainerLogs(ctx context.Context, id string) (io.ReadCloser, error) {
+	return cli.ContainerLogs(ctx, id, container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Tail:       "4",
+		Follow:     true,
+		Timestamps: false,
+		Details:    false,
+	})
 }
 
 func FormattedSummary(item container.Summary, width int) string {

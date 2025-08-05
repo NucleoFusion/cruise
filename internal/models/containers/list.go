@@ -1,8 +1,11 @@
 package containers
 
 import (
+	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 	"time"
@@ -11,13 +14,21 @@ import (
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
+	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
+
+type LogStreamer struct {
+	ctx    context.Context
+	cancel context.CancelFunc
+	lines  chan string
+}
 
 type ContainerList struct {
 	Width            int
@@ -32,6 +43,9 @@ type ContainerList struct {
 	StatsReader      container.StatsResponseReader
 	Stats            container.StatsResponse
 	Decoder          *json.Decoder
+	Logs             *io.ReadCloser
+	LogStreamer      *LogStreamer
+	LogItems         []string
 	Ti               textinput.Model
 	Vp               viewport.Model
 }
@@ -59,6 +73,7 @@ func NewContainerList(w int, h int) *ContainerList {
 		ExpandedIndex:    0,
 		Vp:               vp,
 		IsDetailsLoading: true,
+		LogItems:         make([]string, 0),
 	}
 }
 
@@ -73,8 +88,29 @@ func (s *ContainerList) Init() tea.Cmd {
 }
 
 func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
+	if s.LogStreamer != nil {
+		select {
+		case line := <-s.LogStreamer.lines:
+			if len(line) > s.Width/2 {
+				line = line[:s.Width/2-3] + "..."
+			}
+			s.LogItems = append(s.LogItems, line)
+			if len(s.LogItems) > 4 {
+				s.LogItems = s.LogItems[len(s.LogItems)-4:]
+			}
+		default:
+			break
+		}
+	}
+
 	switch msg := msg.(type) {
 	case messages.ContainerReadyMsg:
+		if s.IsExpanded && !s.IsDetailsLoading {
+			var m container.StatsResponse
+			s.Decoder.Decode(&m)
+			s.Stats = m
+		}
+
 		s.Items = msg.Items
 		s.FilteredItems = msg.Items
 		s.Err = msg.Err
@@ -89,6 +125,10 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 		s.IsDetailsLoading = false
 		s.StatsReader = msg.Stats
 		s.Decoder = msg.Decoder
+
+		s.Logs = msg.Logs
+		s.LogItems = make([]string, 0)
+		s.StartLogStream()
 
 		var m container.StatsResponse
 		s.Decoder.Decode(&m)
@@ -186,6 +226,8 @@ func (s *ContainerList) UpdateList() {
 		}
 
 		if s.IsExpanded && k == s.ExpandedIndex {
+			line += "\n"
+
 			dropdown := ""
 			if s.IsDetailsLoading {
 				dropdown += lipgloss.Place(s.Width-14, 6, lipgloss.Center, lipgloss.Center, "Loading")
@@ -197,15 +239,22 @@ func (s *ContainerList) UpdateList() {
 					totalTxBytes += netStats.TxBytes
 				}
 
-				dropdown += fmt.Sprintf(" %s | [CPU%%: %d | Mem: %d | Network: %.2fMB Rx / %.2fMB Tx ]\n",
-					strings.Trim(s.Stats.Name, "/"), s.Stats.CPUStats.CPUUsage.TotalUsage, s.Stats.MemoryStats.Usage, float64(totalRxBytes)/(1024*1024), float64(totalTxBytes)/(1024*1024))
+				dropdown += fmt.Sprintf(" %s | [CPU%%: %.2f | Mem%%: %.2fMB | Network: %.2fMB Rx / %.2fMB Tx ]\n",
+					strings.Trim(s.Stats.Name, "/"), utils.CalculateCPUPercent(s.Stats), float64(s.Stats.MemoryStats.Usage)/(1024*1024),
+					float64(totalRxBytes)/(1024*1024), float64(totalTxBytes)/(1024*1024))
 
 				dropdown += strings.Repeat("─", s.Width-14)
 
-				dropdown += "\n\n\n"
+				if len(s.LogItems) == 0 {
+					dropdown += "\n\n\nWaiting for Logs..."
+				} else {
+					for _, v := range s.LogItems {
+						dropdown += "\n #> " + v
+					}
+				}
 			}
 
-			line += lipgloss.NewStyle().MarginLeft(3).Border(styles.DropdownBorder()).Render(dropdown)
+			line += lipgloss.NewStyle().MarginLeft(3).Border(lipgloss.RoundedBorder()).Render(dropdown)
 		}
 
 		text += line + "\n"
@@ -257,9 +306,90 @@ func (s *ContainerList) NewStats() tea.Cmd {
 		}
 		decoder := json.NewDecoder(stats.Body)
 
+		logs, err := docker.GetContainerLogs(context.Background(), s.GetCurrentItem().ID)
+		if err != nil {
+			return messages.ErrorMsg{
+				Title: "Error Querying Logs",
+				Locn:  "Container Page",
+				Msg:   err.Error(),
+			}
+		}
+
 		return messages.NewContainerDetails{
 			Stats:   stats,
 			Decoder: decoder,
+			Logs:    &logs,
 		}
 	})
+}
+
+func (s *ContainerList) StartLogStream() {
+	// Cancel previous log stream
+	if s.LogStreamer != nil {
+		s.LogStreamer.cancel()
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	lines := make(chan string, 100)
+
+	s.LogStreamer = &LogStreamer{
+		ctx:    ctx,
+		cancel: cancel,
+		lines:  lines,
+	}
+
+	// Something about demuxing the logs
+	stdoutReader, stdoutWriter := io.Pipe()
+	stderrReader, stderrWriter := io.Pipe()
+
+	go func() {
+		defer stdoutWriter.Close()
+		defer stderrWriter.Close()
+		_, err := stdcopy.StdCopy(stdoutWriter, stderrWriter, *s.Logs)
+		if err != nil {
+			fmt.Println("StdCopy Error:", err)
+		}
+	}()
+
+	go func() {
+		logs := s.Logs
+		defer (*logs).Close()
+
+		scanner := bufio.NewScanner(stdoutReader)
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				if scanner.Scan() {
+					line := scanner.Text()
+					if line != "" {
+						lines <- line
+					}
+				}
+			}
+		}
+	}()
+
+	go func() {
+		logs := s.Logs
+		defer (*logs).Close()
+
+		scanner := bufio.NewScanner(stderrReader)
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				if scanner.Scan() {
+					line := scanner.Text()
+					if line != "" {
+						lines <- line
+					}
+				}
+			}
+		}
+	}()
 }

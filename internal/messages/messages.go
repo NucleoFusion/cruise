@@ -2,6 +2,7 @@ package messages
 
 import (
 	"encoding/json"
+	"io"
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/data"
@@ -30,6 +31,7 @@ type (
 	NewContainerDetails struct {
 		Stats   container.StatsResponseReader
 		Decoder *json.Decoder
+		Logs    *io.ReadCloser
 	}
 
 	ContainerReadyMsg struct {
