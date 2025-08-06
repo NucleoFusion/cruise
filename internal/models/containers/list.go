@@ -214,10 +214,10 @@ func (s *ContainerList) View() string {
 func (s *ContainerList) UpdateList() {
 	w := (s.Width)/9 - 1
 
-	text := lipgloss.NewStyle().Bold(true).Render(docker.SummaryHeaders(w)+"\n") + "\n"
+	text := lipgloss.NewStyle().Bold(true).Render(docker.ContainerHeaders(w)+"\n") + "\n"
 
 	for k, v := range s.FilteredItems {
-		line := docker.FormattedSummary(v, w)
+		line := docker.ContainerFormattedSummary(v, w)
 
 		if k == s.SelectedIndex {
 			line = lipgloss.NewStyle().Background(colors.Load().Lavender).Foreground(colors.Load().Base).Render(line)
@@ -270,7 +270,7 @@ func (s *ContainerList) Filter(val string) {
 	originals := make([]container.Summary, len(s.Items))
 
 	for i, v := range s.Items {
-		str := docker.FormattedSummary(v, w)
+		str := docker.ContainerFormattedSummary(v, w)
 		formatted[i] = str
 		originals[i] = v
 	}

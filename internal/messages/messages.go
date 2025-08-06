@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
+	"github.com/docker/docker/api/types/image"
 )
 
 type DashboardTick time.Time
@@ -37,6 +38,10 @@ type (
 	ContainerReadyMsg struct {
 		Items []container.Summary
 		Err   error
+	}
+
+	ImagesReadyMsg struct {
+		Items []image.Summary
 	}
 
 	FzfSelection struct {

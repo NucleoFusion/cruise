@@ -9,6 +9,7 @@ import (
 	errorpopup "github.com/NucleoFusion/cruise/internal/models/error"
 	"github.com/NucleoFusion/cruise/internal/models/fzf"
 	"github.com/NucleoFusion/cruise/internal/models/home"
+	"github.com/NucleoFusion/cruise/internal/models/images"
 	tea "github.com/charmbracelet/bubbletea"
 	overlay "github.com/rmhubbert/bubbletea-overlay"
 )
@@ -23,6 +24,7 @@ type Root struct {
 	IsShowingError bool
 	Home           *home.Home
 	Containers     *containers.Containers
+	Images         *images.Images
 	ErrorPopup     *errorpopup.ErrorPopup
 	PageFzf        fzf.FuzzyFinder
 	Overlay        *overlay.Model
@@ -36,6 +38,7 @@ func NewRoot() *Root {
 		PageItems: map[string]enums.PageType{
 			"Home":       enums.Home,
 			"Containers": enums.Containers,
+			"Images":     enums.Images,
 		},
 	}
 }
@@ -65,6 +68,10 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cnt, cmd := s.Containers.Update(msg)
 		s.Containers = cnt.(*containers.Containers)
 		return s, cmd
+	case messages.ImagesReadyMsg:
+		img, cmd := s.Images.Update(msg)
+		s.Images = img.(*images.Images)
+		return s, cmd
 	case messages.FzfSelection:
 		s.CurrentPage = s.PageItems[msg.Selection]
 		s.IsChangingPage = false
@@ -74,6 +81,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmd = s.Home.Init()
 		case enums.Containers:
 			cmd = s.Containers.Init()
+		case enums.Images:
+			cmd = s.Images.Init()
 		}
 		return s, cmd
 	case tea.KeyMsg:
@@ -88,11 +97,12 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s.Width = msg.Width
 		s.Height = msg.Height
 
-		s.PageFzf = fzf.NewFzf([]string{"Home", "Containers"}, msg.Width, msg.Height)
+		s.PageFzf = fzf.NewFzf([]string{"Home", "Containers", "Images"}, msg.Width, msg.Height)
 		s.Home = home.NewHome(msg.Width, msg.Height)
 		s.Containers = containers.NewContainers(msg.Width, msg.Height)
+		s.Images = images.NewImages(msg.Width, msg.Height)
 
-		cmd := tea.Batch(s.Home.Init(), s.Containers.Init())
+		cmd := tea.Batch(s.Home.Init(), s.Containers.Init(), s.Images.Init())
 
 		s.IsLoading = false
 		return s, cmd
@@ -112,6 +122,10 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case enums.Containers:
 		cnt, cmd := s.Containers.Update(msg)
 		s.Containers = cnt.(*containers.Containers)
+		return s, cmd
+	case enums.Images:
+		img, cmd := s.Images.Update(msg)
+		s.Images = img.(*images.Images)
 		return s, cmd
 	}
 
@@ -136,6 +150,8 @@ func (s *Root) View() string {
 		return s.Home.View()
 	case enums.Containers:
 		return s.Containers.View()
+	case enums.Images:
+		return s.Images.View()
 	}
 
 	return "Cruise - A TUI Docker Client"

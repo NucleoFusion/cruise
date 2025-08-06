@@ -31,13 +31,7 @@ func GetNumContainers() int {
 }
 
 func GetContainers() ([]container.Summary, error) {
-	containers, err := cli.ContainerList(context.Background(), container.ListOptions{All: true})
-	if err != nil {
-		fmt.Println("Error: " + err.Error())
-		return containers, err
-	}
-
-	return containers, nil
+	return cli.ContainerList(context.Background(), container.ListOptions{All: true})
 }
 
 // Gives a realtime updater
@@ -57,7 +51,7 @@ func GetContainerLogs(ctx context.Context, id string) (io.ReadCloser, error) {
 	})
 }
 
-func FormattedSummary(item container.Summary, width int) string {
+func ContainerFormattedSummary(item container.Summary, width int) string {
 	name := "-"
 	if len(item.Names) > 0 {
 		name = strings.TrimPrefix(item.Names[0], "/")
@@ -79,7 +73,7 @@ func FormattedSummary(item container.Summary, width int) string {
 	)
 }
 
-func SummaryHeaders(width int) string {
+func ContainerHeaders(width int) string {
 	format := strings.Repeat(fmt.Sprintf("%%-%ds ", width), 9)
 
 	return fmt.Sprintf(
