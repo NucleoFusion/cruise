@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/NucleoFusion/cruise/internal/utils"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
 )
 
@@ -21,6 +22,16 @@ func GetNumImages() int {
 
 func GetImages() ([]image.Summary, error) {
 	return cli.ImageList(context.Background(), image.ListOptions{All: true})
+}
+
+func RemoveImage(id string) error {
+	_, err := cli.ImageRemove(context.Background(), id, image.RemoveOptions{PruneChildren: true, Force: false})
+	return err
+}
+
+func PruneImages() error {
+	_, err := cli.ImagesPrune(context.Background(), filters.NewArgs())
+	return err
 }
 
 func ImagesHeaders(width int) string {

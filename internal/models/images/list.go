@@ -1,7 +1,6 @@
 package images
 
 import (
-	"fmt"
 	"sort"
 	"time"
 
@@ -60,7 +59,6 @@ func (s *ImageList) Init() tea.Cmd {
 				Title: "Error Querying Images",
 			}
 		}
-		fmt.Println("Returning ImagesReady")
 		return messages.ImagesReadyMsg{Items: images}
 	})
 }
@@ -70,7 +68,18 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 	case messages.ImagesReadyMsg:
 		s.Items = msg.Items
 		s.FilteredItems = msg.Items
-		return s, nil // TODO: Return tick
+		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
+			images, err := docker.GetImages()
+			if err != nil {
+				return messages.ErrorMsg{
+					Locn:  "Images Page",
+					Msg:   err.Error(),
+					Title: "Error Querying Images",
+				}
+			}
+			return messages.ImagesReadyMsg{Items: images}
+		})
+
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
 			if msg.String() == "esc" {

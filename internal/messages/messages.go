@@ -44,6 +44,8 @@ type (
 		Items []image.Summary
 	}
 
+	UpdateImagesMsg struct{}
+
 	FzfSelection struct {
 		Selection string
 		Exited    bool
