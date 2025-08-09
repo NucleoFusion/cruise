@@ -34,6 +34,40 @@ func PruneImages() error {
 	return err
 }
 
+func PushImage(img string) error {
+	_, err := cli.ImagePush(context.Background(), img, image.PushOptions{})
+	return err
+}
+
+func PullImage(img string) error {
+	_, err := cli.ImagePull(context.Background(), img, image.PullOptions{})
+	return err
+}
+
+// TODO: Requires a seperate popup
+// func BuildImage(img string) error {
+// 	_, err := cli.ImageBuild(context.Background(), img, image.PullOptions{})
+// 	return err
+// }
+
+func ImageHistory(img string) (string, error) {
+	layers, err := cli.ImageHistory(context.Background(), img)
+	if err != nil {
+		return "", err
+	}
+
+	text := ""
+	for k, v := range layers {
+		id := v.ID
+		if len(id) > 19 {
+			id = id[:19]
+		}
+		text += fmt.Sprintf("Layer: %-3d %-20s Size: %-7s %s \n", k, id, fmt.Sprintf("%dMB", v.Size/(1024*1024)), v.CreatedBy)
+	}
+
+	return text, nil
+}
+
 func ImagesHeaders(width int) string {
 	format := strings.Repeat(fmt.Sprintf("%%-%ds ", width), 5)
 

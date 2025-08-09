@@ -10,6 +10,7 @@ import (
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -25,11 +26,16 @@ type Images struct {
 	Height    int
 	List      *ImageList
 	Keymap    keymap.ImagesMap
+	Vp        viewport.Model
 	Help      help.Model
+	ShowVp    bool
 	IsLoading bool
 }
 
 func NewImages(w int, h int) *Images {
+	vp := viewport.New(w*2/3, h/2)
+	vp.Style = styles.PageStyle().Padding(1, 2)
+
 	return &Images{
 		Width:     w,
 		Height:    h,
@@ -37,6 +43,8 @@ func NewImages(w int, h int) *Images {
 		List:      NewImageList(w-4, h-7-strings.Count(styles.ImagesText, "\n")),
 		Keymap:    keymap.NewImagesMap(),
 		Help:      help.New(),
+		Vp:        vp,
+		ShowVp:    false,
 	}
 }
 
@@ -61,6 +69,14 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			var cmd tea.Cmd
 			s.List, cmd = s.List.Update(msg)
 			return s, cmd
+		} else if s.ShowVp {
+			if key.Matches(msg, key.NewBinding(key.WithKeys("esc"))) {
+				s.ShowVp = false
+				return s, nil
+			}
+			var cmd tea.Cmd
+			s.Vp, cmd = s.Vp.Update(msg)
+			return s, cmd
 		}
 		switch {
 		case key.Matches(msg, s.Keymap.Remove):
@@ -71,6 +87,46 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						Msg:   err.Error(),
 						Locn:  "Images Page",
 						Title: "Error Removing Image",
+					}
+				}
+			}
+			return s, nil
+		case key.Matches(msg, s.Keymap.Pull):
+			curr := s.List.GetCurrentItem()
+			img := curr.ID // Accurately get the image name
+			if len(curr.RepoTags) > 0 && curr.RepoTags[0] != "<none>:<none>" {
+				img = curr.RepoTags[0]
+			} else if len(curr.RepoDigests) > 0 {
+				img = curr.RepoDigests[0]
+			}
+
+			err := docker.PullImage(img)
+			if err != nil {
+				return s, func() tea.Msg {
+					return messages.ErrorMsg{
+						Msg:   err.Error(),
+						Locn:  "Images Page",
+						Title: "Error Pulling Image",
+					}
+				}
+			}
+			return s, nil
+		case key.Matches(msg, s.Keymap.Push):
+			curr := s.List.GetCurrentItem()
+			img := curr.ID // Accurately get the image name
+			if len(curr.RepoTags) > 0 && curr.RepoTags[0] != "<none>:<none>" {
+				img = curr.RepoTags[0]
+			} else if len(curr.RepoDigests) > 0 {
+				img = curr.RepoDigests[0]
+			}
+
+			err := docker.PushImage(img)
+			if err != nil {
+				return s, func() tea.Msg {
+					return messages.ErrorMsg{
+						Msg:   err.Error(),
+						Locn:  "Images Page",
+						Title: "Error Pushing Image",
 					}
 				}
 			}
@@ -87,8 +143,30 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 			return s, nil
-			// case key.Matches(msg, s.Keymap.Layers):
-			// 	// remove
+		case key.Matches(msg, s.Keymap.Layers):
+			curr := s.List.GetCurrentItem()
+			img := curr.ID // Accurately get the image name
+			if len(curr.RepoTags) > 0 && curr.RepoTags[0] != "<none>:<none>" {
+				img = curr.RepoTags[0]
+			} else if len(curr.RepoDigests) > 0 {
+				img = curr.RepoDigests[0]
+			}
+
+			text, err := docker.ImageHistory(img)
+			if err != nil {
+				return s, func() tea.Msg {
+					return messages.ErrorMsg{
+						Msg:   err.Error(),
+						Locn:  "Images Page",
+						Title: "Error Querying Image Layers",
+					}
+				}
+			}
+
+			s.Vp.SetContent(text)
+
+			s.ShowVp = true
+			return s, nil
 		}
 	}
 
@@ -98,6 +176,10 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *Images) View() string {
+	if s.ShowVp {
+		return lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, s.Vp.View())
+	}
+
 	return lipgloss.JoinVertical(lipgloss.Center,
 		styles.TextStyle().Render(styles.ImagesText), s.GetListText(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
 }
