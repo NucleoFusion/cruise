@@ -29,6 +29,14 @@ type (
 
 	CloseError struct{}
 
+	MsgPopup struct {
+		Title string
+		Msg   string
+		Locn  string
+	}
+
+	CloseMsgPopup struct{}
+
 	NewContainerDetails struct {
 		Stats   container.StatsResponseReader
 		Decoder *json.Decoder

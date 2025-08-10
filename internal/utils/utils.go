@@ -90,3 +90,22 @@ func CalculateMemoryPercent(stats container.StatsResponse) float64 {
 
 	return percent
 }
+
+// Wraps the text to the given length and also limits no. of lines, adds a "..." line if exceeding.
+func WrapAndLimit(s string, maxLen, maxLines int) string {
+	var lines []string
+
+	for i := 0; i < len(s); i += maxLen {
+		end := i + maxLen
+		if end > len(s) {
+			end = len(s)
+		}
+		lines = append(lines, s[i:end])
+	}
+
+	if len(lines) > maxLines {
+		lines = append(lines[:maxLines], "...")
+	}
+
+	return strings.Join(lines, "\n")
+}

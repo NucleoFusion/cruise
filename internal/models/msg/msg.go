@@ -1,4 +1,4 @@
-package errorpopup
+package msgpopup
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type ErrorPopup struct {
+type MsgPopup struct {
 	Width    int
 	Height   int
 	Message  string
@@ -17,8 +17,8 @@ type ErrorPopup struct {
 	Location string
 }
 
-func NewErrorPopup(w, h int, msg, title, location string) *ErrorPopup {
-	return &ErrorPopup{
+func NewMsgPopup(w, h int, msg, title, location string) *MsgPopup {
+	return &MsgPopup{
 		Width:    w,
 		Height:   h,
 		Message:  utils.WrapAndLimit(msg, 20, 3),
@@ -27,19 +27,18 @@ func NewErrorPopup(w, h int, msg, title, location string) *ErrorPopup {
 	}
 }
 
-func (s *ErrorPopup) Init() tea.Cmd { return nil }
+func (s *MsgPopup) Init() tea.Cmd { return nil }
 
-func (s *ErrorPopup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s *MsgPopup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return s, nil
 }
 
-func (s *ErrorPopup) View() string {
+func (s *MsgPopup) View() string {
 	style := lipgloss.NewStyle()
 
-	text := fmt.Sprintf("%s\n\n%s", style.Foreground(colors.Load().Red).Render(s.Title+" | "+s.Location),
-
+	text := fmt.Sprintf("%s\n\n%s", style.Foreground(colors.Load().Lavender).Render(s.Title+" | "+s.Location),
 		style.Foreground(colors.Load().Text).Render(s.Message))
 
-	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Sapphire).
+	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Overlay0).
 		Background(colors.Load().Crust).Padding(1, 3).Render(text)
 }

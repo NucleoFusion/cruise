@@ -10,6 +10,7 @@ import (
 	"github.com/NucleoFusion/cruise/internal/models/fzf"
 	"github.com/NucleoFusion/cruise/internal/models/home"
 	"github.com/NucleoFusion/cruise/internal/models/images"
+	msgpopup "github.com/NucleoFusion/cruise/internal/models/msg"
 	tea "github.com/charmbracelet/bubbletea"
 	overlay "github.com/rmhubbert/bubbletea-overlay"
 )
@@ -22,10 +23,12 @@ type Root struct {
 	PageItems      map[string]enums.PageType
 	IsChangingPage bool
 	IsShowingError bool
+	IsShowingMsg   bool
 	Home           *home.Home
 	Containers     *containers.Containers
 	Images         *images.Images
 	ErrorPopup     *errorpopup.ErrorPopup
+	MsgPopup       *msgpopup.MsgPopup
 	PageFzf        fzf.FuzzyFinder
 	Overlay        *overlay.Model
 }
@@ -64,6 +67,23 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		s.Overlay = overlay.New(s.ErrorPopup, curr, overlay.Right, overlay.Top, 2, 2)
 		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg { return messages.CloseError{} })
+	case messages.CloseMsgPopup:
+		s.IsShowingMsg = false
+		return s, nil
+	case messages.MsgPopup:
+		s.IsShowingMsg = true
+		s.MsgPopup = msgpopup.NewMsgPopup(s.Width, s.Height, msg.Msg, msg.Title, msg.Locn)
+
+		var curr tea.Model
+		switch s.CurrentPage {
+		case enums.Home:
+			curr = s.Home
+		case enums.Containers:
+			curr = s.Containers
+		}
+
+		s.Overlay = overlay.New(s.MsgPopup, curr, overlay.Right, overlay.Top, 2, 2)
+		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg { return messages.CloseMsgPopup{} })
 	case messages.ContainerReadyMsg:
 		cnt, cmd := s.Containers.Update(msg)
 		s.Containers = cnt.(*containers.Containers)
@@ -137,7 +157,7 @@ func (s *Root) View() string {
 		return "\nLoading..."
 	}
 
-	if s.IsShowingError {
+	if s.IsShowingError || s.IsShowingMsg {
 		return s.Overlay.View()
 	}
 
