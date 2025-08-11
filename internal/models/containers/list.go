@@ -298,21 +298,13 @@ func (s *ContainerList) NewStats() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
 		stats, err := docker.GetContainerStats(s.GetCurrentItem().ID)
 		if err != nil {
-			return messages.ErrorMsg{
-				Title: "Error Querying Stats",
-				Locn:  "Container Page",
-				Msg:   err.Error(),
-			}
+			return utils.ReturnError("Containers Page", "Error Querying Stats", err)
 		}
 		decoder := json.NewDecoder(stats.Body)
 
 		logs, err := docker.GetContainerLogs(context.Background(), s.GetCurrentItem().ID)
 		if err != nil {
-			return messages.ErrorMsg{
-				Title: "Error Querying Logs",
-				Locn:  "Container Page",
-				Msg:   err.Error(),
-			}
+			return utils.ReturnError("Containers Page", "Error Querying Logs", err)
 		}
 
 		return messages.NewContainerDetails{

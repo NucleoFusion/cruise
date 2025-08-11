@@ -63,6 +63,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			curr = s.Home
 		case enums.Containers:
 			curr = s.Containers
+		case enums.Images:
+			curr = s.Images
 		}
 
 		s.Overlay = overlay.New(s.ErrorPopup, curr, overlay.Right, overlay.Top, 2, 2)
@@ -80,6 +82,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			curr = s.Home
 		case enums.Containers:
 			curr = s.Containers
+		case enums.Images:
+			curr = s.Images
 		}
 
 		s.Overlay = overlay.New(s.MsgPopup, curr, overlay.Right, overlay.Top, 2, 2)

@@ -1,6 +1,7 @@
 package images
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
+	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -82,15 +84,10 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Remove):
 			err := docker.RemoveImage(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Msg:   err.Error(),
-						Locn:  "Images Page",
-						Title: "Error Removing Image",
-					}
-				}
+				return s, utils.ReturnError("Images Page", "Error Removing Image", err)
 			}
-			return s, nil
+			return s, utils.ReturnMsg("Images Page", "Removing Image",
+				fmt.Sprintf("Successfully Removed Image w/ ID %s", s.List.GetCurrentItem().ID))
 		case key.Matches(msg, s.Keymap.Pull):
 			curr := s.List.GetCurrentItem()
 			img := curr.ID // Accurately get the image name
@@ -102,15 +99,10 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			err := docker.PullImage(img)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Msg:   err.Error(),
-						Locn:  "Images Page",
-						Title: "Error Pulling Image",
-					}
-				}
+				return s, utils.ReturnError("Images Page", "Error Pulling Image", err)
 			}
-			return s, nil
+			return s, utils.ReturnMsg("Images Page", "Pulling Image",
+				fmt.Sprintf("Successfully Pulled Image w/ ID %s", s.List.GetCurrentItem().ID))
 		case key.Matches(msg, s.Keymap.Push):
 			curr := s.List.GetCurrentItem()
 			img := curr.ID // Accurately get the image name
@@ -122,27 +114,16 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			err := docker.PushImage(img)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Msg:   err.Error(),
-						Locn:  "Images Page",
-						Title: "Error Pushing Image",
-					}
-				}
+				return s, utils.ReturnError("Images Page", "Error Pushing Image", err)
 			}
-			return s, nil
+			return s, utils.ReturnMsg("Images Page", "Pushing Image",
+				fmt.Sprintf("Successfully Pushed Image w/ ID %s", s.List.GetCurrentItem().ID))
 		case key.Matches(msg, s.Keymap.Prune):
 			err := docker.PruneImages()
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Msg:   err.Error(),
-						Locn:  "Images Page",
-						Title: "Error Pruning Images",
-					}
-				}
+				return s, utils.ReturnError("Images Page", "Error Pruning Image", err)
 			}
-			return s, nil
+			return s, utils.ReturnMsg("Images Page", "Pruning Image", "Successfully Pruned Images")
 		case key.Matches(msg, s.Keymap.Layers):
 			curr := s.List.GetCurrentItem()
 			img := curr.ID // Accurately get the image name
@@ -154,13 +135,7 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			text, err := docker.ImageHistory(img)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Msg:   err.Error(),
-						Locn:  "Images Page",
-						Title: "Error Querying Image Layers",
-					}
-				}
+				return s, utils.ReturnError("Images Page", "Error Querying Image Layers", err)
 			}
 
 			s.Vp.SetContent(text)
@@ -197,11 +172,7 @@ func (s *Images) Refresh() tea.Cmd {
 	return tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
 		items, err := docker.GetImages()
 		if err != nil {
-			return messages.ErrorMsg{
-				Locn:  "Images Page",
-				Msg:   err.Error(),
-				Title: "Error Querying Images",
-			}
+			return utils.ReturnError("Images Page", "Error Querying Images", err)
 		}
 		return messages.ImagesReadyMsg{Items: items}
 	})

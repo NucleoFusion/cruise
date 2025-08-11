@@ -10,6 +10,7 @@ import (
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
+	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -62,92 +63,62 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Start):
 			err := docker.StartContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Title: "Error Starting Container",
-						Msg:   err.Error(),
-						Locn:  "Containers Page",
-					}
-				}
+				return s, utils.ReturnError("Containers Page", "Error Starting Contianer", err)
 			}
-			return s, nil
+			return s, utils.ReturnMsg("Container Page", "Started Container",
+				fmt.Sprintf("Successfully Started Container w/ ID %s", s.List.GetCurrentItem().ID))
+
 		case key.Matches(msg, s.Keymap.Pause):
 			err := docker.PauseContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Title: "Error Pausing Container",
-						Msg:   err.Error(),
-						Locn:  "Containers Page",
-					}
-				}
+				return s, utils.ReturnError("Containers Page", "Error Pausing Contianer", err)
 			}
-			return s, nil
+			return s, utils.ReturnMsg("Container Page", "Pausing Container",
+				fmt.Sprintf("Successfully Pausing Container w/ ID %s", s.List.GetCurrentItem().ID))
+
 		case key.Matches(msg, s.Keymap.Unpause):
 			err := docker.UnpauseContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Title: "Error Unpausing Container",
-						Msg:   err.Error(),
-						Locn:  "Containers Page",
-					}
-				}
+				return s, utils.ReturnError("Containers Page", "Error Unpausing Contianer", err)
 			}
-			return s, nil
+			return s, utils.ReturnMsg("Container Page", "Unpausing Container",
+				fmt.Sprintf("Successfully Unpausing Container w/ ID %s", s.List.GetCurrentItem().ID))
+
 		case key.Matches(msg, s.Keymap.Remove):
 			err := docker.RemoveContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Title: "Error Removing Container",
-						Msg:   err.Error(),
-						Locn:  "Containers Page",
-					}
-				}
+				return s, utils.ReturnError("Containers Page", "Error Removing Contianer", err)
 			}
-			return s, nil
+			return s, utils.ReturnMsg("Container Page", "Removing Container",
+				fmt.Sprintf("Successfully Removing Container w/ ID %s", s.List.GetCurrentItem().ID))
+
 		case key.Matches(msg, s.Keymap.Restart):
 			err := docker.RestartContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Title: "Error Restarting Container",
-						Msg:   err.Error(),
-						Locn:  "Containers Page",
-					}
-				}
+				return s, utils.ReturnError("Containers Page", "Error Restarting Contianer", err)
 			}
-			return s, nil
+			return s, utils.ReturnMsg("Container Page", "Restarting Container",
+				fmt.Sprintf("Successfully Restarting Container w/ ID %s", s.List.GetCurrentItem().ID))
+
 		case key.Matches(msg, s.Keymap.Stop):
 			err := docker.StopContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Title: "Error Stopping Container",
-						Msg:   err.Error(),
-						Locn:  "Containers Page",
-					}
-				}
+				return s, utils.ReturnError("Containers Page", "Error Stopping Contianer", err)
 			}
-			return s, nil
+
+			return s, utils.ReturnMsg("Container Page", "Stopping Container",
+				fmt.Sprintf("Successfully Stopped Container w/ ID %s", s.List.GetCurrentItem().ID))
+
 		case key.Matches(msg, s.Keymap.Exec):
-			cmd := exec.Command("ghostty", "-e", fmt.Sprintf("docker exec -it %s %s", s.List.GetCurrentItem().ID, "sh"))
+			cmd := exec.Command("ghostty", "-e", fmt.Sprintf("docker exec -it %s %s", s.List.GetCurrentItem().ID, "sh")) // TODO: Terminal customization
 			cmd.Stdin = nil
 			cmd.Stdout = nil
 			cmd.Stderr = nil
 
 			err := cmd.Start()
 			if err != nil {
-				return s, func() tea.Msg {
-					return messages.ErrorMsg{
-						Title: "Error Execing into Container",
-						Msg:   err.Error(),
-						Locn:  "Containers Page",
-					}
-				}
+				return s, utils.ReturnError("Containers Page", "Error Execing into Container", err)
 			}
-
 			return s, nil
 		}
 	}

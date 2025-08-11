@@ -5,8 +5,30 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NucleoFusion/cruise/internal/messages"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/docker/docker/api/types/container"
 )
+
+func ReturnError(loc, title string, err error) tea.Cmd {
+	return func() tea.Msg {
+		return messages.ErrorMsg{
+			Locn:  loc,
+			Title: title,
+			Msg:   err.Error(),
+		}
+	}
+}
+
+func ReturnMsg(loc, title, msg string) tea.Cmd {
+	return func() tea.Msg {
+		return messages.MsgPopup{
+			Locn:  loc,
+			Title: title,
+			Msg:   msg,
+		}
+	}
+}
 
 func ShortID(id string) string {
 	if len(id) > 12 {

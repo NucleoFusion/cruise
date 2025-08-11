@@ -8,6 +8,7 @@ import (
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
+	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -53,11 +54,7 @@ func (s *ImageList) Init() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
 		images, err := docker.GetImages()
 		if err != nil {
-			return messages.ErrorMsg{
-				Locn:  "Images Page",
-				Msg:   err.Error(),
-				Title: "Error Querying Images",
-			}
+			return utils.ReturnError("Images Page", "Error Querying Images", err)
 		}
 		return messages.ImagesReadyMsg{Items: images}
 	})
@@ -71,11 +68,7 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
 			images, err := docker.GetImages()
 			if err != nil {
-				return messages.ErrorMsg{
-					Locn:  "Images Page",
-					Msg:   err.Error(),
-					Title: "Error Querying Images",
-				}
+				return utils.ReturnError("Images Page", "Error Querying Images", err)
 			}
 			return messages.ImagesReadyMsg{Items: images}
 		})
