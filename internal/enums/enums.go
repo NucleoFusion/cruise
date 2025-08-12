@@ -6,6 +6,7 @@ const (
 	Home PageType = iota
 	Containers
 	Images
+	Vulnerability
 )
 
 type ErrorType int

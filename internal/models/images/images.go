@@ -17,12 +17,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// Prune, Image Layers, CRUD images
-// TODO: Search Repo's for image
-// TODO: w/ Registry push/pull/build
-// TODO: Vulnerability Scanning
-// TODO: Rename Tags
-
 type Images struct {
 	Width     int
 	Height    int

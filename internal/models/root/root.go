@@ -11,26 +11,30 @@ import (
 	"github.com/NucleoFusion/cruise/internal/models/home"
 	"github.com/NucleoFusion/cruise/internal/models/images"
 	msgpopup "github.com/NucleoFusion/cruise/internal/models/msg"
+	"github.com/NucleoFusion/cruise/internal/models/vulnerability"
 	tea "github.com/charmbracelet/bubbletea"
 	overlay "github.com/rmhubbert/bubbletea-overlay"
 )
 
 type Root struct {
-	Width          int
-	Height         int
-	CurrentPage    enums.PageType
+	Width       int
+	Height      int
+	CurrentPage enums.PageType
+	PageItems   map[string]enums.PageType
+	// Showing Variables
 	IsLoading      bool
-	PageItems      map[string]enums.PageType
 	IsChangingPage bool
 	IsShowingError bool
 	IsShowingMsg   bool
-	Home           *home.Home
-	Containers     *containers.Containers
-	Images         *images.Images
-	ErrorPopup     *errorpopup.ErrorPopup
-	MsgPopup       *msgpopup.MsgPopup
-	PageFzf        fzf.FuzzyFinder
-	Overlay        *overlay.Model
+	// Pages / Models
+	Home          *home.Home
+	Containers    *containers.Containers
+	Images        *images.Images
+	Vulnerability *vulnerability.Vulnerability
+	ErrorPopup    *errorpopup.ErrorPopup
+	MsgPopup      *msgpopup.MsgPopup
+	PageFzf       fzf.FuzzyFinder
+	Overlay       *overlay.Model
 }
 
 func NewRoot() *Root {
@@ -39,9 +43,10 @@ func NewRoot() *Root {
 		IsLoading:      true,
 		IsShowingError: false,
 		PageItems: map[string]enums.PageType{
-			"Home":       enums.Home,
-			"Containers": enums.Containers,
-			"Images":     enums.Images,
+			"Home":          enums.Home,
+			"Containers":    enums.Containers,
+			"Images":        enums.Images,
+			"Vulnerability": enums.Vulnerability,
 		},
 	}
 }
@@ -65,6 +70,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			curr = s.Containers
 		case enums.Images:
 			curr = s.Images
+		case enums.Vulnerability:
+			curr = s.Vulnerability
 		}
 
 		s.Overlay = overlay.New(s.ErrorPopup, curr, overlay.Right, overlay.Top, 2, 2)
@@ -83,6 +90,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case enums.Containers:
 			curr = s.Containers
 		case enums.Images:
+			curr = s.Images
+		case enums.Vulnerability:
 			curr = s.Images
 		}
 
@@ -107,6 +116,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmd = s.Containers.Init()
 		case enums.Images:
 			cmd = s.Images.Init()
+		case enums.Vulnerability:
+			cmd = s.Images.Init()
 		}
 		return s, cmd
 	case tea.KeyMsg:
@@ -121,10 +132,11 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s.Width = msg.Width
 		s.Height = msg.Height
 
-		s.PageFzf = fzf.NewFzf([]string{"Home", "Containers", "Images"}, msg.Width, msg.Height)
+		s.PageFzf = fzf.NewFzf([]string{"Home", "Containers", "Images", "Vulnerability"}, msg.Width, msg.Height)
 		s.Home = home.NewHome(msg.Width, msg.Height)
 		s.Containers = containers.NewContainers(msg.Width, msg.Height)
 		s.Images = images.NewImages(msg.Width, msg.Height)
+		s.Vulnerability = vulnerability.NewVulnerability(msg.Width, msg.Height)
 
 		cmd := tea.Batch(s.Home.Init(), s.Containers.Init(), s.Images.Init())
 
@@ -151,6 +163,10 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		img, cmd := s.Images.Update(msg)
 		s.Images = img.(*images.Images)
 		return s, cmd
+	case enums.Vulnerability:
+		img, cmd := s.Vulnerability.Update(msg)
+		s.Vulnerability = img.(*vulnerability.Vulnerability)
+		return s, cmd
 	}
 
 	return s, nil
@@ -176,6 +192,8 @@ func (s *Root) View() string {
 		return s.Containers.View()
 	case enums.Images:
 		return s.Images.View()
+	case enums.Vulnerability:
+		return s.Vulnerability.View()
 	}
 
 	return "Cruise - A TUI Docker Client"
