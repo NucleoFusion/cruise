@@ -5,6 +5,10 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+func ErrorStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Background(colors.Load().Red).Foreground(colors.Load().Base)
+}
+
 func PageStyle() lipgloss.Style {
 	return lipgloss.NewStyle().Background(colors.Load().Base).Foreground(colors.Load().Text).
 		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender)

@@ -12,6 +12,13 @@ const (
 type ErrorType int
 
 const (
-	Fatal = iota
+	Fatal ErrorType = iota
 	Warning
+)
+
+type Severity int
+
+const (
+	High Severity = iota
+	Medium
 )

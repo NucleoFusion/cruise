@@ -117,7 +117,7 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case enums.Images:
 			cmd = s.Images.Init()
 		case enums.Vulnerability:
-			cmd = s.Images.Init()
+			cmd = s.Vulnerability.Init()
 		}
 		return s, cmd
 	case tea.KeyMsg:

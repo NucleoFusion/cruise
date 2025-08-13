@@ -37,6 +37,10 @@ type (
 
 	CloseMsgPopup struct{}
 
+	ScannerListMsg struct {
+		Found []bool
+	}
+
 	NewContainerDetails struct {
 		Stats   container.StatsResponseReader
 		Decoder *json.Decoder
