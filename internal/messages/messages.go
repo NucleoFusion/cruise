@@ -37,6 +37,15 @@ type (
 
 	CloseMsgPopup struct{}
 
+	StartScanMsg struct {
+		Img string
+	}
+
+	ScanResponse struct {
+		Arr []any
+		Err error
+	}
+
 	ScannerListMsg struct {
 		Found []bool
 	}

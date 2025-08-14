@@ -131,3 +131,11 @@ func WrapAndLimit(s string, maxLen, maxLines int) string {
 
 	return strings.Join(lines, "\n")
 }
+
+func ToAnySlice[T any](in []T) []any {
+	out := make([]any, len(in))
+	for i := range in {
+		out[i] = in[i]
+	}
+	return out
+}

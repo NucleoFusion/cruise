@@ -20,5 +20,9 @@ func SubpageStyle() lipgloss.Style {
 }
 
 func TitleStyle() lipgloss.Style {
-	return lipgloss.NewStyle().Foreground(colors.Load().Sapphire)
+	return lipgloss.NewStyle().Background(colors.Load().Surface0).Foreground(colors.Load().Sapphire).Padding(0, 1)
+}
+
+func SelectedStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Background(colors.Load().Lavender).Foreground(colors.Load().Base)
 }

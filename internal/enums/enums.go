@@ -19,6 +19,9 @@ const (
 type Severity int
 
 const (
-	High Severity = iota
+	Critical Severity = iota
+	High
 	Medium
+	Low
+	Unknown
 )
