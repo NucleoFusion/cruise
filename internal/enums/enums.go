@@ -7,7 +7,7 @@ const (
 	Containers
 	Images
 	Vulnerability
-	Monitoring
+	Logs
 )
 
 type ErrorType int
