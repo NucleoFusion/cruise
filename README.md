@@ -86,14 +86,32 @@
 
 ---
 
-## 🗺️ Roadmap
+## V1 Roadmap
 
-- [ ] MVP: Container and Image management
-- [ ] Docker Compose project control
-- [ ] Volume/network tooling
-- [ ] Compose editor with Git
-- [ ] Full metrics/logs dashboard
-- [ ] Registry integration & vulnerability scan
+### Containers 
+- [X] Port mapping visualization
+- [ ] Remove Container Dropdown, instead make a VP, that displays all details for that container. (Graphs)
+
+### Vulnerability 
+- [X] Vulnerability scanning (Trivy/Grype)
+- [X] Individual 
+- [X] Toggle b/w trivy and grype
+- [ ] Export (When config done, define a export folder) 
+
+### Volumes & Networks
+- [ ] Volume management with usage stats & backup/restore & prune
+- [ ] Network topology visualization
+
+### Monitoring & Logs
+- [ ] Centralized log aggregation with search
+- [ ] Alert configuration (notifications)
+- [ ] logs export (When config done)
+
+## Misc
+- [ ] Config File
+- [ ] Docs
+- [ ] UI Polish (use lipgloss where possible)
+- [ ] Mouse Support
 
 ---
 
