@@ -21,6 +21,11 @@ func TickDashboard() tea.Cmd {
 }
 
 type (
+	PortMapMsg struct {
+		Arr []string
+		Err error
+	}
+
 	ErrorMsg struct {
 		Title string
 		Msg   string

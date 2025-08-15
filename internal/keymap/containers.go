@@ -14,6 +14,7 @@ type ContainersMap struct {
 	Remove  key.Binding
 	Pause   key.Binding
 	Unpause key.Binding
+	PortMap key.Binding
 }
 
 func NewContainersMap() ContainersMap {
@@ -45,6 +46,10 @@ func NewContainersMap() ContainersMap {
 		Exec: key.NewBinding(
 			key.WithKeys("e"),
 			key.WithHelp("e", "exec -it"),
+		),
+		PortMap: key.NewBinding(
+			key.WithKeys("m"),
+			key.WithHelp("m", "port map"),
 		),
 	}
 }

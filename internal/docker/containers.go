@@ -20,6 +20,29 @@ type Details struct {
 	EventStream chan *events.Message
 }
 
+func GetPorts() ([]string, error) {
+	conts, err := GetContainers()
+	if err != nil {
+		return nil, err
+	}
+
+	arr := make([]string, 0)
+	for _, cnt := range conts {
+		inp, err := cli.ContainerInspect(context.Background(), cnt.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		for port, bindings := range inp.NetworkSettings.Ports {
+			for _, b := range bindings {
+				arr = append(arr, fmt.Sprintf("%s --> %s:%s | %s", port, b.HostIP, b.HostPort, cnt.Names[0]))
+			}
+		}
+	}
+
+	return arr, nil
+}
+
 func GetNumContainers() int {
 	containers, err := cli.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {

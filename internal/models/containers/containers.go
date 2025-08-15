@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NucleoFusion/cruise/internal/colors"
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
@@ -13,20 +14,27 @@ import (
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 type Containers struct {
-	Width     int
-	Height    int
-	List      *ContainerList
-	Keymap    keymap.ContainersMap
-	Help      help.Model
-	IsLoading bool
+	Width       int
+	Height      int
+	List        *ContainerList
+	Vp          viewport.Model
+	Keymap      keymap.ContainersMap
+	Help        help.Model
+	IsLoading   bool
+	ShowPortmap bool
 }
 
 func NewContainers(w int, h int) *Containers {
+	vp := viewport.New(w/3, h/2)
+	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).
+		Padding(1).Foreground(colors.Load().Text)
+
 	return &Containers{
 		Width:     w,
 		Height:    h,
@@ -34,6 +42,7 @@ func NewContainers(w int, h int) *Containers {
 		List:      NewContainerList(w-4, h-7-strings.Count(styles.ContainersText, "\n")),
 		Keymap:    keymap.NewContainersMap(),
 		Help:      help.New(),
+		Vp:        vp,
 	}
 }
 
@@ -53,10 +62,29 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
+	case messages.PortMapMsg:
+		if msg.Err != nil {
+			return s, utils.ReturnError("Containers Page", "Error Getting Ports", msg.Err)
+		}
+
+		s.Vp.SetContent(strings.Join(msg.Arr, "\n"))
+		if len(msg.Arr) == 0 {
+			s.Vp.SetContent("No Port Mappings found")
+		}
+
+		return s, nil
 	case tea.KeyMsg:
 		if s.List.Ti.Focused() {
 			var cmd tea.Cmd
 			s.List, cmd = s.List.Update(msg)
+			return s, cmd
+		} else if s.ShowPortmap {
+			if msg.String() == "esc" {
+				s.ShowPortmap = false
+				return s, nil
+			}
+			var cmd tea.Cmd
+			s.Vp, cmd = s.Vp.Update(msg)
 			return s, cmd
 		}
 		switch {
@@ -120,6 +148,13 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return s, utils.ReturnError("Containers Page", "Error Execing into Container", err)
 			}
 			return s, nil
+		case key.Matches(msg, s.Keymap.PortMap):
+			s.ShowPortmap = true
+			s.Vp.SetContent("Loading...")
+			return s, tea.Tick(0, func(_ time.Time) tea.Msg {
+				arr, err := docker.GetPorts()
+				return messages.PortMapMsg{Arr: arr, Err: err}
+			})
 		}
 	}
 
@@ -129,6 +164,9 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *Containers) View() string {
+	if s.ShowPortmap {
+		return lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, s.Vp.View())
+	}
 	return lipgloss.JoinVertical(lipgloss.Center,
 		styles.TextStyle().Render(styles.ContainersText), s.GetListText(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
 }
