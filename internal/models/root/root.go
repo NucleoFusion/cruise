@@ -47,6 +47,7 @@ func NewRoot() *Root {
 			"Containers":    enums.Containers,
 			"Images":        enums.Images,
 			"Vulnerability": enums.Vulnerability,
+			"Logs":          enums.Logs,
 		},
 	}
 }
