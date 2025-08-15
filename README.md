@@ -22,26 +22,27 @@
 ## ✨ Features
 
 ## Dashboard
-- [ ] Display system-wide resource usage (CPU, memory, disk)
-- [ ] Show quick stats (total containers, images, volumes, networks)
-- [ ] Track recent Docker activity
-- [ ] Display Docker daemon status
+- [X] Display system-wide resource usage (CPU, memory, disk)
+- [X] Show quick stats (total containers, images, volumes, networks)
+- [X] Track recent Docker activity
+- [X] Display Docker daemon status
 
 ## Containers
-- [ ] Search and filter containers
-- [ ] Real-time monitoring (CPU%, memory, network IO)
-- [ ] Start/stop/restart/remove/pause containers
-- [ ] Exec into containers (`docker exec -it`)
-- [ ] Stream logs with search and filter
-- [ ] Visualize port mappings
-- [ ] Group containers by Compose project
+- [X] Search and filter containers
+- [X] Real-time monitoring (CPU%, memory, network IO)
+- [X] Start/stop/restart/remove/pause containers
+- [X] Exec into containers (`docker exec -it`)
+- [X] Stream logs with search and filter
+- [X] Visualize port mappings
+- [ ] Container Details popup (realtime)
+- ~[ ] Group containers by Compose project~
 
 ## Images
-- [ ] Pull/push/build/remove images
-- [ ] Image repository browser
-- [ ] Vulnerability scanning (Trivy/Grype)
-- [ ] Tag management and cleanup
-- [ ] Size analysis and optimization
+- [X] Pull/push/build/remove images
+- ~[ ] Image repository browser~
+- [X] Vulnerability scanning (Trivy/Grype)
+- [X] Tag management and cleanup
+- [X] Size analysis and optimization
 
 ## Docker Compose
 
