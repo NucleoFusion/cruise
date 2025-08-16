@@ -104,7 +104,7 @@ func (s *Monitoring) FormattedView() string {
 	text := ""
 	events := s.Events
 	for _, msg := range events {
-		text += docker.FormatDockerEvent(*msg) + "\n"
+		text += docker.FormatDockerEventVerbose(*msg) + "\n"
 	}
 
 	return text

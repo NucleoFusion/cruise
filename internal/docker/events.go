@@ -3,8 +3,10 @@ package docker
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 )
@@ -45,8 +47,45 @@ func FormatDockerEvent(msg events.Message) string {
 		}
 	}
 	if len(attrs) > 0 {
-		attrs = attrs[:len(attrs)-1] // trim trailing space
+		attrs = attrs[:len(attrs)-1] // trim
 	}
 
 	return fmt.Sprintf("[%s] %s %s %s", eventTime, msg.Type, msg.Action, attrs)
+}
+
+func FormatDockerEventVerbose(msg events.Message) string {
+	eventTime := time.Unix(msg.Time, 0).Format("15:04:05")
+
+	// useful attr
+	var keys []string
+	switch msg.Type {
+	case "container":
+		keys = []string{"name", "image", "exitCode", "signal"}
+	case "image":
+		keys = []string{"name", "tag"}
+	case "network":
+		keys = []string{"name", "type"}
+	case "volume":
+		keys = []string{"name", "driver"}
+	case "plugin":
+		keys = []string{"name", "type"}
+	default:
+		keys = []string{} // fallback
+	}
+
+	var extras []string
+	for _, k := range keys {
+		if v, ok := msg.Actor.Attributes[k]; ok && v != "" {
+			extras = append(extras, fmt.Sprintf("%s=%s", k, v))
+		}
+	}
+
+	return fmt.Sprintf(
+		"[%s] %-20s %-10s %-10s %s",
+		eventTime,
+		utils.Shorten(msg.Actor.ID, 20),
+		msg.Action,
+		msg.Type,
+		strings.Join(extras, ", "),
+	)
 }
