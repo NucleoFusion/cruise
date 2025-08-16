@@ -1,20 +1,35 @@
-package home
+package monitoring
 
 import (
+	"context"
+	"strings"
 	"time"
 
+	"github.com/NucleoFusion/cruise/internal/colors"
 	"github.com/NucleoFusion/cruise/internal/docker"
+	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/docker/docker/api/types/events"
 )
 
-type Logs struct {
+type LogStreamer struct {
+	ctx    context.Context
+	cancel context.CancelFunc
+	lines  chan string
+}
+
+type Monitoring struct {
 	Width     int
 	Height    int
+	Vp        viewport.Model
+	Help      help.Model
 	Events    []*events.Message
 	EventChan <-chan *events.Message
 	ErrChan   <-chan error
@@ -22,53 +37,62 @@ type Logs struct {
 	Length    int
 }
 
-func NewLogs(w int, h int) *Logs {
+func NewMonitoring(w int, h int) *Monitoring {
+	vp := viewport.New(w, h-3-strings.Count(styles.MonitoringText, "\n"))
+	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).
+		Padding(1).Foreground(colors.Load().Text)
+
 	eventChan, errChan := docker.RecentEventStream(h/3 - 6)
-	return &Logs{
+
+	return &Monitoring{
 		Width:     w,
 		Height:    h,
-		IsLoading: true,
-		Length:    h/3 - 6,
+		Help:      help.New(),
+		Vp:        vp,
+		Length:    h - 5 - strings.Count(styles.MonitoringText, "\n"),
 		EventChan: eventChan,
 		ErrChan:   errChan,
 	}
 }
 
-func (s *Logs) Init() tea.Cmd {
+func (s *Monitoring) Init() tea.Cmd {
 	return tea.Batch(s.Sub())
 }
 
-func (s *Logs) Sub() tea.Cmd {
+func (s *Monitoring) Sub() tea.Cmd {
 	return tea.Every(2*time.Second, func(_ time.Time) tea.Msg {
 		return s.PollEvents()()
 	})
 }
 
-func (s *Logs) Update(msg tea.Msg) (*Logs, tea.Cmd) {
+func (s *Monitoring) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.NewEvents:
 		s.Events = append(s.Events, msg.Events...)
 
-		if len(s.Events) > s.Length {
-			s.Events = s.Events[len(s.Events)-s.Length:]
-		}
 		if s.IsLoading {
 			s.IsLoading = false
 		}
+
+		s.Vp.SetYOffset(len(s.Events))
 
 		return s, s.Sub()
 	}
 	return s, nil
 }
 
-func (s Logs) View() string {
-	return styles.SubpageStyle().PaddingTop(1).PaddingLeft(4).Render(lipgloss.JoinVertical(lipgloss.Center,
-		styles.TitleStyle().Render("Event Logs"),
-		lipgloss.Place(s.Width*2/3-4, s.Height/3-4,
-			lipgloss.Left, lipgloss.Bottom, s.FormattedView())))
+func (s *Monitoring) View() string {
+	if s.IsLoading {
+		s.Vp.SetContent("Loading...")
+	} else {
+		s.Vp.SetContent(s.FormattedView())
+	}
+
+	return lipgloss.JoinVertical(lipgloss.Center,
+		styles.TextStyle().Render(styles.MonitoringText), s.Vp.View(), s.Help.View(keymap.NewDynamic([]key.Binding{})))
 }
 
-func (s *Logs) FormattedView() string {
+func (s *Monitoring) FormattedView() string {
 	if s.IsLoading {
 		return "Loading Logs....\n"
 	}
@@ -86,13 +110,13 @@ func (s *Logs) FormattedView() string {
 	return text
 }
 
-func (s *Logs) PollEvents() tea.Cmd {
+func (s *Monitoring) PollEvents() tea.Cmd {
 	return func() tea.Msg {
 		evs := make([]*events.Message, 0, s.Length)
 
 		select {
 		case err := <-s.ErrChan:
-			return utils.ReturnError("Home Page", "Error in Logs", err)
+			return utils.ReturnError("Monitoring Page", "Error Querying Events", err)
 		default:
 			for i := 0; i < s.Length; i++ {
 				select {
