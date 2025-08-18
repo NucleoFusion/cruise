@@ -8,6 +8,7 @@ const (
 	Images
 	Vulnerability
 	Monitoring
+	Networks
 )
 
 type ErrorType int

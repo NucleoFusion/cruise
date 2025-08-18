@@ -45,6 +45,14 @@ var MonitoringText = `
                                                      /____/
 `
 
+var NetworksText = `
+    _   __       __                          __        
+   / | / /___   / /_ _      __ ____   _____ / /__ _____
+  /  |/ // _ \ / __/| | /| / // __ \ / ___// //_// ___/
+ / /|  //  __// /_  | |/ |/ // /_/ // /   / ,<  (__  ) 
+/_/ |_/ \___/ \__/  |__/|__/ \____//_/   /_/|_|/____/  
+`
+
 func TextStyle() lipgloss.Style {
 	return lipgloss.NewStyle().Foreground(colors.Load().Text)
 }

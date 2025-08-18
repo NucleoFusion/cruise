@@ -12,6 +12,7 @@ import (
 	"github.com/NucleoFusion/cruise/internal/models/images"
 	"github.com/NucleoFusion/cruise/internal/models/monitoring"
 	msgpopup "github.com/NucleoFusion/cruise/internal/models/msg"
+	"github.com/NucleoFusion/cruise/internal/models/networks"
 	"github.com/NucleoFusion/cruise/internal/models/vulnerability"
 	tea "github.com/charmbracelet/bubbletea"
 	overlay "github.com/rmhubbert/bubbletea-overlay"
@@ -33,6 +34,7 @@ type Root struct {
 	Images        *images.Images
 	Vulnerability *vulnerability.Vulnerability
 	Monitoring    *monitoring.Monitoring
+	Networks      *networks.Networks
 	ErrorPopup    *errorpopup.ErrorPopup
 	MsgPopup      *msgpopup.MsgPopup
 	PageFzf       fzf.FuzzyFinder
@@ -50,6 +52,7 @@ func NewRoot() *Root {
 			"Images":        enums.Images,
 			"Vulnerability": enums.Vulnerability,
 			"Monitoring":    enums.Monitoring,
+			"Networks":      enums.Networks,
 		},
 	}
 }
@@ -77,6 +80,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			curr = s.Vulnerability
 		case enums.Monitoring:
 			curr = s.Monitoring
+		case enums.Networks:
+			curr = s.Networks
 		}
 
 		s.Overlay = overlay.New(s.ErrorPopup, curr, overlay.Right, overlay.Top, 2, 2)
@@ -100,6 +105,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			curr = s.Vulnerability
 		case enums.Monitoring:
 			curr = s.Monitoring
+		case enums.Networks:
+			curr = s.Networks
 		}
 
 		s.Overlay = overlay.New(s.MsgPopup, curr, overlay.Right, overlay.Top, 2, 2)
@@ -127,6 +134,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmd = s.Vulnerability.Init()
 		case enums.Monitoring:
 			cmd = s.Monitoring.Init()
+		case enums.Networks:
+			cmd = s.Networks.Init()
 		}
 		return s, cmd
 	case tea.KeyMsg:
@@ -141,14 +150,15 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s.Width = msg.Width
 		s.Height = msg.Height
 
-		s.PageFzf = fzf.NewFzf([]string{"Home", "Containers", "Images", "Vulnerability", "Monitoring"}, msg.Width, msg.Height)
+		s.PageFzf = fzf.NewFzf([]string{"Home", "Containers", "Images", "Vulnerability", "Monitoring", "Networks"}, msg.Width, msg.Height)
 		s.Home = home.NewHome(msg.Width, msg.Height)
 		s.Containers = containers.NewContainers(msg.Width, msg.Height)
 		s.Images = images.NewImages(msg.Width, msg.Height)
 		s.Vulnerability = vulnerability.NewVulnerability(msg.Width, msg.Height)
 		s.Monitoring = monitoring.NewMonitoring(msg.Width, msg.Height)
+		s.Networks = networks.NewNetworks(msg.Width, msg.Height)
 
-		cmd := tea.Batch(s.Home.Init(), s.Containers.Init(), s.Images.Init(), s.Monitoring.Init())
+		cmd := tea.Batch(s.Home.Init(), s.Containers.Init(), s.Images.Init(), s.Monitoring.Init(), s.Networks.Init())
 
 		s.IsLoading = false
 		return s, cmd
@@ -181,6 +191,10 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		img, cmd := s.Monitoring.Update(msg)
 		s.Monitoring = img.(*monitoring.Monitoring)
 		return s, cmd
+	case enums.Networks:
+		img, cmd := s.Networks.Update(msg)
+		s.Networks = img.(*networks.Networks)
+		return s, cmd
 	}
 
 	return s, nil
@@ -210,6 +224,8 @@ func (s *Root) View() string {
 		return s.Vulnerability.View()
 	case enums.Monitoring:
 		return s.Monitoring.View()
+	case enums.Networks:
+		return s.Networks.View()
 	}
 
 	return "Cruise - A TUI Docker Client"

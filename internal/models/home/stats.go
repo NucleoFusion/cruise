@@ -38,7 +38,7 @@ func (s QuickStats) GetFormattedView() string {
 	vols := docker.GetNumVolumes()
 	cntnr := docker.GetNumContainers()
 	imgs := docker.GetNumImages()
-	ntwrks := docker.GetNumNetworks()
+	ntwrks, _ := docker.GetNumNetworks()
 
 	return fmt.Sprintf(`
 Containers: %d

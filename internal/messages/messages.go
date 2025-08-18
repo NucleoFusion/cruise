@@ -10,6 +10,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/network"
 )
 
 type DashboardTick time.Time
@@ -71,6 +72,12 @@ type (
 	}
 
 	UpdateImagesMsg struct{}
+
+	NetworksReadyMsg struct {
+		Items []network.Summary
+	}
+
+	UpdateNetworksMsg struct{}
 
 	FzfSelection struct {
 		Selection string
