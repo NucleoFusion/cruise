@@ -11,29 +11,28 @@ import (
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 type Networks struct {
-	Width  int
-	Height int
-	List   *NetworkList
+	Width   int
+	Height  int
+	List    *NetworkList
+	Details *NetworkDetail
 	// Keymap    keymap.NetworksMap
-	Help      help.Model
-	IsLoading bool
+	Help       help.Model
+	IsLoading  bool
+	ShowDetail bool
 }
 
 func NewNetworks(w int, h int) *Networks {
-	vp := viewport.New(w*2/3, h/2)
-	vp.Style = styles.PageStyle().Padding(1, 2)
-
 	return &Networks{
-		Width:     w,
-		Height:    h,
-		IsLoading: true,
-		List:      NewNetworkList(w-4, h-7-strings.Count(styles.NetworksText, "\n")),
+		Width:      w,
+		Height:     h,
+		IsLoading:  true,
+		ShowDetail: false,
+		List:       NewNetworkList(w-4, h-7-strings.Count(styles.NetworksText, "\n")),
 		// Keymap:    keymap.NewNetworksMap(),
 		Help: help.New(),
 	}
@@ -61,6 +60,12 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			s.List, cmd = s.List.Update(msg)
 			return s, cmd
 		}
+		switch msg.String() {
+		case "enter":
+			s.ShowDetail = true
+			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
+			return s, nil
+		}
 	}
 
 	var cmd tea.Cmd
@@ -69,6 +74,10 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *Networks) View() string {
+	if s.ShowDetail {
+		return s.Details.View()
+	}
+
 	return lipgloss.JoinVertical(lipgloss.Center,
 		styles.TextStyle().Render(styles.NetworksText), s.GetListText(), s.Help.View(keymap.NewDynamic([]key.Binding{})))
 }
