@@ -2,6 +2,7 @@ package networks
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/styles"
@@ -15,13 +16,20 @@ type NetworkDetail struct {
 	Width   int
 	Height  int
 	Network network.Summary
+	Labels  []string
 }
 
 func NewDetail(w int, h int, ntw network.Summary) *NetworkDetail {
+	labels := make([]string, 0, len(ntw.Labels))
+	for k := range ntw.Labels {
+		labels = append(labels, k)
+	}
+
 	return &NetworkDetail{
 		Width:   w,
 		Height:  h,
 		Network: ntw,
+		Labels:  labels,
 	}
 }
 
@@ -29,12 +37,12 @@ func (s *NetworkDetail) Init() tea.Cmd {
 	return nil
 }
 
-func (s *NetworkDetail) Update() (*NetworkDetail, tea.Cmd) {
+func (s *NetworkDetail) Update(msg tea.Msg) (*NetworkDetail, tea.Cmd) {
 	return s, nil
 }
 
 func (s *NetworkDetail) View() string {
-	return lipgloss.JoinHorizontal(lipgloss.Center, lipgloss.JoinVertical(lipgloss.Center, s.getDashboardView(), s.getFlagView()),
+	return lipgloss.JoinHorizontal(lipgloss.Center, lipgloss.JoinVertical(lipgloss.Center, s.getDashboardView(), s.getLabelView()),
 		lipgloss.JoinVertical(lipgloss.Center, s.getContainerView(),
 			lipgloss.JoinHorizontal(lipgloss.Center, s.getOptionsView(), s.getIPAMView())))
 }
@@ -58,11 +66,24 @@ func (s *NetworkDetail) getDashboardView() string {
 		styles.DetailKeyStyle().Render(" Ingress: "), styles.TextStyle().Render(ingr))
 
 	return styles.PageStyle().Padding(1, 2).Render(lipgloss.JoinVertical(lipgloss.Center, styles.TitleStyle().Render("Network Details"), "\n\n",
-		lipgloss.Place(s.Width/3-6, s.Height*2/3-8, lipgloss.Left, lipgloss.Center, text)))
+		lipgloss.Place(s.Width/3-6, s.Height/2-8, lipgloss.Left, lipgloss.Center, text)))
 }
 
-func (s *NetworkDetail) getFlagView() string {
-	return styles.PageStyle().Render(lipgloss.Place(s.Width/3-2, s.Height/3-2, lipgloss.Center, lipgloss.Center, "Flags"))
+func (s *NetworkDetail) getLabelView() string {
+	text := ""
+
+	if len(s.Labels) == 0 {
+		return styles.PageStyle().Padding(1, 2).Render(lipgloss.JoinVertical(lipgloss.Center, styles.TitleStyle().Render("Labels"), "\n\n",
+			lipgloss.Place(s.Width/3-6, s.Height/2-8, lipgloss.Center, lipgloss.Center, "No Labels Found")))
+	}
+
+	for _, v := range s.Labels {
+		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(strings.TrimPrefix(v, "com.docker."), 25))),
+			styles.TextStyle().Render(utils.Shorten(s.Network.Labels[v], s.Width/3-8-len(v))))
+	}
+
+	return styles.PageStyle().Padding(1, 2).Render(lipgloss.JoinVertical(lipgloss.Center, styles.TitleStyle().Render("Labels"), "\n\n",
+		lipgloss.Place(s.Width/3-6, s.Height/2-8, lipgloss.Left, lipgloss.Center, text)))
 }
 
 func (s *NetworkDetail) getContainerView() string {

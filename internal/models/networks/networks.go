@@ -54,6 +54,9 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
+	case messages.CloseDetails:
+		s.ShowDetail = false
+		return s, nil
 	case tea.KeyMsg:
 		if s.List.Ti.Focused() {
 			var cmd tea.Cmd
@@ -65,6 +68,11 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			s.ShowDetail = true
 			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
 			return s, nil
+		case "esc":
+			if s.ShowDetail {
+				s.ShowDetail = false
+				return s, nil
+			}
 		}
 	}
 
