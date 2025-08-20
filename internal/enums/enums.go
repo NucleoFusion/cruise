@@ -9,6 +9,7 @@ const (
 	Vulnerability
 	Monitoring
 	Networks
+	Volumes
 )
 
 type ErrorType int

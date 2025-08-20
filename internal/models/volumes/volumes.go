@@ -1,0 +1,88 @@
+package volumes
+
+import (
+	"strings"
+
+	"github.com/NucleoFusion/cruise/internal/keymap"
+	"github.com/NucleoFusion/cruise/internal/messages"
+	"github.com/NucleoFusion/cruise/internal/styles"
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+)
+
+type Volumes struct {
+	Width  int
+	Height int
+	List   *VolumeList
+	// Details *NetworkDetail
+	// Keymap    keymap.VolumesMap
+	Help       help.Model
+	IsLoading  bool
+	ShowDetail bool
+}
+
+func NewVolumes(w int, h int) *Volumes {
+	return &Volumes{
+		Width:      w,
+		Height:     h,
+		IsLoading:  true,
+		ShowDetail: false,
+		List:       NewVolumeList(w-4, h-7-strings.Count(styles.VolumesText, "\n")),
+		// Keymap:    keymap.NewVolumesMap(),
+		Help: help.New(),
+	}
+}
+
+func (s *Volumes) Init() tea.Cmd {
+	return s.List.Init()
+}
+
+func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case messages.VolumesReadyMsg:
+		s.IsLoading = false
+		var cmd tea.Cmd
+		s.List, cmd = s.List.Update(msg)
+		return s, cmd
+		// case messages.UpdateVolumesMsg:
+		// 	var cmd tea.Cmd
+		// 	s.List, cmd = s.List.Update(msg)
+		// return s, cmd
+	case messages.CloseDetails:
+		s.ShowDetail = false
+		return s, nil
+	case tea.KeyMsg:
+		if s.List.Ti.Focused() {
+			var cmd tea.Cmd
+			s.List, cmd = s.List.Update(msg)
+			return s, cmd
+		}
+		switch msg.String() {
+		case "esc":
+			if s.ShowDetail {
+				s.ShowDetail = false
+				return s, nil
+			}
+		}
+	}
+
+	var cmd tea.Cmd
+	s.List, cmd = s.List.Update(msg)
+	return s, cmd
+}
+
+func (s *Volumes) View() string {
+	return lipgloss.JoinVertical(lipgloss.Center,
+		styles.TextStyle().Render(styles.VolumesText), s.GetListText(), s.Help.View(keymap.NewDynamic([]key.Binding{})))
+}
+
+func (s *Volumes) GetListText() string {
+	if s.IsLoading {
+		return lipgloss.Place(s.Width-2, s.Height-4-strings.Count(styles.VolumesText, "\n"),
+			lipgloss.Center, lipgloss.Center, styles.TextStyle().Render("Loading..."))
+	}
+
+	return lipgloss.NewStyle().Padding(1).Render(s.List.View())
+}

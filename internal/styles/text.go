@@ -53,6 +53,14 @@ var NetworksText = `
 /_/ |_/ \___/ \__/  |__/|__/ \____//_/   /_/|_|/____/  
 `
 
+var VolumesText = `
+ _    __        __                             
+| |  / /____   / /__  __ ____ ___   ___   _____
+| | / // __ \ / // / / // __ '__ \ / _ \ / ___/
+| |/ // /_/ // // /_/ // / / / / //  __/(__  ) 
+|___/ \____//_/ \__,_//_/ /_/ /_/ \___//____/  
+`
+
 func TextStyle() lipgloss.Style {
 	return lipgloss.NewStyle().Foreground(colors.Load().Text)
 }

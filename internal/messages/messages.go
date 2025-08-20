@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/volume"
 )
 
 type DashboardTick time.Time
@@ -77,6 +78,10 @@ type (
 
 	NetworksReadyMsg struct {
 		Items []network.Summary
+	}
+
+	VolumesReadyMsg struct {
+		Items []*volume.Volume
 	}
 
 	UpdateNetworksMsg struct{}
