@@ -1,11 +1,15 @@
 package volumes
 
 import (
+	"fmt"
 	"strings"
+	"time"
 
+	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
+	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -13,10 +17,10 @@ import (
 )
 
 type Volumes struct {
-	Width  int
-	Height int
-	List   *VolumeList
-	// Details *NetworkDetail
+	Width   int
+	Height  int
+	List    *VolumeList
+	Details *VolumeDetail
 	// Keymap    keymap.VolumesMap
 	Help       help.Model
 	IsLoading  bool
@@ -60,11 +64,29 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return s, cmd
 		}
 		switch msg.String() {
+		case "r":
+			err := docker.RemoveVolumes(s.List.GetCurrentItem().Name)
+			if err != nil {
+				return s, utils.ReturnError("Volumes Page", "Error Removing Volume", err)
+			}
+			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Volumes Page", "Removed Volume",
+				fmt.Sprintf("Successfully Removed Volume %s", s.List.GetCurrentItem().Name)))
+		case "p":
+			err := docker.PruneVolumes()
+			if err != nil {
+				return s, utils.ReturnError("Volumes Page", "Error Pruning Volumes", err)
+			}
+			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Volumes Page", "Pruned Volumes",
+				"Successfully Pruned Volumes"))
 		case "esc":
 			if s.ShowDetail {
 				s.ShowDetail = false
 				return s, nil
 			}
+		case "enter":
+			s.ShowDetail = true
+			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
+			return s, nil
 		}
 	}
 
@@ -74,6 +96,10 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *Volumes) View() string {
+	if s.ShowDetail {
+		return s.Details.View()
+	}
+
 	return lipgloss.JoinVertical(lipgloss.Center,
 		styles.TextStyle().Render(styles.VolumesText), s.GetListText(), s.Help.View(keymap.NewDynamic([]key.Binding{})))
 }
@@ -85,4 +111,15 @@ func (s *Volumes) GetListText() string {
 	}
 
 	return lipgloss.NewStyle().Padding(1).Render(s.List.View())
+}
+
+func (s *Volumes) Refresh() tea.Cmd {
+	return tea.Tick(0, func(_ time.Time) tea.Msg {
+		vols, err := docker.GetVolumes()
+		if err != nil {
+			fmt.Println(err)
+			return utils.ReturnError("Volumes Page", "Error Querying Volumes", err)
+		}
+		return messages.VolumesReadyMsg{Items: vols.Volumes}
+	})
 }
