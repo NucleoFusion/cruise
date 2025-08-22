@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/NucleoFusion/cruise/internal/utils"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 )
 
@@ -20,6 +21,15 @@ func GetNetworks() ([]network.Summary, error) {
 	}
 
 	return networks, nil
+}
+
+func PruneNetworks() error {
+	_, err := cli.NetworksPrune(context.Background(), filters.NewArgs())
+	return err
+}
+
+func RemoveNetwork(id string) error {
+	return cli.NetworkRemove(context.Background(), id)
 }
 
 func NetworksFormattedSummary(ntwrk network.Summary, width int) string {

@@ -17,11 +17,11 @@ import (
 )
 
 type Volumes struct {
-	Width   int
-	Height  int
-	List    *VolumeList
-	Details *VolumeDetail
-	// Keymap    keymap.VolumesMap
+	Width      int
+	Height     int
+	List       *VolumeList
+	Details    *VolumeDetail
+	Keymap     keymap.VolMap
 	Help       help.Model
 	IsLoading  bool
 	ShowDetail bool
@@ -34,8 +34,8 @@ func NewVolumes(w int, h int) *Volumes {
 		IsLoading:  true,
 		ShowDetail: false,
 		List:       NewVolumeList(w-4, h-7-strings.Count(styles.VolumesText, "\n")),
-		// Keymap:    keymap.NewVolumesMap(),
-		Help: help.New(),
+		Keymap:     keymap.NewVolMap(),
+		Help:       help.New(),
 	}
 }
 
@@ -50,10 +50,6 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
-		// case messages.UpdateVolumesMsg:
-		// 	var cmd tea.Cmd
-		// 	s.List, cmd = s.List.Update(msg)
-		// return s, cmd
 	case messages.CloseDetails:
 		s.ShowDetail = false
 		return s, nil
@@ -63,27 +59,27 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			s.List, cmd = s.List.Update(msg)
 			return s, cmd
 		}
-		switch msg.String() {
-		case "r":
+		switch {
+		case key.Matches(msg, s.Keymap.Remove):
 			err := docker.RemoveVolumes(s.List.GetCurrentItem().Name)
 			if err != nil {
 				return s, utils.ReturnError("Volumes Page", "Error Removing Volume", err)
 			}
 			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Volumes Page", "Removed Volume",
 				fmt.Sprintf("Successfully Removed Volume %s", s.List.GetCurrentItem().Name)))
-		case "p":
+		case key.Matches(msg, s.Keymap.Prune):
 			err := docker.PruneVolumes()
 			if err != nil {
 				return s, utils.ReturnError("Volumes Page", "Error Pruning Volumes", err)
 			}
 			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Volumes Page", "Pruned Volumes",
 				"Successfully Pruned Volumes"))
-		case "esc":
+		case key.Matches(msg, s.Keymap.ExitDetails):
 			if s.ShowDetail {
 				s.ShowDetail = false
 				return s, nil
 			}
-		case "enter":
+		case key.Matches(msg, s.Keymap.ShowDetails):
 			s.ShowDetail = true
 			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
 			return s, nil
@@ -101,7 +97,7 @@ func (s *Volumes) View() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.VolumesText), s.GetListText(), s.Help.View(keymap.NewDynamic([]key.Binding{})))
+		styles.TextStyle().Render(styles.VolumesText), s.GetListText(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
 }
 
 func (s *Volumes) GetListText() string {

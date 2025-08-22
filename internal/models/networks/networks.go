@@ -1,6 +1,7 @@
 package networks
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -16,11 +17,11 @@ import (
 )
 
 type Networks struct {
-	Width   int
-	Height  int
-	List    *NetworkList
-	Details *NetworkDetail
-	// Keymap    keymap.NetworksMap
+	Width      int
+	Height     int
+	List       *NetworkList
+	Details    *NetworkDetail
+	Keymap     keymap.NetMap
 	Help       help.Model
 	IsLoading  bool
 	ShowDetail bool
@@ -33,8 +34,8 @@ func NewNetworks(w int, h int) *Networks {
 		IsLoading:  true,
 		ShowDetail: false,
 		List:       NewNetworkList(w-4, h-7-strings.Count(styles.NetworksText, "\n")),
-		// Keymap:    keymap.NewNetworksMap(),
-		Help: help.New(),
+		Keymap:     keymap.NewNetMap(),
+		Help:       help.New(),
 	}
 }
 
@@ -63,16 +64,30 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			s.List, cmd = s.List.Update(msg)
 			return s, cmd
 		}
-		switch msg.String() {
-		case "enter":
+		switch {
+		case key.Matches(msg, s.Keymap.ShowDetails):
 			s.ShowDetail = true
 			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
 			return s, nil
-		case "esc":
+		case key.Matches(msg, s.Keymap.ExitDetails):
 			if s.ShowDetail {
 				s.ShowDetail = false
 				return s, nil
 			}
+		case key.Matches(msg, s.Keymap.Remove):
+			err := docker.RemoveNetwork(s.List.GetCurrentItem().ID)
+			if err != nil {
+				return s, utils.ReturnError("Networks Page", "Error Removing Network", err)
+			}
+			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Networks Page", "Removed Network",
+				fmt.Sprintf("Successfully Removed Networks w/ ID %s", s.List.GetCurrentItem().ID)))
+		case key.Matches(msg, s.Keymap.Prune):
+			err := docker.PruneNetworks()
+			if err != nil {
+				return s, utils.ReturnError("Networks Page", "Error Pruning Networks", err)
+			}
+			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Networks Page", "Pruned Networks",
+				"Successfully Pruned Networks"))
 		}
 	}
 
@@ -87,7 +102,7 @@ func (s *Networks) View() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.NetworksText), s.GetListText(), s.Help.View(keymap.NewDynamic([]key.Binding{})))
+		styles.TextStyle().Render(styles.NetworksText), s.GetListText(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
 }
 
 func (s *Networks) GetListText() string {
