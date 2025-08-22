@@ -1,13 +1,9 @@
 package containers
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
-	"fmt"
-	"io"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/colors"
@@ -20,7 +16,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
@@ -31,23 +26,14 @@ type LogStreamer struct {
 }
 
 type ContainerList struct {
-	Width            int
-	Height           int
-	Items            []container.Summary
-	Err              error
-	FilteredItems    []container.Summary
-	SelectedIndex    int
-	IsExpanded       bool
-	ExpandedIndex    int
-	IsDetailsLoading bool
-	StatsReader      container.StatsResponseReader
-	Stats            container.StatsResponse
-	Decoder          *json.Decoder
-	Logs             *io.ReadCloser
-	LogStreamer      *LogStreamer
-	LogItems         []string
-	Ti               textinput.Model
-	Vp               viewport.Model
+	Width         int
+	Height        int
+	Items         []container.Summary
+	Err           error
+	FilteredItems []container.Summary
+	SelectedIndex int
+	Ti            textinput.Model
+	Vp            viewport.Model
 }
 
 func NewContainerList(w int, h int) *ContainerList {
@@ -65,15 +51,11 @@ func NewContainerList(w int, h int) *ContainerList {
 		Padding(1).Foreground(colors.Load().Text)
 
 	return &ContainerList{
-		Width:            w,
-		Height:           h,
-		Ti:               ti,
-		SelectedIndex:    0,
-		IsExpanded:       false,
-		ExpandedIndex:    0,
-		Vp:               vp,
-		IsDetailsLoading: true,
-		LogItems:         make([]string, 0),
+		Width:         w,
+		Height:        h,
+		Ti:            ti,
+		SelectedIndex: 0,
+		Vp:            vp,
 	}
 }
 
@@ -88,54 +70,7 @@ func (s *ContainerList) Init() tea.Cmd {
 }
 
 func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
-	if s.LogStreamer != nil {
-		select {
-		case line := <-s.LogStreamer.lines:
-			if len(line) > s.Width/2 {
-				line = line[:s.Width/2-3] + "..."
-			}
-			s.LogItems = append(s.LogItems, line)
-			if len(s.LogItems) > 4 {
-				s.LogItems = s.LogItems[len(s.LogItems)-4:]
-			}
-		default:
-			break
-		}
-	}
-
 	switch msg := msg.(type) {
-	case messages.ContainerReadyMsg:
-		if s.IsExpanded && !s.IsDetailsLoading {
-			var m container.StatsResponse
-			s.Decoder.Decode(&m)
-			s.Stats = m
-		}
-
-		s.Items = msg.Items
-		s.FilteredItems = msg.Items
-		s.Err = msg.Err
-		return s, tea.Tick(2*time.Second, func(_ time.Time) tea.Msg {
-			items, err := docker.GetContainers()
-			return messages.ContainerReadyMsg{
-				Items: items,
-				Err:   err,
-			}
-		})
-	case messages.NewContainerDetails:
-		s.IsDetailsLoading = false
-		s.StatsReader = msg.Stats
-		s.Decoder = msg.Decoder
-
-		s.Logs = msg.Logs
-		s.LogItems = make([]string, 0)
-		s.StartLogStream()
-
-		var m container.StatsResponse
-		s.Decoder.Decode(&m)
-		s.Stats = m
-
-		return s, nil
-
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
 			if msg.String() == "esc" {
@@ -170,24 +105,6 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 			}
 			s.UpdateList()
 			return s, nil
-		case "enter":
-			if s.IsExpanded {
-				if s.SelectedIndex == s.ExpandedIndex {
-					s.IsExpanded = false
-					return s, nil
-				}
-
-				s.IsDetailsLoading = true
-
-				s.ExpandedIndex = s.SelectedIndex
-				return s, s.NewStats()
-			}
-
-			s.IsDetailsLoading = true
-
-			s.ExpandedIndex = s.SelectedIndex
-			s.IsExpanded = true
-			return s, s.NewStats()
 		}
 	}
 	return s, nil
@@ -223,38 +140,6 @@ func (s *ContainerList) UpdateList() {
 			line = lipgloss.NewStyle().Background(colors.Load().Lavender).Foreground(colors.Load().Base).Render(line)
 		} else {
 			line = styles.TextStyle().Render(line)
-		}
-
-		if s.IsExpanded && k == s.ExpandedIndex {
-			line += "\n"
-
-			dropdown := ""
-			if s.IsDetailsLoading {
-				dropdown += lipgloss.Place(s.Width-14, 6, lipgloss.Center, lipgloss.Center, "Loading")
-			} else {
-				var totalRxBytes, totalTxBytes uint64
-
-				for _, netStats := range s.Stats.Networks {
-					totalRxBytes += netStats.RxBytes
-					totalTxBytes += netStats.TxBytes
-				}
-
-				dropdown += fmt.Sprintf(" %s | [CPU%%: %.2f | Mem%%: %.2fMB | Network: %.2fMB Rx / %.2fMB Tx ]\n",
-					strings.Trim(s.Stats.Name, "/"), utils.CalculateCPUPercent(s.Stats), float64(s.Stats.MemoryStats.Usage)/(1024*1024),
-					float64(totalRxBytes)/(1024*1024), float64(totalTxBytes)/(1024*1024))
-
-				dropdown += strings.Repeat("─", s.Width-14)
-
-				if len(s.LogItems) == 0 {
-					dropdown += "\n\n\nWaiting for Logs..."
-				} else {
-					for _, v := range s.LogItems {
-						dropdown += "\n #> " + v
-					}
-				}
-			}
-
-			line += lipgloss.NewStyle().MarginLeft(3).Border(lipgloss.RoundedBorder()).Render(dropdown)
 		}
 
 		text += line + "\n"
@@ -313,75 +198,4 @@ func (s *ContainerList) NewStats() tea.Cmd {
 			Logs:    &logs,
 		}
 	})
-}
-
-func (s *ContainerList) StartLogStream() {
-	// Cancel previous log stream
-	if s.LogStreamer != nil {
-		s.LogStreamer.cancel()
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	lines := make(chan string, 100)
-
-	s.LogStreamer = &LogStreamer{
-		ctx:    ctx,
-		cancel: cancel,
-		lines:  lines,
-	}
-
-	// Something about demuxing the logs
-	stdoutReader, stdoutWriter := io.Pipe()
-	stderrReader, stderrWriter := io.Pipe()
-
-	go func() {
-		defer stdoutWriter.Close()
-		defer stderrWriter.Close()
-		_, err := stdcopy.StdCopy(stdoutWriter, stderrWriter, *s.Logs)
-		if err != nil {
-			fmt.Println("StdCopy Error:", err)
-		}
-	}()
-
-	go func() {
-		logs := s.Logs
-		defer (*logs).Close()
-
-		scanner := bufio.NewScanner(stdoutReader)
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				if scanner.Scan() {
-					line := scanner.Text()
-					if line != "" {
-						lines <- line
-					}
-				}
-			}
-		}
-	}()
-
-	go func() {
-		logs := s.Logs
-		defer (*logs).Close()
-
-		scanner := bufio.NewScanner(stderrReader)
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				if scanner.Scan() {
-					line := scanner.Text()
-					if line != "" {
-						lines <- line
-					}
-				}
-			}
-		}
-	}()
 }
