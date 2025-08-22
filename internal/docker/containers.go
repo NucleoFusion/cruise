@@ -43,6 +43,10 @@ func GetPorts() ([]string, error) {
 	return arr, nil
 }
 
+func InspectContainer(id string) (container.InspectResponse, error) {
+	return cli.ContainerInspect(context.Background(), id)
+}
+
 func GetNumContainers() int {
 	containers, err := cli.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
@@ -111,6 +115,25 @@ func ContainerHeaders(width int) string {
 		"Mounts",
 		"Size",
 	)
+}
+
+func GetBlkio(stats container.StatsResponse, platform string) (uint64, uint64) {
+	switch platform {
+	case "windows":
+		return stats.StorageStats.ReadSizeBytes, stats.StorageStats.WriteSizeBytes
+	case "linux":
+		var read, write uint64
+		for _, entry := range stats.BlkioStats.IoServiceBytesRecursive {
+			switch entry.Op {
+			case "Read":
+				read += entry.Value
+			case "Write":
+				write += entry.Value
+			}
+		}
+		return read, write
+	}
+	return 0, 0
 }
 
 func StartContainer(ID string) error {

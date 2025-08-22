@@ -7,14 +7,16 @@ import (
 )
 
 type ContainersMap struct {
-	Start   key.Binding
-	Exec    key.Binding
-	Restart key.Binding
-	Stop    key.Binding
-	Remove  key.Binding
-	Pause   key.Binding
-	Unpause key.Binding
-	PortMap key.Binding
+	Start       key.Binding
+	Exec        key.Binding
+	Restart     key.Binding
+	Stop        key.Binding
+	Remove      key.Binding
+	Pause       key.Binding
+	Unpause     key.Binding
+	PortMap     key.Binding
+	ShowDetails key.Binding
+	ExitDetails key.Binding
 }
 
 func NewContainersMap() ContainersMap {
@@ -50,6 +52,14 @@ func NewContainersMap() ContainersMap {
 		PortMap: key.NewBinding(
 			key.WithKeys("m"),
 			key.WithHelp("m", "port map"),
+		),
+		ShowDetails: key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "show detail"),
+		),
+		ExitDetails: key.NewBinding(
+			key.WithKeys("esc"),
+			key.WithHelp("esc", "exit detail"),
 		),
 	}
 }

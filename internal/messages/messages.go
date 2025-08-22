@@ -65,6 +65,14 @@ type (
 		Logs    *io.ReadCloser
 	}
 
+	ContainerDetailsReady struct {
+		Stats   container.StatsResponseReader
+		Decoder *json.Decoder
+		Logs    *io.ReadCloser
+	}
+
+	ContainerDetailsTick struct{}
+
 	ContainerReadyMsg struct {
 		Items []container.Summary
 		Err   error

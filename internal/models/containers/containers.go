@@ -23,11 +23,13 @@ type Containers struct {
 	Width       int
 	Height      int
 	List        *ContainerList
+	Details     *ContainerDetail
 	Vp          viewport.Model
 	Keymap      keymap.ContainersMap
 	Help        help.Model
 	IsLoading   bool
 	ShowPortmap bool
+	ShowDetail  bool
 }
 
 func NewContainers(w int, h int) *Containers {
@@ -52,6 +54,18 @@ func (s *Containers) Init() tea.Cmd {
 
 func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case messages.ContainerDetailsReady:
+		if s.ShowDetail {
+			var cmd tea.Cmd
+			s.Details, cmd = s.Details.Update(msg)
+			return s, cmd
+		}
+	case messages.ContainerDetailsTick:
+		if s.ShowDetail {
+			var cmd tea.Cmd
+			s.Details, cmd = s.Details.Update(msg)
+			return s, cmd
+		}
 	case messages.NewContainerDetails:
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
@@ -155,6 +169,15 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				arr, err := docker.GetPorts()
 				return messages.PortMapMsg{Arr: arr, Err: err}
 			})
+		case key.Matches(msg, s.Keymap.ShowDetails):
+			s.ShowDetail = true
+			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
+			return s, s.Details.Init()
+		case key.Matches(msg, s.Keymap.ExitDetails):
+			if s.ShowDetail {
+				s.ShowDetail = false
+				return s, nil
+			}
 		}
 	}
 
@@ -167,6 +190,11 @@ func (s *Containers) View() string {
 	if s.ShowPortmap {
 		return lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, s.Vp.View())
 	}
+
+	if s.ShowDetail {
+		return s.Details.View()
+	}
+
 	return lipgloss.JoinVertical(lipgloss.Center,
 		styles.TextStyle().Render(styles.ContainersText), s.GetListText(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
 }
