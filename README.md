@@ -64,12 +64,10 @@
 - [ ] Git integration for version control
 
 ## Volumes & Networks
-- [ ] Volume management with usage stats
-- [ ] Volume backup and restore
-- [ ] Cleanup unused volumes and networks
-- [ ] Visualize network topology
-- [ ] Distinguish bind mounts vs. named volumes
-- [ ] Visualize network security policies
+- [X] Volume management with usage stats
+- [X] Volume backup and restore
+- [X] Cleanup unused volumes and networks
+- [X] Visualize network topology
 
 ## Build & Registry
 - [ ] Manage build contexts
@@ -78,8 +76,8 @@
 - [ ] Manage and clean build cache
 
 ## Monitoring & Logs
-- [ ] Centralized log viewer with search
-- [ ] Real-time metrics dashboard
+- [X] Centralized log viewer with search
+- [X] Real-time metrics dashboard
 - [ ] Configure alerts and notifications
 - [ ] Export metrics and logs
 
@@ -99,11 +97,11 @@
 - [ ] Export (When config done, define a export folder) 
 
 ### Volumes & Networks
-- [ ] Volume management with usage stats & backup/restore & prune
-- [ ] Network topology visualization
+- [X] Volume management with usage stats & backup/restore & prune
+- [X] Network topology visualization
 
 ### Monitoring & Logs
-- [ ] Centralized log aggregation with search
+- [X] Centralized log aggregation with search
 - [ ] Alert configuration (notifications)
 - [ ] logs export (When config done)
 
