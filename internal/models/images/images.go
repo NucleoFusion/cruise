@@ -8,9 +8,9 @@ import (
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
+	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -23,22 +23,22 @@ type Images struct {
 	List      *ImageList
 	Keymap    keymap.ImagesMap
 	Vp        viewport.Model
-	Help      help.Model
+	Help      styledhelp.StyledHelp
 	ShowVp    bool
 	IsLoading bool
 }
 
 func NewImages(w int, h int) *Images {
-	vp := viewport.New(w*2/3, h/2)
+	vp := viewport.New(w*2/3, h/2-2)
 	vp.Style = styles.PageStyle().Padding(1, 2)
 
 	return &Images{
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewImageList(w-4, h-7-strings.Count(styles.ImagesText, "\n")),
+		List:      NewImageList(w-4, h-8-strings.Count(styles.ImagesText, "\n")),
 		Keymap:    keymap.NewImagesMap(),
-		Help:      help.New(),
+		Help:      styledhelp.NewStyledHelp(keymap.NewImagesMap().Bindings(), w),
 		Vp:        vp,
 		ShowVp:    false,
 	}
@@ -150,7 +150,7 @@ func (s *Images) View() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.ImagesText), s.GetListText(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
+		styles.TextStyle().Render(styles.ImagesText), s.GetListText(), s.Help.View())
 }
 
 func (s *Images) GetListText() string {
@@ -159,7 +159,7 @@ func (s *Images) GetListText() string {
 			lipgloss.Center, lipgloss.Top, "Loading...")
 	}
 
-	return lipgloss.NewStyle().Padding(1).Render(s.List.View())
+	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
 }
 
 func (s *Images) Refresh() tea.Cmd {

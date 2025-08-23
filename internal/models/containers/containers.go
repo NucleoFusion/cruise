@@ -10,9 +10,9 @@ import (
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
+	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -26,7 +26,7 @@ type Containers struct {
 	Details     *ContainerDetail
 	Vp          viewport.Model
 	Keymap      keymap.ContainersMap
-	Help        help.Model
+	Help        styledhelp.StyledHelp
 	IsLoading   bool
 	ShowPortmap bool
 	ShowDetail  bool
@@ -41,9 +41,9 @@ func NewContainers(w int, h int) *Containers {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewContainerList(w-4, h-7-strings.Count(styles.ContainersText, "\n")),
+		List:      NewContainerList(w-4, h-3-strings.Count(styles.ContainersText, "\n")),
 		Keymap:    keymap.NewContainersMap(),
-		Help:      help.New(),
+		Help:      styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w),
 		Vp:        vp,
 	}
 }
@@ -196,7 +196,7 @@ func (s *Containers) View() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.ContainersText), s.GetListText(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
+		styles.TextStyle().Render(styles.ContainersText), s.GetListText(), s.Help.View())
 }
 
 func (s *Containers) GetListText() string {
@@ -205,7 +205,7 @@ func (s *Containers) GetListText() string {
 			lipgloss.Center, lipgloss.Top, "Loading...")
 	}
 
-	return lipgloss.NewStyle().Padding(1).Render(s.List.View())
+	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
 }
 
 func (s *Containers) Refresh() tea.Cmd {

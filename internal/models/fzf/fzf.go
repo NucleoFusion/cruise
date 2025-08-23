@@ -6,7 +6,7 @@ import (
 	"github.com/NucleoFusion/cruise/internal/colors"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
-	"github.com/charmbracelet/bubbles/help"
+	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -19,7 +19,7 @@ type FuzzyFinder struct {
 	Width         int
 	Height        int
 	Keymap        keymap.FuzzyMap
-	Help          help.Model
+	Help          styledhelp.StyledHelp
 	Vp            viewport.Model
 	Ti            textinput.Model
 	Items         []string
@@ -31,7 +31,7 @@ func NewFzf(items []string, w int, h int) FuzzyFinder {
 	return FuzzyFinder{
 		Width:         w,
 		Height:        h,
-		Help:          help.New(),
+		Help:          styledhelp.NewStyledHelp(keymap.NewFuzzyMap().Bindings(), w),
 		Keymap:        keymap.NewFuzzyMap(),
 		Items:         items,
 		Filtered:      items,
@@ -103,7 +103,7 @@ func (m *FuzzyFinder) View() string {
 		lipgloss.JoinVertical(lipgloss.Center,
 			lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).Render(m.Ti.View()),
 			m.Vp.View()))
-	hlp := lipgloss.NewStyle().PaddingLeft(2).Render(m.Help.View(keymap.NewDynamic(m.Keymap.Bindings())))
+	hlp := lipgloss.NewStyle().PaddingLeft(2).Render(m.Help.View())
 	return lipgloss.JoinVertical(lipgloss.Left, pg, hlp)
 }
 

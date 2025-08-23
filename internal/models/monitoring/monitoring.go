@@ -10,9 +10,9 @@ import (
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
+	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -34,7 +34,7 @@ type Monitoring struct {
 	Vp        viewport.Model
 	Ti        textinput.Model
 	Keymap    keymap.MonitorMap
-	Help      help.Model
+	Help      styledhelp.StyledHelp
 	Events    []*events.Message
 	Filtered  []*events.Message
 	EventChan <-chan *events.Message
@@ -62,7 +62,7 @@ func NewMonitoring(w int, h int) *Monitoring {
 	return &Monitoring{
 		Width:     w,
 		Height:    h,
-		Help:      help.New(),
+		Help:      styledhelp.NewStyledHelp(keymap.NewMonitorMap().Bindings(), w),
 		Keymap:    keymap.NewMonitorMap(),
 		Vp:        vp,
 		Ti:        ti,
@@ -128,7 +128,7 @@ func (s *Monitoring) View() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.MonitoringText), styles.PageStyle().Render(s.Ti.View()), s.Vp.View(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
+		styles.TextStyle().Render(styles.MonitoringText), styles.PageStyle().Render(s.Ti.View()), s.Vp.View(), s.Help.View())
 }
 
 func (s *Monitoring) FormattedView() string {

@@ -8,9 +8,9 @@ import (
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
+	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -22,7 +22,7 @@ type Networks struct {
 	List       *NetworkList
 	Details    *NetworkDetail
 	Keymap     keymap.NetMap
-	Help       help.Model
+	Help       styledhelp.StyledHelp
 	IsLoading  bool
 	ShowDetail bool
 }
@@ -33,9 +33,9 @@ func NewNetworks(w int, h int) *Networks {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewNetworkList(w-4, h-7-strings.Count(styles.NetworksText, "\n")),
+		List:       NewNetworkList(w-4, h-8-strings.Count(styles.NetworksText, "\n")),
 		Keymap:     keymap.NewNetMap(),
-		Help:       help.New(),
+		Help:       styledhelp.NewStyledHelp(keymap.NewNetMap().Bindings(), w),
 	}
 }
 
@@ -102,7 +102,7 @@ func (s *Networks) View() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.NetworksText), s.GetListText(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
+		styles.TextStyle().Render(styles.NetworksText), s.GetListText(), s.Help.View())
 }
 
 func (s *Networks) GetListText() string {
@@ -111,7 +111,7 @@ func (s *Networks) GetListText() string {
 			lipgloss.Center, lipgloss.Top, "Loading...")
 	}
 
-	return lipgloss.NewStyle().Padding(1).Render(s.List.View())
+	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
 }
 
 func (s *Networks) Refresh() tea.Cmd {

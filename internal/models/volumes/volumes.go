@@ -8,9 +8,9 @@ import (
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
+	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -22,7 +22,7 @@ type Volumes struct {
 	List       *VolumeList
 	Details    *VolumeDetail
 	Keymap     keymap.VolMap
-	Help       help.Model
+	Help       styledhelp.StyledHelp
 	IsLoading  bool
 	ShowDetail bool
 }
@@ -33,9 +33,9 @@ func NewVolumes(w int, h int) *Volumes {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewVolumeList(w-4, h-7-strings.Count(styles.VolumesText, "\n")),
+		List:       NewVolumeList(w-4, h-8-strings.Count(styles.VolumesText, "\n")),
 		Keymap:     keymap.NewVolMap(),
-		Help:       help.New(),
+		Help:       styledhelp.NewStyledHelp(keymap.NewVolMap().Bindings(), w),
 	}
 }
 
@@ -97,7 +97,7 @@ func (s *Volumes) View() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.VolumesText), s.GetListText(), s.Help.View(keymap.NewDynamic(s.Keymap.Bindings())))
+		styles.TextStyle().Render(styles.VolumesText), s.GetListText(), s.Help.View())
 }
 
 func (s *Volumes) GetListText() string {
@@ -106,7 +106,7 @@ func (s *Volumes) GetListText() string {
 			lipgloss.Center, lipgloss.Center, styles.TextStyle().Render("Loading..."))
 	}
 
-	return lipgloss.NewStyle().Padding(1).Render(s.List.View())
+	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
 }
 
 func (s *Volumes) Refresh() tea.Cmd {

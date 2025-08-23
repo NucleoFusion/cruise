@@ -38,7 +38,7 @@ type ContainerList struct {
 
 func NewContainerList(w int, h int) *ContainerList {
 	ti := textinput.New()
-	ti.Width = w - 9
+	ti.Width = w - 10
 	ti.Prompt = " Search: "
 	ti.Placeholder = "Press '/' to search..."
 
@@ -46,7 +46,7 @@ func NewContainerList(w int, h int) *ContainerList {
 	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().Surface2)
 	ti.TextStyle = styles.TextStyle()
 
-	vp := viewport.New(w+3, h+1)
+	vp := viewport.New(w+2, h-4)
 	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).
 		Padding(1).Foreground(colors.Load().Text)
 
@@ -71,6 +71,18 @@ func (s *ContainerList) Init() tea.Cmd {
 
 func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 	switch msg := msg.(type) {
+	case messages.ContainerReadyMsg:
+		s.Items = msg.Items
+		s.FilteredItems = msg.Items
+		s.Err = msg.Err
+		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
+			items, err := docker.GetContainers()
+			return messages.ContainerReadyMsg{
+				Items: items,
+				Err:   err,
+			}
+		})
+
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
 			if msg.String() == "esc" {
@@ -112,11 +124,11 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 
 func (s *ContainerList) View() string {
 	if s.Err != nil {
-		return lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, "Error: "+s.Err.Error())
+		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height-2, lipgloss.Center, lipgloss.Center, "Error: "+s.Err.Error()))
 	}
 
 	if len(s.Items) == 0 {
-		return lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, "No Containers Found!")
+		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height-2, lipgloss.Center, lipgloss.Center, "No Containers Found!"))
 	}
 
 	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender)
