@@ -2,7 +2,6 @@ package containers
 
 import (
 	"context"
-	"encoding/json"
 	"sort"
 	"time"
 
@@ -10,7 +9,6 @@ import (
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
-	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -189,25 +187,4 @@ func (s *ContainerList) Filter(val string) {
 
 func (s *ContainerList) GetCurrentItem() container.Summary {
 	return s.FilteredItems[s.SelectedIndex]
-}
-
-func (s *ContainerList) NewStats() tea.Cmd {
-	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		stats, err := docker.GetContainerStats(s.GetCurrentItem().ID)
-		if err != nil {
-			return utils.ReturnError("Containers Page", "Error Querying Stats", err)
-		}
-		decoder := json.NewDecoder(stats.Body)
-
-		logs, err := docker.GetContainerLogs(context.Background(), s.GetCurrentItem().ID)
-		if err != nil {
-			return utils.ReturnError("Containers Page", "Error Querying Logs", err)
-		}
-
-		return messages.NewContainerDetails{
-			Stats:   stats,
-			Decoder: decoder,
-			Logs:    &logs,
-		}
-	})
 }

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/docker"
@@ -54,17 +55,17 @@ func NewDetail(w int, h int, cnt container.Summary) *ContainerDetail {
 	// Network VP
 	nvp := viewport.New(w/4, h/2)
 	nvp.Style = styles.PageStyle().Padding(1, 2)
-	// ivp.SetContent(getIPAMView(ntw, ipamOpts, w))
+	nvp.SetContent(getNetworksView(insp, w))
 
 	// Volumes VP
 	vvp := viewport.New(w/4, h/2)
 	vvp.Style = styles.PageStyle().Padding(1, 2)
-	// ovp.SetContent(getOptionsView(ntw, opts, w))
+	vvp.SetContent(getVolumeView(insp, w))
 
 	// Logs VP
 	lvp := viewport.New(w-2, h/2)
 	lvp.Style = styles.PageStyle().Padding(1, 2)
-	// ovp.SetContent(getOptionsView(ntw, opts, w))
+	lvp.SetContent(getLogsView(make([]string, 0), w, h))
 
 	return &ContainerDetail{
 		Width:      w,
@@ -77,6 +78,7 @@ func NewDetail(w int, h int, cnt container.Summary) *ContainerDetail {
 		VolVp:      vvp,
 		ResourceVp: rvp,
 		LogItems:   make([]string, 0),
+		IsLoading:  true,
 	}
 }
 
@@ -89,7 +91,7 @@ func (s *ContainerDetail) Init() tea.Cmd {
 			}
 			decoder := json.NewDecoder(stats.Body)
 
-			logs, err := docker.GetContainerLogs(context.Background(), s.Container.ID)
+			logs, err := docker.GetContainerLogs(context.Background(), s.Container.ID, 20)
 			if err != nil {
 				return utils.ReturnError("Containers Page", "Error Querying Logs", err)
 			}
@@ -104,36 +106,42 @@ func (s *ContainerDetail) Init() tea.Cmd {
 
 func (s *ContainerDetail) Update(msg tea.Msg) (*ContainerDetail, tea.Cmd) {
 	if s.LogStreamer != nil {
-		select {
-		case line := <-s.LogStreamer.lines:
-			if len(line) > s.Width/2 {
-				line = line[:s.Width/2-3] + "..."
+	drain: // named scope to return to
+		for {
+			select {
+			case line := <-s.LogStreamer.lines:
+				s.LogItems = append(s.LogItems, utils.Shorten(line, s.Width))
+				if s.LogsVp.YOffset+s.LogsVp.Height < len(s.LogItems)-2 {
+					s.LogsVp.YOffset += 1
+				}
+			default:
+				break drain // returning to named scope
 			}
-			s.LogItems = append(s.LogItems, line)
-			if len(s.LogItems) > 4 {
-				s.LogItems = s.LogItems[len(s.LogItems)-4:]
-			}
-		default:
-			break
 		}
 	}
 
 	switch msg := msg.(type) {
 	case messages.ContainerDetailsTick:
-		s.UpdateVP()
+		if !s.IsLoading {
+			var st container.StatsResponse
+			s.Decoder.Decode(&st)
+			s.Stats = st
+			s.UpdateVP()
+		}
 		return s, tea.Tick(2*time.Second, func(_ time.Time) tea.Msg { return messages.ContainerDetailsTick{} })
 	case messages.ContainerDetailsReady:
-		s.IsLoading = false
 		s.StatsReader = msg.Stats
 		s.Decoder = msg.Decoder
+		s.IsLoading = false
 
 		s.Logs = msg.Logs
 		s.LogItems = make([]string, 0)
 		s.StartLogStream()
 
-		var m container.StatsResponse
-		s.Decoder.Decode(&m)
-		s.Stats = m
+		var st container.StatsResponse
+		s.Decoder.Decode(&st)
+		s.Stats = st
+
 		s.UpdateVP()
 
 		return s, nil
@@ -186,8 +194,61 @@ func getResourceView(cnt container.InspectResponse, stats container.StatsRespons
 	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Resource ")), "\n\n", text)
 }
 
+func getNetworksView(insp container.InspectResponse, w int) string {
+	ports := "\n"
+	for k, v := range insp.NetworkSettings.Ports {
+		host := make([]string, 0)
+		for _, pb := range v {
+			host = append(host, fmt.Sprintf("%s:%s", pb.HostIP, pb.HostPort))
+		}
+		ports += fmt.Sprintf("\n%s <-> %s", string(k), strings.Join(host, " ~ "))
+	}
+
+	nets := "\n"
+	for k, v := range insp.NetworkSettings.Networks {
+		nets += fmt.Sprintf("\n%s ~ %s", k, v.IPAddress)
+	}
+	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s ",
+		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(insp.HostConfig.NetworkMode.NetworkName(), w/4-10)),
+		styles.DetailKeyStyle().Render(" Networks: "), styles.TextStyle().Render(nets),
+		styles.DetailKeyStyle().Render(" Ports:- "), styles.TextStyle().Render(ports))
+
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Networks ")), "\n\n", text)
+}
+
+func getVolumeView(cnt container.InspectResponse, w int) string {
+	if len(cnt.Mounts) == 0 {
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Volume ")), "\n\n", "No Mounts Found")
+	}
+	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s \n\n%s %s \n\n%s %s ",
+		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Name, w/4-10)),
+		styles.DetailKeyStyle().Render(" Dest: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Destination, w/4-10)),
+		styles.DetailKeyStyle().Render(" Source: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Source, w/4-10)),
+		styles.DetailKeyStyle().Render(" Type: "), styles.TextStyle().Render(utils.Shorten(string(cnt.Mounts[0].Type), w/4-10)),
+		styles.DetailKeyStyle().Render(" Mode: "), styles.TextStyle().Render(cnt.Mounts[0].Mode))
+
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Volume ")), "\n\n", text)
+}
+
+func getLogsView(items []string, w int, h int) string {
+	if len(items) == 0 {
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w-6, lipgloss.Center, styles.TitleStyle().Render(" Logs ")), "\n\n", "No Logs yet...")
+	}
+
+	its := items
+	if len(items) > h-7 { // Accounted for padding and header
+		its = items[len(items)-(h-7):]
+	}
+
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w-6, lipgloss.Center, styles.TitleStyle().Render(" Logs ")), "\n\n", strings.Join(its, "\n"))
+}
+
 func (s *ContainerDetail) UpdateVP() {
+	if s.IsLoading {
+		return
+	}
 	s.ResourceVp.SetContent(getResourceView(s.Insp, s.Stats, s.Width))
+	s.LogsVp.SetContent(getLogsView(s.LogItems, s.Width, s.LogsVp.Height))
 }
 
 func (s *ContainerDetail) StartLogStream() {

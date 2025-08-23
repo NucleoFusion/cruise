@@ -67,11 +67,11 @@ func GetContainerStats(id string) (container.StatsResponseReader, error) {
 }
 
 // Stream of logs
-func GetContainerLogs(ctx context.Context, id string) (io.ReadCloser, error) {
+func GetContainerLogs(ctx context.Context, id string, tail int) (io.ReadCloser, error) {
 	return cli.ContainerLogs(ctx, id, container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
-		Tail:       "4",
+		Tail:       fmt.Sprintf("%d", tail),
 		Follow:     true,
 		Timestamps: false,
 		Details:    false,
