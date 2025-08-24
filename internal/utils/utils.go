@@ -2,6 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -154,4 +157,18 @@ func ToAnySlice[T any](in []T) []any {
 		out[i] = in[i]
 	}
 	return out
+}
+
+func GetCfgDir() string {
+	switch runtime.GOOS {
+	case "linux", "darwin":
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, ".config", "cruise")
+	case "windows":
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, ".cruise")
+	default:
+		cfg, _ := os.UserConfigDir()
+		return cfg
+	}
 }

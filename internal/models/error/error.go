@@ -37,7 +37,6 @@ func (s *ErrorPopup) View() string {
 	style := lipgloss.NewStyle()
 
 	text := fmt.Sprintf("%s\n\n%s", style.Foreground(colors.Load().Red).Render(s.Title+" | "+s.Location),
-
 		style.Foreground(colors.Load().Text).Render(s.Message))
 
 	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Sapphire).
