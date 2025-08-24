@@ -153,24 +153,28 @@ func (s *Monitoring) PollEvents() tea.Cmd {
 	return func() tea.Msg {
 		evs := make([]*events.Message, 0, s.Length)
 
-		select {
-		case err := <-s.ErrChan:
-			return utils.ReturnError("Monitoring Page", "Error Querying Events", err)
-		default:
-			for i := 0; i < s.Length; i++ {
-				select {
-				case ev := <-s.EventChan:
-					evs = append(evs, ev)
-				default:
-					return messages.NewEvents{
-						Events: evs,
+	drain:
+		for {
+			select {
+			case err := <-s.ErrChan:
+				return utils.ReturnError("Monitoring Page", "Error Querying Events", err)
+			default:
+				for i := 0; i < s.Length; i++ {
+					select {
+					case ev := <-s.EventChan:
+						evs = append(evs, ev)
+					default:
+						return messages.NewEvents{
+							Events: evs,
+						}
 					}
 				}
+				break drain
 			}
+		}
 
-			return messages.NewEvents{
-				Events: evs,
-			}
+		return messages.NewEvents{
+			Events: evs,
 		}
 	}
 }
