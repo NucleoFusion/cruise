@@ -34,17 +34,17 @@
 - [X] Exec into containers (`docker exec -it`)
 - [X] Stream logs with search and filter
 - [X] Visualize port mappings
-- [ ] Container Details popup (realtime)
-- ~[ ] Group containers by Compose project~
+- [X] Container Details popup (realtime)
+- ~[ ] Group containers by Compose project~ (v2)
 
 ## Images
 - [X] Pull/push/build/remove images
-- ~[ ] Image repository browser~
+- ~[ ] Image repository browser~ (v2)
 - [X] Vulnerability scanning (Trivy/Grype)
 - [X] Tag management and cleanup
 - [X] Size analysis and optimization
 
-## Docker Compose
+## Docker Compose (v2)
 
 ### Dashboard
 - [ ] List all Compose projects
@@ -88,7 +88,7 @@
 
 ### Containers 
 - [X] Port mapping visualization
-- [ ] Remove Container Dropdown, instead make a VP, that displays all details for that container. (Graphs)
+- [X] Remove Container Dropdown, instead make a VP, that displays all details for that container. (Graphs)
 
 ### Vulnerability 
 - [X] Vulnerability scanning (Trivy/Grype)
@@ -102,13 +102,13 @@
 
 ### Monitoring & Logs
 - [X] Centralized log aggregation with search
-- [ ] Alert configuration (notifications)
+- ~[ ] Alert configuration (notifications)~ (v2)
 - [ ] logs export (When config done)
 
 ## Misc
 - [ ] Config File
 - [ ] Docs
-- [ ] UI Polish (use lipgloss where possible)
+- [X] UI Polish (use lipgloss where possible)
 - [ ] Mouse Support
 
 ---
