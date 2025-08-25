@@ -1,48 +1,75 @@
-# 🚢 Cruise – A Docker TUI Client
+# Cruise – Docker TUI Client
 
-> Terminal UI for managing Docker and Docker Compose projects with style and speed.
+> Terminal UI for managing Docker with style and speed.
 
-**Cruise** is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for interacting with Docker. Built with Go and [Bubbletea](https://github.com/charmbracelet/bubbletea), it offers a visually rich, mouse-less experience for managing containers, images, volumes, networks, Compose stacks, and more — all from your terminal.
-
----
+**Cruise** is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for interacting with Docker. Built with Go and [Bubbletea](https://github.com/charmbracelet/bubbletea), it offers a visually rich, keyboard-first experience for managing containers, images, volumes, networks, logs and more — all from your terminal.
 
 
-## 🚧 Tech Stack
+## Description
+
+Ever felt that docker CLI is too lengthy or limited? Find yourself executing commands again and again for stats? Or wrote a full multiline command just for a typo to ruin it? Well... Fret no more. Cruise - Is a TUI Docker Client, fitting easily in your terminal-first dev workflow, while making repetitive Docker work easy and fun.
+
+> How is _cruise_ different from existing solutions?
+
+Existing applications are limited in what they do, they serve as mostly a monitoring service, _not_ a management service let alone a Client.
+
+With Cruise you can:
+- Manage Lifecycles of Containers, Images, Volumes, Networks.
+- Have a centralized Monitoring service
+- Scan images for vulnerabilities
+- Get Detailed view on Docker Artifacts
+- and more to come!
+
+### 🚧 Tech Stack
 
 - **Go** – High performance, robust concurrency
 - **Bubbletea** – Elegant terminal UI framework
 - **Charm ecosystem** – [Lipgloss](https://github.com/charmbracelet/lipgloss), [Bubbles](https://github.com/charmbracelet/bubbles), [Glamour](https://github.com/charmbracelet/glamour)
 - **Docker SDK for Go** – Deep Docker integration
 - **Trivy / Grype** – Vulnerability scanning
-- **YAML parser** – Safe Compose editing
-- Optional: **nvim** or fallback editor
+- **Viper** – Configuration management
 
----
 
-## ✨ Features
+## Usage
 
-## Dashboard
-- [X] Display system-wide resource usage (CPU, memory, disk)
-- [X] Show quick stats (total containers, images, volumes, networks)
-- [X] Track recent Docker activity
-- [X] Display Docker daemon status
+<details>
+  <summary>Screenshots</summary>
+</details>
 
-## Containers
-- [X] Search and filter containers
-- [X] Real-time monitoring (CPU%, memory, network IO)
-- [X] Start/stop/restart/remove/pause containers
-- [X] Exec into containers (`docker exec -it`)
-- [X] Stream logs with search and filter
-- [X] Visualize port mappings
-- [X] Container Details popup (realtime)
-- ~[ ] Group containers by Compose project~ (v2)
+Once [installed](#installation). You can run the app normally.
 
+```
+cruise
+```
+
+## Installation
+
+Coming soon...
+
+
+## Contributing
+
+Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for more.
+
+
+## License
+
+MIT License – see [LICENSE](LICENSE) for details.
+
+## Credits
+
+Built by [Nucleo](https://github.com/NucleoFusion).
+
+Inspiration and Advice from [SourcewareLab](https://github.com/SourcewareLab).
+
+Special Thanks to [Hegedus Mark](https://github.com/hegedus-mark) and [Mongy](https://github.com/A-Cer23).
+
+## TODO Features
+
+<details>
+  
 ## Images
-- [X] Pull/push/build/remove images
 - ~[ ] Image repository browser~ (v2)
-- [X] Vulnerability scanning (Trivy/Grype)
-- [X] Tag management and cleanup
-- [X] Size analysis and optimization
 
 ## Docker Compose (v2)
 
@@ -63,12 +90,6 @@
 - [ ] Syntax highlighting and error detection
 - [ ] Git integration for version control
 
-## Volumes & Networks
-- [X] Volume management with usage stats
-- [X] Volume backup and restore
-- [X] Cleanup unused volumes and networks
-- [X] Visualize network topology
-
 ## Build & Registry
 - [ ] Manage build contexts
 - [ ] Edit Dockerfiles with syntax support
@@ -76,70 +97,24 @@
 - [ ] Manage and clean build cache
 
 ## Monitoring & Logs
-- [X] Centralized log viewer with search
-- [X] Real-time metrics dashboard
 - [ ] Configure alerts and notifications
 - [ ] Export metrics and logs
 
+</details>
 
----
 
 ## V1 Roadmap
 
-### Containers 
-- [X] Port mapping visualization
-- [X] Remove Container Dropdown, instead make a VP, that displays all details for that container. (Graphs)
-
+<details>
+  
 ### Vulnerability 
-- [X] Vulnerability scanning (Trivy/Grype)
-- [X] Individual 
-- [X] Toggle b/w trivy and grype
 - [ ] Export (When config done, define a export folder) 
 
-### Volumes & Networks
-- [X] Volume management with usage stats & backup/restore & prune
-- [X] Network topology visualization
-
 ### Monitoring & Logs
-- [X] Centralized log aggregation with search
-- ~[ ] Alert configuration (notifications)~ (v2)
 - [ ] logs export (When config done)
 
 ## Misc
-- [ ] Config File
 - [ ] Docs
-- [X] UI Polish (use lipgloss where possible)
 - [ ] Mouse Support
 
----
-
-## 📦 Installation
-
-Coming soon...
-
----
-
-## 💬 Contributing
-
-Contributions, feedback, and feature requests are welcome!
-
-1. Clone the repo
-2. Run with `go run .` (or build via `go build`)
-3. Hack away 🚀
-
-Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for more.
-
----
-
-## 📄 License
-
-MIT License – see [LICENSE](LICENSE) for details.
-
----
-
-## 🧑‍💻 Author
-
-Built with ❤️ by [Nucleo](https://github.com/NucleoFusion)
-
----
-
+</details>
