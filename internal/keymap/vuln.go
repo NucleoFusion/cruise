@@ -3,6 +3,7 @@ package keymap
 import (
 	"reflect"
 
+	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
 )
 
@@ -12,14 +13,15 @@ type VulnMap struct {
 }
 
 func NewVulnMap() VulnMap {
+	m := config.Cfg.Keybinds.Vulnerability
 	return VulnMap{
 		FocusScanners: key.NewBinding(
-			key.WithKeys("S"),
-			key.WithHelp("S", "focus scanners"),
+			key.WithKeys(m.FocusScanners),
+			key.WithHelp(m.FocusScanners, "focus scanners"),
 		),
 		FocusList: key.NewBinding(
-			key.WithKeys("L"),
-			key.WithHelp("L", "focus list"),
+			key.WithKeys(m.FocusList),
+			key.WithHelp(m.FocusList, "focus list"),
 		),
 	}
 }

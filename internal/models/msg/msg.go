@@ -36,9 +36,9 @@ func (s *MsgPopup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (s *MsgPopup) View() string {
 	style := lipgloss.NewStyle()
 
-	text := fmt.Sprintf("%s\n\n%s", style.Foreground(colors.Load().Lavender).Render(s.Title+" | "+s.Location),
+	text := fmt.Sprintf("%s\n\n%s", style.Foreground(colors.Load().MsgText).Render(s.Title+" | "+s.Location),
 		style.Foreground(colors.Load().Text).Render(s.Message))
 
-	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Overlay0).
-		Background(colors.Load().Crust).Padding(1, 3).Render(text)
+	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().PopupBorder).
+		Background(colors.Load().ErrorBg).Padding(1, 3).Render(text)
 }

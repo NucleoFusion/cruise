@@ -45,7 +45,7 @@ type Monitoring struct {
 
 func NewMonitoring(w int, h int) *Monitoring {
 	vp := viewport.New(w, h-7-strings.Count(styles.MonitoringText, "\n"))
-	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).
+	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 
 	ti := textinput.New()
@@ -53,8 +53,8 @@ func NewMonitoring(w int, h int) *Monitoring {
 	ti.Prompt = " Search: "
 	ti.Placeholder = "Press '/' to search..."
 
-	ti.PromptStyle = lipgloss.NewStyle().Foreground(colors.Load().Lavender)
-	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().Surface2)
+	ti.PromptStyle = lipgloss.NewStyle().Foreground(colors.Load().FocusedBorder)
+	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().PlaceholderText)
 	ti.TextStyle = styles.TextStyle()
 
 	eventChan, errChan := docker.RecentEventStream(h/3 - 6)

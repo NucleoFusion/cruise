@@ -3,6 +3,7 @@ package keymap
 import (
 	"reflect"
 
+	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
 )
 
@@ -14,22 +15,23 @@ type NetMap struct {
 }
 
 func NewNetMap() NetMap {
+	m := config.Cfg.Keybinds.Network
 	return NetMap{
 		Remove: key.NewBinding(
-			key.WithKeys("r"),
-			key.WithHelp("r", "remove"),
+			key.WithKeys(m.Remove),
+			key.WithHelp(m.Remove, "remove"),
 		),
 		Prune: key.NewBinding(
-			key.WithKeys("p"),
-			key.WithHelp("p", "prune"),
+			key.WithKeys(m.Prune),
+			key.WithHelp(m.Prune, "prune"),
 		),
 		ShowDetails: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("enter", "show details"),
+			key.WithKeys(m.ShowDetails),
+			key.WithHelp(m.ShowDetails, "show details"),
 		),
 		ExitDetails: key.NewBinding(
-			key.WithKeys("esc"),
-			key.WithHelp("esc", "exit details"),
+			key.WithKeys(m.ExitDetails),
+			key.WithHelp(m.ExitDetails, "exit details"),
 		),
 	}
 }

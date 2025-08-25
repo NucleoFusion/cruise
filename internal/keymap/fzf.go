@@ -3,6 +3,7 @@ package keymap
 import (
 	"reflect"
 
+	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
 )
 
@@ -15,22 +16,23 @@ type FuzzyMap struct {
 }
 
 func NewFuzzyMap() FuzzyMap {
+	m := config.Cfg.Keybinds.Fzf
 	return FuzzyMap{
 		Up: key.NewBinding(
-			key.WithKeys("up"),
-			key.WithHelp("up", "up"),
+			key.WithKeys(m.Up),
+			key.WithHelp(m.Up, "up"),
 		),
 		Down: key.NewBinding(
-			key.WithKeys("down"),
-			key.WithHelp("down", "down"),
+			key.WithKeys(m.Down),
+			key.WithHelp(m.Down, "down"),
 		),
 		Enter: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("enter", "enter"),
+			key.WithKeys(m.Enter),
+			key.WithHelp(m.Enter, "enter"),
 		),
 		Exit: key.NewBinding(
-			key.WithKeys("esc"),
-			key.WithHelp("esc", "exit"),
+			key.WithKeys(m.Exit),
+			key.WithHelp(m.Exit, "exit"),
 		),
 	}
 }

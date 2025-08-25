@@ -14,4 +14,6 @@ type Styles struct {
 	ErrorText        string `mapstructure:"error_text"`
 	ErrorBg          string `mapstructure:"error_bg"`
 	PopupBorder      string `mapstructure:"popup_border"`
+	PlaceholderText  string `mapstructure:"placeholder_text"`
+	MsgText          string `mapstructure:"msg_text"`
 }

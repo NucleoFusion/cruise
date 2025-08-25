@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/colors"
+	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
@@ -33,12 +34,12 @@ func NewImageList(w int, h int) *ImageList {
 	ti.Prompt = " Search: "
 	ti.Placeholder = "Press '/' to search..."
 
-	ti.PromptStyle = lipgloss.NewStyle().Foreground(colors.Load().Lavender)
-	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().Surface2)
+	ti.PromptStyle = lipgloss.NewStyle().Foreground(colors.Load().FocusedBorder)
+	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().PlaceholderText)
 	ti.TextStyle = styles.TextStyle()
 
 	vp := viewport.New(w+3, h+1)
-	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).
+	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 
 	return &ImageList{
@@ -75,7 +76,7 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
-			if msg.String() == "esc" {
+			if msg.String() == config.Cfg.Keybinds.Global.UnfocusSearch {
 				s.Ti.Blur()
 				return s, nil
 			}
@@ -86,10 +87,10 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 			return s, cmd
 		}
 		switch msg.String() {
-		case "/":
+		case config.Cfg.Keybinds.Global.FocusSearch:
 			s.Ti.Focus()
 			return s, nil
-		case "down":
+		case config.Cfg.Keybinds.Global.ListDown:
 			if len(s.FilteredItems)-1 > s.SelectedIndex {
 				s.SelectedIndex += 1
 			}
@@ -98,7 +99,7 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 			}
 			s.UpdateList()
 			return s, nil
-		case "up":
+		case config.Cfg.Keybinds.Global.ListUp:
 			if 0 < s.SelectedIndex {
 				s.SelectedIndex -= 1
 			}
@@ -106,8 +107,6 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 				s.Vp.YOffset -= 1
 			}
 			s.UpdateList()
-			return s, nil
-		case "enter":
 			return s, nil
 		}
 	}
@@ -119,7 +118,7 @@ func (s *ImageList) View() string {
 		return lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, "No Containers Found!")
 	}
 
-	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender)
+	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder)
 
 	s.UpdateList()
 
@@ -137,7 +136,7 @@ func (s *ImageList) UpdateList() {
 		line := docker.ImagesFormattedSummary(v, w)
 
 		if k == s.SelectedIndex {
-			line = lipgloss.NewStyle().Background(colors.Load().Lavender).Foreground(colors.Load().Base).Render(line)
+			line = lipgloss.NewStyle().Background(colors.Load().MenuSelectedBg).Foreground(colors.Load().MenuSelectedText).Render(line)
 		} else {
 			line = styles.TextStyle().Render(line)
 		}

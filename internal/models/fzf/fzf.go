@@ -101,7 +101,7 @@ func (m *FuzzyFinder) Update(msg tea.Msg) (FuzzyFinder, tea.Cmd) {
 func (m *FuzzyFinder) View() string {
 	pg := lipgloss.Place(m.Width, m.Height-1, lipgloss.Center, lipgloss.Center,
 		lipgloss.JoinVertical(lipgloss.Center,
-			lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).Render(m.Ti.View()),
+			lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).Render(m.Ti.View()),
 			m.Vp.View()))
 	hlp := lipgloss.NewStyle().PaddingLeft(2).Render(m.Help.View())
 	return lipgloss.JoinVertical(lipgloss.Left, pg, hlp)

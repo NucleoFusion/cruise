@@ -11,11 +11,11 @@ func ItemLineStyle(w int) lipgloss.Style {
 }
 
 func SelectedItemStyle(w int) lipgloss.Style {
-	return ItemLineStyle(w).Background(colors.Load().Lavender).Foreground(colors.Load().Base)
+	return ItemLineStyle(w).Background(colors.Load().MenuSelectedBg).Foreground(colors.Load().MenuSelectedText)
 }
 
 func VPStyle() lipgloss.Style {
-	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).
+	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Foreground(colors.Load().Text)
 }
 

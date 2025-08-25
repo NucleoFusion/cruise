@@ -22,8 +22,8 @@ func NewStyledHelp(b []key.Binding, w int) StyledHelp {
 	h := help.New()
 	h.Styles.FullKey = h.Styles.FullKey.Margin(0, 0).Padding(0, 0)
 	h.Styles.FullDesc = h.Styles.FullDesc.Margin(0, 0).Padding(0, 0)
-	h.Styles.ShortKey = lipgloss.NewStyle().Background(colors.Load().Surface0).Foreground(colors.Load().Text)
-	h.Styles.ShortDesc = lipgloss.NewStyle().Foreground(colors.Load().Overlay0)
+	h.Styles.ShortKey = lipgloss.NewStyle().Background(colors.Load().HelpKeyText).Foreground(colors.Load().Text)
+	h.Styles.ShortDesc = lipgloss.NewStyle().Foreground(colors.Load().HelpDescText)
 
 	newk := make([]key.Binding, 0, len(b))
 	newk = append(newk, key.NewBinding(key.WithKeys("tab"), key.WithHelp(" tab ", "switch pages")))

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +18,11 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
+	if err := config.SetCfg(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

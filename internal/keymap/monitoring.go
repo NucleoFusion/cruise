@@ -3,6 +3,7 @@ package keymap
 import (
 	"reflect"
 
+	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
 )
 
@@ -12,14 +13,15 @@ type MonitorMap struct {
 }
 
 func NewMonitorMap() MonitorMap {
+	m := config.Cfg.Keybinds.Monitoring
 	return MonitorMap{
 		Search: key.NewBinding(
-			key.WithKeys("/"),
-			key.WithHelp("/", "search"),
+			key.WithKeys(m.Search),
+			key.WithHelp(m.Search, "search"),
 		),
 		ExitSearch: key.NewBinding(
-			key.WithKeys("esc"),
-			key.WithHelp("esc", "exit search"),
+			key.WithKeys(m.ExitSearch),
+			key.WithHelp(m.ExitSearch, "exit search"),
 		),
 	}
 }

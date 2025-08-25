@@ -6,27 +6,27 @@ import (
 )
 
 func ErrorStyle() lipgloss.Style {
-	return lipgloss.NewStyle().Background(colors.Load().Red).Foreground(colors.Load().Base)
+	return lipgloss.NewStyle().Background(colors.Load().ErrorBg).Foreground(colors.Load().ErrorText)
 }
 
 func PageStyle() lipgloss.Style {
-	return lipgloss.NewStyle().Background(colors.Load().Base).Foreground(colors.Load().Text).
-		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender)
+	return lipgloss.NewStyle().Foreground(colors.Load().Text).
+		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder)
 }
 
 func SubpageStyle() lipgloss.Style {
-	return lipgloss.NewStyle().Background(colors.Load().Base).Foreground(colors.Load().Text).
-		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Surface1)
+	return lipgloss.NewStyle().Foreground(colors.Load().Text).
+		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().UnfocusedBorder)
 }
 
 func TitleStyle() lipgloss.Style {
-	return lipgloss.NewStyle().Background(colors.Load().Surface0).Foreground(colors.Load().Sapphire).Padding(0, 1)
+	return lipgloss.NewStyle().Background(colors.Load().SubtitleBg).Foreground(colors.Load().SubtitleText).Padding(0, 1)
 }
 
 func SelectedStyle() lipgloss.Style {
-	return lipgloss.NewStyle().Background(colors.Load().Lavender).Foreground(colors.Load().Base)
+	return lipgloss.NewStyle().Background(colors.Load().MenuSelectedText).Foreground(colors.Load().MenuSelectedText)
 }
 
 func DetailKeyStyle() lipgloss.Style {
-	return lipgloss.NewStyle().Foreground(colors.Load().Text).Background(colors.Load().Surface0)
+	return lipgloss.NewStyle().Foreground(colors.Load().HelpKeyText).Background(colors.Load().HelpKeyBg)
 }

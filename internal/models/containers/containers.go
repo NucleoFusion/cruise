@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/colors"
+	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
@@ -34,7 +35,7 @@ type Containers struct {
 
 func NewContainers(w int, h int) *Containers {
 	vp := viewport.New(w/3, h/2)
-	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().Lavender).
+	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 
 	return &Containers{
@@ -93,7 +94,7 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			s.List, cmd = s.List.Update(msg)
 			return s, cmd
 		} else if s.ShowPortmap {
-			if msg.String() == "esc" {
+			if msg.String() == config.Cfg.Keybinds.Container.ExitDetails {
 				s.ShowPortmap = false
 				return s, nil
 			}

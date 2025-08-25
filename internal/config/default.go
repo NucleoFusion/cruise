@@ -74,6 +74,8 @@ func Default() Config {
 			ErrorText:        "#f38ba8",
 			ErrorBg:          "#11111b",
 			PopupBorder:      "#74c7ec",
+			PlaceholderText:  "#585b70",
+			MsgText:          "#74c7ec",
 		}, // TODO: Fill styles and refactor colors package and its uses
 	}
 }

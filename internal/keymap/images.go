@@ -3,6 +3,7 @@ package keymap
 import (
 	"reflect"
 
+	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
 )
 
@@ -17,30 +18,31 @@ type ImagesMap struct {
 }
 
 func NewImagesMap() ImagesMap {
+	m := config.Cfg.Keybinds.Images
 	return ImagesMap{
 		Remove: key.NewBinding(
-			key.WithKeys("r"),
-			key.WithHelp("r", "remove"),
+			key.WithKeys(m.Remove),
+			key.WithHelp(m.Remove, "remove"),
 		),
 		Prune: key.NewBinding(
-			key.WithKeys("d"),
-			key.WithHelp("d", "prune"),
+			key.WithKeys(m.Prune),
+			key.WithHelp(m.Prune, "prune"),
 		),
 		Pull: key.NewBinding(
-			key.WithKeys("u"),
-			key.WithHelp("u", "pull"),
+			key.WithKeys(m.Pull),
+			key.WithHelp(m.Pull, "pull"),
 		),
 		Push: key.NewBinding(
-			key.WithKeys("p"),
-			key.WithHelp("p", "push"),
+			key.WithKeys(m.Push),
+			key.WithHelp(m.Push, "push"),
 		),
 		Build: key.NewBinding(
-			key.WithKeys("b"),
-			key.WithHelp("b", "build"),
+			key.WithKeys(m.Build),
+			key.WithHelp(m.Build, "build"),
 		),
 		Layers: key.NewBinding(
-			key.WithKeys("l"),
-			key.WithHelp("l", "layers"),
+			key.WithKeys(m.Build),
+			key.WithHelp(m.Build, "layers"),
 		),
 	}
 }

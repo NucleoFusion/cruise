@@ -8,4 +8,5 @@ type Config struct {
 
 type Global struct {
 	ExportDir string `mapstructure:"export_dir"`
+	Shell     string `mapstructure:"export_dir"` // TODO
 }
