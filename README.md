@@ -5,7 +5,7 @@
 **Cruise** is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for interacting with Docker. Built with Go and [Bubbletea](https://github.com/charmbracelet/bubbletea), it offers a visually rich, keyboard-first experience for managing containers, images, volumes, networks, logs and more — all from your terminal.
 
 
-## Description
+## 📖 Description
 
 Ever felt that docker CLI is too lengthy or limited? Find yourself executing commands again and again for stats? Or wrote a full multiline command just for a typo to ruin it? Well... Fret no more. Cruise - Is a TUI Docker Client, fitting easily in your terminal-first dev workflow, while making repetitive Docker work easy and fun.
 
@@ -30,33 +30,30 @@ With Cruise you can:
 - **Viper** – Configuration management
 
 
-## Usage
+## 🚀 Usage
 
 <details>
   <summary>Screenshots</summary>
 </details>
 
-Once [installed](#installation). You can run the app normally.
+Once [installed](#installation). You can run the app with `cruise`.
 
-```
-cruise
-```
 
-## Installation
+## 📦 Installation
 
 Coming soon...
 
 
-## Contributing
+## 🤝 Contributing
 
 Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for more.
 
 
-## License
+## 📜 License
 
 MIT License – see [LICENSE](LICENSE) for details.
 
-## Credits
+## 🙌 Credits
 
 Built by [Nucleo](https://github.com/NucleoFusion).
 
@@ -64,57 +61,4 @@ Inspiration and Advice from [SourcewareLab](https://github.com/SourcewareLab).
 
 Special Thanks to [Hegedus Mark](https://github.com/hegedus-mark) and [Mongy](https://github.com/A-Cer23).
 
-## TODO Features
 
-<details>
-  
-## Images
-- ~[ ] Image repository browser~ (v2)
-
-## Docker Compose (v2)
-
-### Dashboard
-- [ ] List all Compose projects
-- [ ] Up/down/restart/recreate operations
-- [ ] Visualize Compose service dependencies
-- [ ] Manage environment variables
-
-### Service Dashboard
-- [ ] Start/stop/restart/scale services
-- [ ] Real-time service monitoring
-- [ ] Network visualization
-- [ ] Aggregated service logs with filters
-
-### Compose Editor
-- [ ] Built-in editor with nvim or fallback
-- [ ] Syntax highlighting and error detection
-- [ ] Git integration for version control
-
-## Build & Registry
-- [ ] Manage build contexts
-- [ ] Edit Dockerfiles with syntax support
-- [ ] Configure private registries
-- [ ] Manage and clean build cache
-
-## Monitoring & Logs
-- [ ] Configure alerts and notifications
-- [ ] Export metrics and logs
-
-</details>
-
-
-## V1 Roadmap
-
-<details>
-  
-### Vulnerability 
-- [ ] Export (When config done, define a export folder) 
-
-### Monitoring & Logs
-- [ ] logs export (When config done)
-
-## Misc
-- [ ] Docs
-- [ ] Mouse Support
-
-</details>
