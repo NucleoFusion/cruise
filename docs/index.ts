@@ -10,18 +10,17 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
+      { text: 'About', link: '/about/' },
       { text: 'Docs', link: '/docs/' }
     ],
 
-    sidebar: [
-      {
-        text: 'Docs',
-        items: [
-          { text: 'About', link: '/markdown-examples' },
-          { text: 'Configuration', link: '/api-examples' }
-        ]
-      }
-    ],
+    sidebar: {
+      "/": [
+        { text: "About", link: "/about/" },
+        { text: "Getting Started", link: "/getting-started/" },
+        { text: "Documentation", link: "/docs/" }
+      ]
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/NucleoFusion/cruise' }
