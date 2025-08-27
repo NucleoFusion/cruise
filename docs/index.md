@@ -7,7 +7,7 @@ hero:
   text: A Docker TUI Client 
   actions:
     - theme: brand 
-      text: Get Started 
+      text: Getting Started 
       link: /docs
     - theme: alt
       text: Documentation 
