@@ -17,8 +17,21 @@ export default defineConfig({
     sidebar: {
       "/": [
         { text: "About", link: "/about/" },
-        { text: "Getting Started", link: "/getting-started/" },
+        { text: "Getting Started", link: "/docs/getting-started/" },
         { text: "Documentation", link: "/docs/" }
+      ],
+      "/docs/": [
+        { text: "Documentation", link: "/docs/" },
+        { text: "Getting Started", link: "/docs/getting-started" },
+        { text: "Installation", link: "/docs/install" },
+        { text: "Configuration", link: "/docs/config/" },
+        { text: "Contributing", link: "/docs/contributing" },
+      ],
+      "/docs/config/": [
+        { text: "Configuration", link: "/docs/config/" },
+        { text: "General", link: "/docs/config/general" },
+        { text: "Keybinds", link: "/docs/config/keybinds" },
+        { text: "Styles", link: "/docs/config/styles" },
       ]
     },
 
