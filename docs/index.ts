@@ -17,12 +17,11 @@ export default defineConfig({
     sidebar: {
       "/": [
         { text: "About", link: "/about/" },
-        { text: "Getting Started", link: "/docs/getting-started/" },
-        { text: "Documentation", link: "/docs/" }
+        { text: "Getting Started", link: "/docs/" },
+        { text: "Configuration", link: "/docs/config/" }
       ],
       "/docs/": [
-        { text: "Documentation", link: "/docs/" },
-        { text: "Getting Started", link: "/docs/getting-started" },
+        { text: "Getting Started", link: "/docs/" },
         { text: "Installation", link: "/docs/install" },
         { text: "Configuration", link: "/docs/config/" },
         { text: "Contributing", link: "/docs/contributing" },

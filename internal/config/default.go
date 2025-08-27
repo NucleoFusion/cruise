@@ -3,7 +3,7 @@ package config
 func Default() Config {
 	return Config{
 		Global: Global{
-			ExportDir: "/home/nucleofusion/.cruise/export", // Absolute Path
+			ExportDir: "/home/nucleofusion/.cruise/export", // TODO: Absolute Path
 		},
 		Keybinds: Keybinds{ // TODO: Refactor keymap to use this
 			Global: GlobalKeybinds{
