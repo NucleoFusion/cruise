@@ -24,7 +24,7 @@ func TitleStyle() lipgloss.Style {
 }
 
 func SelectedStyle() lipgloss.Style {
-	return lipgloss.NewStyle().Background(colors.Load().MenuSelectedText).Foreground(colors.Load().MenuSelectedText)
+	return lipgloss.NewStyle().Background(colors.Load().MenuSelectedBg).Foreground(colors.Load().MenuSelectedText)
 }
 
 func DetailKeyStyle() lipgloss.Style {

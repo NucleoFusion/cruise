@@ -1,12 +1,12 @@
 package config
 
 type Config struct {
-	Global   Global   `mapstructure:"global"`
-	Styles   Styles   `mapstructure:"styles"`
-	Keybinds Keybinds `mapstructure:"keybinds"`
+	Global   Global   `mapstructure:"global" toml:"global"`
+	Styles   Styles   `mapstructure:"styles" toml:"styles"`
+	Keybinds Keybinds `mapstructure:"keybinds" toml:"keybinds"`
 }
 
 type Global struct {
-	ExportDir string `mapstructure:"export_dir"`
-	Shell     string `mapstructure:"export_dir"` // TODO
+	ExportDir string `mapstructure:"export_dir" toml:"export_dir"`
+	Term      string `mapstructure:"term" toml:"term"` // TODO
 }

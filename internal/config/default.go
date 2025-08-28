@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 )
@@ -20,7 +21,7 @@ func Default() Config {
 	return Config{
 		Global: Global{
 			ExportDir: expDir,
-			Shell:     "bash", // TODO: Refactor for shell
+			Term:      DetectTerminal(), // TODO: Refactor for shell
 		},
 		Keybinds: Keybinds{
 			Global: GlobalKeybinds{
@@ -108,5 +109,50 @@ func GetDefExportDir() string {
 	default:
 		cfg, _ := os.UserConfigDir()
 		return cfg
+	}
+}
+
+func DetectTerminal() string {
+	if term := os.Getenv("TERMINAL"); term != "" {
+		return term
+	}
+
+	switch runtime.GOOS {
+	case "windows":
+		// Prefer Windows Terminal (wt.exe) if installed
+		if _, err := exec.LookPath("wt.exe"); err == nil {
+			return "wt.exe"
+		}
+		if comspec := os.Getenv("ComSpec"); comspec != "" {
+			return comspec
+		}
+		return "cmd.exe"
+
+	case "darwin":
+		return "open -a Terminal"
+
+	case "linux":
+		if _, err := exec.LookPath("x-terminal-emulator"); err == nil {
+			return "x-terminal-emulator"
+		}
+		// Common terminals
+		candidates := []string{
+			"gnome-terminal",
+			"konsole",
+			"xfce4-terminal",
+			"xterm",
+		}
+		for _, c := range candidates {
+			if _, err := exec.LookPath(c); err == nil {
+				return c
+			}
+		}
+		if sh := os.Getenv("SHELL"); sh != "" {
+			return sh
+		}
+		return "xterm"
+
+	default:
+		return "sh"
 	}
 }

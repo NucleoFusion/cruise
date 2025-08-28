@@ -1,0 +1,77 @@
+[global]
+export_dir = '/home/nucleofusion/.cruise'
+term = 'konsole'
+
+[styles]
+text = '#cdd6f4'
+subtitle_text = '#74c7ec'
+subtitle_bg = '#313244'
+unfocused_border = '#45475a'
+focused_border = '#b4befe'
+help_key_bg = '#313244'
+help_key_text = '#1e1e2e'
+help_desc_text = '#6c7086'
+menu_selected_bg = '#b4befe'
+menu_selected_text = '#1e1e2e'
+error_text = '#f38ba8'
+error_bg = '#11111b'
+popup_border = '#74c7ec'
+placeholder_text = '#585b70'
+msg_text = '#74c7ec'
+
+[keybinds]
+[keybinds.global]
+page_finder = 'tab'
+list_up = 'up'
+list_down = 'down'
+focus_search = '/'
+unfocus_search = 'esc'
+
+[keybinds.container]
+start = 's'
+exec = 'e'
+restart = 'r'
+stop = 't'
+remove = 'd'
+pause = 'p'
+unpause = 'u'
+port_map = 'm'
+show_details = 'enter'
+exit_details = 'esc'
+
+[keybinds.images]
+remove = 'r'
+prune = 'd'
+push = 'p'
+pull = 'u'
+build = 'b'
+layers = 'l'
+exit = ''
+
+[keybinds.fzf]
+up = 'up'
+down = 'down'
+enter = 'enter'
+exit = 'esc'
+
+[keybinds.monitoring]
+search = '/'
+exit_search = 'esc'
+export = ''
+
+[keybinds.network]
+remove = 'r'
+prune = 'p'
+show_details = 'enter'
+exit_details = 'esc'
+
+[keybinds.volume]
+remove = 'r'
+prune = 'p'
+show_details = 'enter'
+exit_details = 'esc'
+
+[keybinds.vulnerability]
+focus_scanners = 'S'
+focus_list = 'L'
+export = ''
