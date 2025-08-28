@@ -36,10 +36,10 @@
 ## 🗺️ V1 Roadmap
   
 ### 🔒 Vulnerability 
-- [ ] Export (When config done, define a export folder) 
+- [X] Export (When config done, define a export folder) 
 
 ### Monitoring & Logs
-- [ ] logs export (When config done)
+- [X] logs export (When config done)
 
 ## Misc
 - [ ] Docs
