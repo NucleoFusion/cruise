@@ -10,6 +10,7 @@ import (
 type MonitorMap struct {
 	Search     key.Binding
 	ExitSearch key.Binding
+	Export     key.Binding
 }
 
 func NewMonitorMap() MonitorMap {
@@ -22,6 +23,10 @@ func NewMonitorMap() MonitorMap {
 		ExitSearch: key.NewBinding(
 			key.WithKeys(m.ExitSearch),
 			key.WithHelp(m.ExitSearch, "exit search"),
+		),
+		Export: key.NewBinding(
+			key.WithKeys(m.Export),
+			key.WithHelp(m.Export, "export"),
 		),
 	}
 }

@@ -52,6 +52,7 @@ type ImagesKeybinds struct {
 type MonitorKeybinds struct {
 	Search     string `mapstructure:"search"`
 	ExitSearch string `mapstructure:"exit_search"`
+	Export     string `mapstructure:"export"`
 }
 
 type NetworkKeybinds struct {
@@ -71,4 +72,5 @@ type VolumeKeybinds struct {
 type VulnerabilityKeybinds struct {
 	FocusScanners string `mapstructure:"focus_scanners"`
 	FocusList     string `mapstructure:"focus_list"`
+	Export        string `mapstructure:"export"`
 }

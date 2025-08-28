@@ -10,6 +10,7 @@ import (
 type VulnMap struct {
 	FocusScanners key.Binding
 	FocusList     key.Binding
+	Export        key.Binding
 }
 
 func NewVulnMap() VulnMap {
@@ -22,6 +23,10 @@ func NewVulnMap() VulnMap {
 		FocusList: key.NewBinding(
 			key.WithKeys(m.FocusList),
 			key.WithHelp(m.FocusList, "focus list"),
+		),
+		Export: key.NewBinding(
+			key.WithKeys(m.Export),
+			key.WithHelp(m.Export, "export"),
 		),
 	}
 }

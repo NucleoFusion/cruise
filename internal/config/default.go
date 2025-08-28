@@ -1,11 +1,28 @@
 package config
 
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+)
+
 func Default() Config {
+	expDir := GetDefExportDir()
+
+	if _, err := os.Stat(expDir); os.IsNotExist(err) {
+		if err := os.MkdirAll(expDir, 0o755); err != nil {
+			fmt.Printf("failed to create config dir: %s", err.Error())
+			os.Exit(1)
+		}
+	}
+
 	return Config{
 		Global: Global{
-			ExportDir: "/home/nucleofusion/.cruise/export", // TODO: Absolute Path
+			ExportDir: expDir,
+			Shell:     "bash", // TODO: Refactor for shell
 		},
-		Keybinds: Keybinds{ // TODO: Refactor keymap to use this
+		Keybinds: Keybinds{
 			Global: GlobalKeybinds{
 				PageFinder:    "tab",
 				ListUp:        "up",
@@ -17,7 +34,7 @@ func Default() Config {
 				Up:    "up",
 				Down:  "down",
 				Enter: "enter",
-				Exit:  "exit",
+				Exit:  "esc",
 			},
 			Container: ContainersKeybinds{
 				Start:       "s",
@@ -69,13 +86,27 @@ func Default() Config {
 			FocusedBorder:    "#b4befe",
 			UnfocusedBorder:  "#45475a",
 			HelpKeyBg:        "#313244",
-			HelpKeyText:      "#cdd6f4",
+			HelpKeyText:      "#1e1e2e", // TODO: Docs change
 			HelpDescText:     "#6c7086",
 			ErrorText:        "#f38ba8",
 			ErrorBg:          "#11111b",
 			PopupBorder:      "#74c7ec",
 			PlaceholderText:  "#585b70",
 			MsgText:          "#74c7ec",
-		}, // TODO: Fill styles and refactor colors package and its uses
+		},
+	}
+}
+
+func GetDefExportDir() string {
+	switch runtime.GOOS {
+	case "linux", "darwin":
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, ".cruise")
+	case "windows":
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, ".cruise", "export")
+	default:
+		cfg, _ := os.UserConfigDir()
+		return cfg
 	}
 }

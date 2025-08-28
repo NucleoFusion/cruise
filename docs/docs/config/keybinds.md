@@ -210,6 +210,15 @@ Default Value:
 exit_search = "esc"
 ```
 
+
+### Export
+Sets the keybind for exporting to the export dir. Can be set using the `export` key.
+
+Default Value:
+``` toml
+export= "e"
+```
+
 ## Networks 
 Denoted by `[keybinds.network]` toml tag.
 
@@ -297,5 +306,13 @@ Sets the keybind for switching focus to the vulnerability results list. Can be s
 Default Value:
 ``` toml
 focus_list = "L"
+```
+
+### Export
+Sets the keybind for exporting to the export dir. Can be set using the `export` key.
+
+Default Value:
+``` toml
+export= "e"
 ```
 

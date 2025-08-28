@@ -115,6 +115,18 @@ func (s *Monitoring) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Search):
 			s.Ti.Focus()
 			return s, nil
+		case key.Matches(msg, s.Keymap.Export):
+			arr := make([]string, 0)
+			for _, v := range s.Events {
+				arr = append(arr, docker.FormatDockerEventVerbose(*v))
+			}
+
+			err := docker.Export(arr, "monitoring")
+			if err != nil {
+				return s, utils.ReturnError("Monitoring", "Error Exporting", err)
+			}
+
+			return s, utils.ReturnMsg("Monitoring", "Exported Successfully", "exported events to export dir.")
 		}
 	}
 	return s, nil

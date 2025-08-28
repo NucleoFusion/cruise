@@ -3,9 +3,12 @@ package docker
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
@@ -88,4 +91,17 @@ func FormatDockerEventVerbose(msg events.Message) string {
 		msg.Type,
 		strings.Join(extras, ", "),
 	)
+}
+
+func Export(content []string, page string) error {
+	filename := fmt.Sprintf("%d:%d_%d-%d_%s", time.Now().Hour(), time.Now().Minute(), time.Now().Day(), time.Now().Month(), page)
+
+	f, err := os.Create(filepath.Join(config.Cfg.Global.ExportDir, filename))
+	if err != nil {
+		return err
+	}
+
+	f.WriteString(strings.Join(content, "\n"))
+
+	return nil
 }
