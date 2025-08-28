@@ -54,7 +54,7 @@ Sets the text color for help key indicators. Can be set using the `help_key_text
 
 Default Value:
 ``` toml
-help_key_text = "#cdd6f4"
+help_key_text = "#1e1e2e"
 ```
 
 ## Help Descriptions Text

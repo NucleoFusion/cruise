@@ -153,7 +153,7 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Sprintf("Successfully Stopped Container w/ ID %s", s.List.GetCurrentItem().ID))
 
 		case key.Matches(msg, s.Keymap.Exec):
-			cmd := exec.Command(config.Cfg.Global.Term, "-e", fmt.Sprintf("docker exec -it %s %s", s.List.GetCurrentItem().ID, "sh")) // TODO: Terminal customization
+			cmd := exec.Command(config.Cfg.Global.Term, "-e", fmt.Sprintf("docker exec -it %s %s", s.List.GetCurrentItem().ID, "sh"))
 			cmd.Stdin = nil
 			cmd.Stdout = nil
 			cmd.Stderr = nil

@@ -21,7 +21,7 @@ func Default() Config {
 	return Config{
 		Global: Global{
 			ExportDir: expDir,
-			Term:      DetectTerminal(), // TODO: Refactor for shell
+			Term:      DetectTerminal(),
 		},
 		Keybinds: Keybinds{
 			Global: GlobalKeybinds{
@@ -87,7 +87,7 @@ func Default() Config {
 			FocusedBorder:    "#b4befe",
 			UnfocusedBorder:  "#45475a",
 			HelpKeyBg:        "#313244",
-			HelpKeyText:      "#1e1e2e", // TODO: Docs change
+			HelpKeyText:      "#1e1e2e",
 			HelpDescText:     "#6c7086",
 			ErrorText:        "#f38ba8",
 			ErrorBg:          "#11111b",
