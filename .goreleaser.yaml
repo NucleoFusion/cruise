@@ -1,0 +1,126 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+
+# The lines below are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/need to use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+---
+version: 2
+
+project_name: cruise
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+
+# Normal tar.gz's
+builds:
+  - binary: cruise
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+      - freebsd
+    goarch:
+      - amd64
+      - arm
+      - arm64
+
+# deb/rpm files
+nfpms:
+  - package_name: cruise
+    homepage: https://nucleofusion.github.io/cruise/
+    maintainer: NucleoFusion <lakshit.singh.mail@gmail.com>
+    description: |-
+      Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
+      User Interface) for interacting with Docker
+    license: MIT License
+    formats:
+      - rpm
+      - deb
+    dependencies:
+      - bash
+      - docker
+    suggests:
+      - trivy
+      - grype
+
+# Homebrew
+homebrew_casks:
+  - name: cruise
+    binary: cruise
+    url:
+      template: "https://github.com/NucleoFusion/cruise/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+      verified: "github.com/NucleoFusion/cruise"
+    homepage: https://nucleofusion.github.io/cruise/
+    description: |-
+      Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
+      User Interface) for interacting with Docker
+    skip_upload: false
+    directory: Casks
+    repository:
+      owner: NucleoFusion
+      name: homebrew-cruise
+      branch: main
+
+# AUR
+aurs: 
+  - name: cruise
+    homepage: https://nucleofusion.github.io/cruise/
+    description: |-
+      Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
+      User Interface) for interacting with Docker
+    maintainers:
+      - "NucleoFusion <lakshit.singh.mail@gmail.com>"
+    license: "MIT"
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: "ssh://aur@aur.archlinux.org/cruise.git"
+    depends: 
+      - docker
+    optdepends: 
+      - trivy
+      - grype
+    
+chocolateys:
+  - name: cruise
+    owners: NucleoFusion
+    title: cruise
+    authors: NucleoFusion
+    project_url: https://nucleofusion.github.io/cruise/
+    description: |-
+      Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
+      User Interface) for interacting with Docker
+    api_key: "{{ .Env.CHOCOLATEY_KEY }}"
+
+archives:
+  - formats: [tar.gz]
+    # this name template makes the OS and Arch compatible
+    # with the results of `uname`.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+release:
+  footer: >-
+
+    ---
+
+    Released by [GoReleaser](https://github.com/goreleaser/goreleaser).

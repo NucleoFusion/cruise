@@ -1,1 +1,3 @@
 cruise
+# Added by goreleaser init:
+dist/
