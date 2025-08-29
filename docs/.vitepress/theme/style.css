@@ -75,6 +75,12 @@
   color: transparent;
 }
 
+img {
+  border: 1px solid #cdd6f4;
+  /* border-radius: 8px; */
+  margin-bottom: 1vh;
+  padding: 4px;
+}
 /* .VPSwitchAppearance { */
 /*   display: none !important; */
 /* } */

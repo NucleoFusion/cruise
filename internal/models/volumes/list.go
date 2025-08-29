@@ -133,7 +133,7 @@ func (s *VolumeList) UpdateList() {
 		line := docker.VolumesFormattedSummary(*v, s.Width)
 
 		if k == s.SelectedIndex {
-			line = lipgloss.NewStyle().Background(colors.Load().MenuSelectedText).Foreground(colors.Load().MenuSelectedBg).Render(line)
+			line = styles.SelectedStyle().Render(line)
 		} else {
 			line = styles.TextStyle().Render(line)
 		}

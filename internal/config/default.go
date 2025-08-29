@@ -87,7 +87,7 @@ func Default() Config {
 			FocusedBorder:    "#b4befe",
 			UnfocusedBorder:  "#45475a",
 			HelpKeyBg:        "#313244",
-			HelpKeyText:      "#1e1e2e",
+			HelpKeyText:      "#cdd6f4",
 			HelpDescText:     "#6c7086",
 			ErrorText:        "#f38ba8",
 			ErrorBg:          "#11111b",

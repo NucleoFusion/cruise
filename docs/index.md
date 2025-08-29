@@ -8,10 +8,10 @@ hero:
   actions:
     - theme: brand 
       text: Getting Started 
-      link: /docs
+      link: /docs/
     - theme: alt
       text: Documentation 
-      link: /config/
+      link: /docs/config/
 
 features:
   - title: Comprehensive Docker Management

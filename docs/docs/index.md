@@ -8,6 +8,23 @@ Docker containers, images, networks, and volumes with ease and efficiency.
 Whether you’re a developer, DevOps engineer, or system administrator, Cruise is designed to seamlessly integrate into your terminal-centric workflow and simplify 
 your Docker experience.
 
+<details>
+  <summary>Screenshots</summary>
+
+![screenshot](/1.png)
+![screenshot](/2.png)
+![screenshot](/3.png)
+![screenshot](/4.png)
+![screenshot](/5.png)
+![screenshot](/6.png)
+![screenshot](/7.png)
+![screenshot](/8.png)
+![screenshot](/9.png)
+![screenshot](/10.png)
+![screenshot](/11.png)
+
+</details>
+
 ## Prerequisites
 
 - **Go** 

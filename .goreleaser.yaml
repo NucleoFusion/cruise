@@ -63,7 +63,7 @@ homebrew_casks:
     directory: Casks
     repository:
       owner: NucleoFusion
-      name: homebrew-cruise
+      name: homebrew-tap
       branch: main
 
 # AUR
