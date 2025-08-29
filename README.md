@@ -34,6 +34,19 @@ With Cruise you can:
 
 <details>
   <summary>Screenshots</summary>
+
+<img width="1827" height="1013" alt="1" src="https://github.com/user-attachments/assets/67e2903d-b754-4ea4-96f6-fb3afd3f9286" />
+<img width="1827" height="1013" alt="2" src="https://github.com/user-attachments/assets/40fb2d54-e05d-4e38-96b4-07852093ee8c" />
+  <img width="1827" height="1013" alt="4" src="https://github.com/user-attachments/assets/22b322db-4eef-443e-a33d-90602c238ff0" />
+  <img width="1827" height="1013" alt="3" src="https://github.com/user-attachments/assets/3d4392a1-1d4c-48c3-aaa7-8f7f7e6e6576" />
+<img width="1827" height="1013" alt="11" src="https://github.com/user-attachments/assets/df9fce45-d612-402d-8414-ad981ff5765c" />
+<img width="1827" height="1013" alt="10" src="https://github.com/user-attachments/assets/8786024c-faf4-4f2a-ae97-d3a886b67ad0" />
+<img width="1827" height="1013" alt="9" src="https://github.com/user-attachments/assets/428dc2a6-2951-4da9-ad3d-1ad4188268fa" />
+<img width="1827" height="1013" alt="8" src="https://github.com/user-attachments/assets/d9dd132a-9e72-480a-b3a3-08b310e51fb4" />
+<img width="1827" height="1013" alt="7" src="https://github.com/user-attachments/assets/bed515da-0c5d-4f72-b771-4f6afcfc35c4" />
+<img width="1827" height="1013" alt="6" src="https://github.com/user-attachments/assets/c1999901-c2de-416c-8bc1-cfea2d368d31" />
+<img width="1827" height="1013" alt="5" src="https://github.com/user-attachments/assets/fc118e59-781e-412b-b787-82f497084587" />
+
 </details>
 
 Once [installed](#installation). You can run the app with `cruise`.
