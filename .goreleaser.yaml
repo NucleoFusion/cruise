@@ -70,9 +70,6 @@ homebrew_casks:
 aurs: 
   - name: cruise
     homepage: https://nucleofusion.github.io/cruise/
-    description: |-
-      Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
-      User Interface) for interacting with Docker
     maintainers:
       - "NucleoFusion <lakshit.singh.mail@gmail.com>"
     license: "MIT"
