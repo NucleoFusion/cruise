@@ -80,6 +80,8 @@ aurs:
     optdepends: 
       - trivy
       - grype
+    package: |-
+      install -Dm755 "./cruise" "${pkgdir}/usr/bin/cruise"
     
 chocolateys:
   - name: cruise
