@@ -5,6 +5,19 @@ It offers a visually rich, keyboard-first experience for managing containers, im
 
 <details>
   <summary>Screenshots</summary>
+
+![screenshot](/1.png)
+![screenshot](/2.png)
+![screenshot](/3.png)
+![screenshot](/4.png)
+![screenshot](/5.png)
+![screenshot](/6.png)
+![screenshot](/7.png)
+![screenshot](/8.png)
+![screenshot](/9.png)
+![screenshot](/10.png)
+![screenshot](/11.png)
+
 </details>
 
 ## Features
@@ -49,7 +62,7 @@ obtaining the best of both worlds.
 
 Oh, and did I mention? Cruise looks a lot better... _and is also configurable_.
 
-## Repo Details
+<!-- ## Repo Details -->
 
 <!-- [![GitHub release](https://img.shields.io/github/v/release/NucleoFusion/cruise?include_prereleases)](https://github.com/NucleoFusion/cruise/releases) -->
 <!-- [![GitHub stars](https://img.shields.io/github/stars/NucleoFusion/cruise?labelColor=#1e1e2e&color=&style=flat)](https://github.com/NucleoFusion/cruise/stargazers) -->
@@ -57,6 +70,6 @@ Oh, and did I mention? Cruise looks a lot better... _and is also configurable_.
 <!-- [![GitHub issues](https://img.shields.io/github/issues/NucleoFusion/cruise)](https://github.com/NucleoFusion/cruise/issues) -->
 <!-- [![GitHub pull requests](https://img.shields.io/github/issues-pr/NucleoFusion/cruise)](https://github.com/NucleoFusion/cruise/pulls) -->
 <!-- [![GitHub contributors](https://img.shields.io/github/contributors/NucleoFusion/cruise)](https://github.com/NucleoFusion/cruise/graphs/contributors) -->
-[![Star History Chart](https://api.star-history.com/svg?repos=NucleoFusion/cruise&type=Date)](https://www.star-history.com/#NucleoFusion/cruise&Date)
+<!-- [![Star History Chart](https://api.star-history.com/svg?repos=NucleoFusion/cruise&type=Date)](https://www.star-history.com/#NucleoFusion/cruise&Date) -->
 
-TBD More
+<!-- TBD More -->

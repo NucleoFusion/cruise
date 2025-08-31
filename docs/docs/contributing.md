@@ -41,4 +41,4 @@ Thank you for considering a contribution! We welcome bug reports, feature reques
 Questions? Use GitHub Discussions or open an issue with the “question” label.
 
 ## Thanks!
-All contributors are credited in the [Credits](README.md#credits) section. We appreciate your help!
+All contributors are credited in the [Credits](https://github.com/NucleoFusion/cruise?tab=readme-ov-file#-description) section. We appreciate your help!
