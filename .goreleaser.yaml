@@ -89,6 +89,7 @@ chocolateys:
     owners: NucleoFusion
     title: cruise
     authors: NucleoFusion
+    skip_publish: true
     project_url: https://nucleofusion.github.io/cruise/
     description: |-
       Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
