@@ -68,20 +68,20 @@ homebrew_casks:
 
 # AUR
 aurs: 
-  - name: cruise
+  - name: cruise-bin
     homepage: https://nucleofusion.github.io/cruise/
     maintainers:
       - "NucleoFusion <lakshit.singh.mail@gmail.com>"
     license: "MIT"
     private_key: "{{ .Env.AUR_KEY }}"
-    git_url: "ssh://aur@aur.archlinux.org/cruise.git"
+    git_url: "ssh://aur@aur.archlinux.org/cruise-bin.git"
     depends: 
       - docker
     optdepends: 
       - trivy
       - grype
     package: |-
-      install -Dm755 "./cruise" "${pkgdir}/usr/bin/cruise"
+      install -Dm755 "./cruise-bin" "${pkgdir}/usr/bin/cruise-bin"
     
 chocolateys:
   - name: cruise
