@@ -60,10 +60,3 @@ Arch users can install _cruise_ through the AUR. using any AUR Helper.
 yay -S cruise
 ```
 
-## Chocolatey
-
-_Cruise_ is also available via Chocolatey.
-
-```bash
-choco install cruise
-```

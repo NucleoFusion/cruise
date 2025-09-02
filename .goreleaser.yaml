@@ -83,17 +83,6 @@ aurs:
     optdepends: 
       - trivy
       - grype
-    
-chocolateys:
-  - name: cruise
-    owners: NucleoFusion
-    title: cruise
-    authors: NucleoFusion
-    project_url: https://nucleofusion.github.io/cruise/
-    description: |-
-      Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
-      User Interface) for interacting with Docker
-    api_key: "{{ .Env.CHOCOLATEY_KEY }}"
 
 archives:
   - formats: [tar.gz]
