@@ -72,6 +72,7 @@ aurs:
     homepage: https://nucleofusion.github.io/cruise/
     maintainers:
       - "NucleoFusion <lakshit.singh.mail@gmail.com>"
+    description: "Cruise is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for interacting with Docker"
     license: "MIT"
     private_key: "{{ .Env.AUR_KEY }}"
     git_url: "ssh://aur@aur.archlinux.org/cruise-bin.git"
@@ -82,18 +83,6 @@ aurs:
       - grype
     package: |-
       install -Dm755 "./cruise" "${pkgdir}/usr/bin/cruise"
-    
-chocolateys:
-  - name: cruise
-    owners: NucleoFusion
-    title: cruise
-    authors: NucleoFusion
-    skip_publish: true
-    project_url: https://nucleofusion.github.io/cruise/
-    description: |-
-      Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
-      User Interface) for interacting with Docker
-    api_key: "{{ .Env.CHOCOLATEY_KEY }}"
 
 archives:
   - formats: [tar.gz]
