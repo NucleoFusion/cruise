@@ -5,7 +5,7 @@
 **Cruise** is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for interacting with Docker. Built with Go and [Bubbletea](https://github.com/charmbracelet/bubbletea), it offers a visually rich, keyboard-first experience for managing containers, images, volumes, networks, logs and more — all from your terminal.
 
 
-## 📖 Description
+## Description
 
 Ever felt that docker CLI is too lengthy or limited? Find yourself executing commands again and again for stats? Or wrote a full multiline command just for a typo to ruin it? Well... Fret no more. Cruise - Is a TUI Docker Client, fitting easily in your terminal-first dev workflow, while making repetitive Docker work easy and fun.
 
@@ -20,7 +20,7 @@ With Cruise you can:
 - Get Detailed view on Docker Artifacts
 - and more to come!
 
-### 🚧 Tech Stack
+### Tech Stack
 
 - **Go** – High performance, robust concurrency
 - **Bubbletea** – Elegant terminal UI framework
@@ -30,7 +30,7 @@ With Cruise you can:
 - **Viper** – Configuration management
 
 
-## 🚀 Usage
+## Usage
 
 <details>
   <summary>Screenshots</summary>
@@ -52,21 +52,20 @@ With Cruise you can:
 Once [installed](#installation). You can run the app with `cruise`.
 
 
-## 📦 Installation
+## Installation
 
-Coming soon...
+Refer to the installation docs [here](https://nucleofusion.github.io/cruise/docs/install.html).
 
-
-## 🤝 Contributing
+## Contributing
 
 Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for more.
 
 
-## 📜 License
+## License
 
 MIT License – see [LICENSE](LICENSE) for details.
 
-## 🙌 Credits
+## Credits
 
 Built by [Nucleo](https://github.com/NucleoFusion).
 

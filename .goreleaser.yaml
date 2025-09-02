@@ -68,21 +68,21 @@ homebrew_casks:
 
 # AUR
 aurs: 
-  - name: cruise
+  - name: cruise-bin
     homepage: https://nucleofusion.github.io/cruise/
-    description: |-
-      Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
-      User Interface) for interacting with Docker
     maintainers:
       - "NucleoFusion <lakshit.singh.mail@gmail.com>"
+    description: "Cruise is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for interacting with Docker"
     license: "MIT"
     private_key: "{{ .Env.AUR_KEY }}"
-    git_url: "ssh://aur@aur.archlinux.org/cruise.git"
+    git_url: "ssh://aur@aur.archlinux.org/cruise-bin.git"
     depends: 
       - docker
     optdepends: 
       - trivy
       - grype
+    package: |-
+      install -Dm755 "./cruise" "${pkgdir}/usr/bin/cruise"
 
 archives:
   - formats: [tar.gz]
