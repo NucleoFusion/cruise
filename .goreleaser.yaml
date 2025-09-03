@@ -41,12 +41,6 @@ nfpms:
     formats:
       - rpm
       - deb
-    dependencies:
-      - bash
-      - docker
-    suggests:
-      - trivy
-      - grype
 
 # Homebrew
 homebrew_casks:
@@ -76,8 +70,6 @@ aurs:
     license: "MIT"
     private_key: "{{ .Env.AUR_KEY }}"
     git_url: "ssh://aur@aur.archlinux.org/cruise-bin.git"
-    depends: 
-      - docker
     optdepends: 
       - trivy
       - grype
