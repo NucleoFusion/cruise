@@ -168,6 +168,6 @@ func (s *Images) Refresh() tea.Cmd {
 		if err != nil {
 			return utils.ReturnError("Images Page", "Error Querying Images", err)
 		}
-		return messages.ImagesReadyMsg{Items: items}
+		return messages.UpdateImagesMsg{Items: items}
 	})
 }

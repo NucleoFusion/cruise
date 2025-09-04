@@ -21,8 +21,9 @@ import (
 type ImageList struct {
 	Width         int
 	Height        int
-	Items         []image.Summary
-	FilteredItems []image.Summary
+	ImageMap      map[string]image.Summary
+	Items         []string
+	FilteredItems []string
 	SelectedIndex int
 	Ti            textinput.Model
 	Vp            viewport.Model
@@ -48,31 +49,53 @@ func NewImageList(w int, h int) *ImageList {
 		Ti:            ti,
 		SelectedIndex: 0,
 		Vp:            vp,
+		ImageMap:      make(map[string]image.Summary),
 	}
 }
 
 func (s *ImageList) Init() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
 		images, err := docker.GetImages()
+
+		m := make(map[string]image.Summary)
+		for _, v := range images {
+			m[v.ID] = v
+		}
+
 		if err != nil {
 			return utils.ReturnError("Images Page", "Error Querying Images", err)
 		}
-		return messages.ImagesReadyMsg{Items: images}
+		return messages.ImagesReadyMsg{Map: m}
 	})
 }
 
 func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.ImagesReadyMsg:
-		s.Items = msg.Items
-		s.FilteredItems = msg.Items
+		s.ImageMap = msg.Map
+
+		items := make([]string, 0, len(msg.Map))
+		for k := range s.ImageMap {
+			items = append(items, k)
+		}
+
+		s.Items = items
+		s.FilteredItems = items
+
 		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
 			images, err := docker.GetImages()
 			if err != nil {
 				return utils.ReturnError("Images Page", "Error Querying Images", err)
 			}
-			return messages.ImagesReadyMsg{Items: images}
+			return messages.UpdateImagesMsg{Items: images}
 		})
+	case messages.UpdateImagesMsg:
+		items := make([]string, 0, len(msg.Items))
+		for _, v := range msg.Items {
+			s.ImageMap[v.ID] = v
+			items = append(items, v.ID)
+		}
+		s.Items = items
 
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
@@ -133,7 +156,7 @@ func (s *ImageList) UpdateList() {
 	text := lipgloss.NewStyle().Bold(true).Render(docker.ImagesHeaders(w)+"\n") + "\n"
 
 	for k, v := range s.FilteredItems {
-		line := docker.ImagesFormattedSummary(v, w)
+		line := docker.ImagesFormattedSummary(s.ImageMap[v], w)
 
 		if k == s.SelectedIndex {
 			line = lipgloss.NewStyle().Background(colors.Load().MenuSelectedBg).Foreground(colors.Load().MenuSelectedText).Render(line)
@@ -154,17 +177,17 @@ func (s *ImageList) Filter(val string) {
 	originals := make([]image.Summary, len(s.Items))
 
 	for i, v := range s.Items {
-		str := docker.ImagesFormattedSummary(v, w)
+		str := docker.ImagesFormattedSummary(s.ImageMap[v], w)
 		formatted[i] = str
-		originals[i] = v
+		originals[i] = s.ImageMap[v]
 	}
 
 	ranked := fuzzy.RankFindFold(val, formatted)
 	sort.Sort(ranked)
 
-	result := make([]image.Summary, len(ranked))
+	result := make([]string, len(ranked))
 	for i, r := range ranked {
-		result[i] = originals[r.OriginalIndex]
+		result[i] = originals[r.OriginalIndex].ID
 	}
 
 	s.FilteredItems = result
@@ -175,5 +198,5 @@ func (s *ImageList) Filter(val string) {
 }
 
 func (s *ImageList) GetCurrentItem() image.Summary {
-	return s.FilteredItems[s.SelectedIndex]
+	return s.ImageMap[s.FilteredItems[s.SelectedIndex]]
 }
