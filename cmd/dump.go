@@ -20,7 +20,11 @@ var dumpCmd = &cobra.Command{
 		path, _ := cmd.Flags().GetString("path")
 		fmt.Println("Dumping config to:", path)
 
-		f, err := os.Create(filepath.Join(path, "dump.toml"))
+		if filepath.Ext(path) == "" {
+			path = filepath.Join(path, "dump.toml")
+		}
+
+		f, err := os.Create(path)
 		if err != nil {
 			fmt.Println("Error Creating File: ", err.Error())
 			return
@@ -34,7 +38,7 @@ var dumpCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println("Successfully Dumped file to " + filepath.Join(path, "dump.toml"))
+		fmt.Println("Successfully Dumped file to " + path)
 	},
 }
 
