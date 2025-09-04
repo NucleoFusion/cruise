@@ -79,10 +79,12 @@ type (
 	}
 
 	ImagesReadyMsg struct {
-		Items []image.Summary
+		Map map[string]image.Summary
 	}
 
-	UpdateImagesMsg struct{}
+	UpdateImagesMsg struct {
+		Items []image.Summary
+	}
 
 	NetworksReadyMsg struct {
 		Items []network.Summary
