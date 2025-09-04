@@ -98,8 +98,8 @@ func ImagesFormattedSummary(image image.Summary, width int) string {
 		format,
 		utils.Shorten(name, width),
 		id,
-		created,
 		size,
+		created,
 		containers,
 	)
 }
