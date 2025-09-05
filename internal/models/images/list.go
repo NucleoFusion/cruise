@@ -79,6 +79,8 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 			items = append(items, k)
 		}
 
+		sort.Strings(items)
+
 		s.Items = items
 		s.FilteredItems = items
 
@@ -90,6 +92,9 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 			s.ImageMap[v.ID] = v
 			items = append(items, v.ID)
 		}
+
+		sort.Strings(items)
+
 		s.Items = items
 		return s, nil
 
