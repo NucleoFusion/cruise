@@ -80,8 +80,8 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				return s, utils.ReturnError("Images Page", "Error Removing Image", err)
 			}
-			return s, utils.ReturnMsg("Images Page", "Removing Image",
-				fmt.Sprintf("Successfully Removed Image w/ ID %s", s.List.GetCurrentItem().ID))
+			return s, tea.Batch(s.UpdateImages(), utils.ReturnMsg("Images Page", "Removing Image",
+				fmt.Sprintf("Successfully Removed Image w/ ID %s", s.List.GetCurrentItem().ID)))
 		case key.Matches(msg, s.Keymap.Pull):
 			curr := s.List.GetCurrentItem()
 			img := curr.ID // Accurately get the image name
@@ -95,8 +95,8 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				return s, utils.ReturnError("Images Page", "Error Pulling Image", err)
 			}
-			return s, utils.ReturnMsg("Images Page", "Pulling Image",
-				fmt.Sprintf("Successfully Pulled Image w/ ID %s", s.List.GetCurrentItem().ID))
+			return s, tea.Batch(s.UpdateImages(), utils.ReturnMsg("Images Page", "Pulling Image",
+				fmt.Sprintf("Successfully Pulled Image w/ ID %s", s.List.GetCurrentItem().ID)))
 		case key.Matches(msg, s.Keymap.Push):
 			curr := s.List.GetCurrentItem()
 			img := curr.ID // Accurately get the image name
@@ -110,14 +110,16 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				return s, utils.ReturnError("Images Page", "Error Pushing Image", err)
 			}
-			return s, utils.ReturnMsg("Images Page", "Pushing Image",
-				fmt.Sprintf("Successfully Pushed Image w/ ID %s", s.List.GetCurrentItem().ID))
+			return s, tea.Batch(s.UpdateImages(), utils.ReturnMsg("Images Page", "Pushing Image",
+				fmt.Sprintf("Successfully Pushed Image w/ ID %s", s.List.GetCurrentItem().ID)))
 		case key.Matches(msg, s.Keymap.Prune):
 			err := docker.PruneImages()
 			if err != nil {
 				return s, utils.ReturnError("Images Page", "Error Pruning Image", err)
 			}
-			return s, utils.ReturnMsg("Images Page", "Pruning Image", "Successfully Pruned Images")
+			return s, tea.Batch(s.UpdateImages(), utils.ReturnMsg("Images Page", "Pruning Image", "Successfully Pruned Images"))
+		case key.Matches(msg, s.Keymap.Sync):
+			return s, s.UpdateImages()
 		case key.Matches(msg, s.Keymap.Layers):
 			curr := s.List.GetCurrentItem()
 			img := curr.ID // Accurately get the image name
@@ -162,12 +164,12 @@ func (s *Images) GetListText() string {
 	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
 }
 
-func (s *Images) Refresh() tea.Cmd {
-	return tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
-		items, err := docker.GetImages()
+func (s *Images) UpdateImages() tea.Cmd {
+	return tea.Tick(0, func(_ time.Time) tea.Msg {
+		images, err := docker.GetImages()
 		if err != nil {
 			return utils.ReturnError("Images Page", "Error Querying Images", err)
 		}
-		return messages.UpdateImagesMsg{Items: items}
+		return messages.UpdateImagesMsg{Items: images}
 	})
 }

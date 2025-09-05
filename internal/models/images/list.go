@@ -82,13 +82,8 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 		s.Items = items
 		s.FilteredItems = items
 
-		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
-			images, err := docker.GetImages()
-			if err != nil {
-				return utils.ReturnError("Images Page", "Error Querying Images", err)
-			}
-			return messages.UpdateImagesMsg{Items: images}
-		})
+		return s, nil
+
 	case messages.UpdateImagesMsg:
 		items := make([]string, 0, len(msg.Items))
 		for _, v := range msg.Items {
@@ -96,6 +91,7 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 			items = append(items, v.ID)
 		}
 		s.Items = items
+		return s, nil
 
 	case tea.KeyMsg:
 		if s.Ti.Focused() {

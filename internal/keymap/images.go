@@ -15,6 +15,7 @@ type ImagesMap struct {
 	Build  key.Binding
 	Layers key.Binding
 	Exit   key.Binding
+	Sync   key.Binding
 }
 
 func NewImagesMap() ImagesMap {
@@ -41,8 +42,12 @@ func NewImagesMap() ImagesMap {
 			key.WithHelp(m.Build, "build"),
 		),
 		Layers: key.NewBinding(
-			key.WithKeys(m.Build),
-			key.WithHelp(m.Build, "layers"),
+			key.WithKeys(m.Layers),
+			key.WithHelp(m.Layers, "layers"),
+		),
+		Sync: key.NewBinding(
+			key.WithKeys(m.Sync),
+			key.WithHelp(m.Sync, "sync"),
 		),
 	}
 }

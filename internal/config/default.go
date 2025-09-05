@@ -56,6 +56,7 @@ func Default() Config {
 				Pull:   "u",
 				Build:  "b",
 				Layers: "l",
+				Sync:   "s",
 			},
 			Network: NetworkKeybinds{
 				ExitDetails: "esc",

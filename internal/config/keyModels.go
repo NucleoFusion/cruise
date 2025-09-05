@@ -47,6 +47,7 @@ type ImagesKeybinds struct {
 	Build  string `mapstructure:"build" toml:"build"`
 	Layers string `mapstructure:"layers" toml:"layers"`
 	Exit   string `mapstructure:"exit" toml:"exit"`
+	Sync   string `mapstructure:"sync" toml:"sync"`
 }
 
 type MonitorKeybinds struct {

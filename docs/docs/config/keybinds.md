@@ -156,6 +156,16 @@ Default Value:
 push = "p"
 ```
 
+
+### Sync 
+
+Sets the keybind for refresh/sync images list. Can be set using the `sync` key.
+
+Default Value:
+``` toml
+sync = "s"
+```
+
 ## Fuzzy Finder(fzf) 
 Denoted by `[keybinds.fzf]` toml tag.
 
