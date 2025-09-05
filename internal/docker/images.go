@@ -87,7 +87,7 @@ func ImagesFormattedSummary(image image.Summary, width int) string {
 		name = image.RepoTags[0]
 	}
 
-	id := utils.ShortID(image.ID)
+	id := utils.Shorten(strings.TrimPrefix(image.ID, "sha256:"), 20)
 	size := utils.FormatSize(image.Size)
 	created := utils.CreatedAgo(image.Created)
 	containers := fmt.Sprintf("%d", image.Containers)
@@ -96,8 +96,8 @@ func ImagesFormattedSummary(image image.Summary, width int) string {
 
 	return fmt.Sprintf(
 		format,
-		utils.Shorten(name, width),
 		id,
+		utils.Shorten(name, width),
 		size,
 		created,
 		containers,
