@@ -84,6 +84,8 @@ func (m *FuzzyFinder) Update(msg tea.Msg) (FuzzyFinder, tea.Cmd) {
 					Exited:    true,
 				}
 			}
+		case key.Matches(msg, keymap.QuickQuitKey()):
+			return *m, tea.Quit
 		default:
 			if m.Ti.Focused() {
 				var cmd tea.Cmd

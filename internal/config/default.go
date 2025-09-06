@@ -30,6 +30,7 @@ func Default() Config {
 				ListDown:      "down",
 				FocusSearch:   "/",
 				UnfocusSearch: "esc",
+				QuickQuit:     "q",
 			},
 			Fzf: FzfKeybinds{
 				Up:    "up",
