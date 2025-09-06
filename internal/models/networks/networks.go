@@ -65,6 +65,8 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return s, cmd
 		}
 		switch {
+		case key.Matches(msg, keymap.QuickQuitKey()):
+			return s, tea.Quit
 		case key.Matches(msg, s.Keymap.ShowDetails):
 			s.ShowDetail = true
 			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())

@@ -1,8 +1,10 @@
 package home
 
 import (
+	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -45,6 +47,11 @@ func (s *Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		s.Logs, cmd = s.Logs.Update(msg)
 		return s, cmd
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, keymap.QuickQuitKey()):
+			return s, tea.Quit
+		}
 	}
 	return s, nil
 }

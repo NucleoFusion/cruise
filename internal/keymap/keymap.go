@@ -1,9 +1,18 @@
 package keymap
 
-import "github.com/charmbracelet/bubbles/key"
+import (
+	"github.com/NucleoFusion/cruise/internal/config"
+	"github.com/charmbracelet/bubbles/key"
+)
 
 type DynamicMap struct {
 	keys []key.Binding
+}
+
+func QuickQuitKey() key.Binding {
+	q := config.Cfg.Keybinds.Global.QuickQuit
+	return key.NewBinding(key.WithKeys(q),
+		key.WithHelp(q, "quit"))
 }
 
 func NewDynamic(keys []key.Binding) *DynamicMap {

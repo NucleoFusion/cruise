@@ -17,6 +17,7 @@ type GlobalKeybinds struct {
 	ListDown      string `mapstructure:"list_down" toml:"list_down"`
 	FocusSearch   string `mapstructure:"focus_search" toml:"focus_search"`
 	UnfocusSearch string `mapstructure:"unfocus_search" toml:"unfocus_search"`
+	QuickQuit     string `mapstructure:"quick_quit" toml:"quick_quit"`
 }
 
 type ContainersKeybinds struct {

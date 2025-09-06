@@ -26,7 +26,7 @@ func NewStyledHelp(b []key.Binding, w int) StyledHelp {
 	h.Styles.ShortDesc = lipgloss.NewStyle().Foreground(colors.Load().HelpDescText)
 
 	newk := make([]key.Binding, 0, len(b))
-	newk = append(newk, key.NewBinding(key.WithKeys("tab"), key.WithHelp(" tab ", "switch pages")))
+	newk = append(newk, key.NewBinding(key.WithKeys("tab"), key.WithHelp(" tab ", "switch pages")), keymap.QuickQuitKey())
 	for _, bind := range b {
 		newk = append(newk, padBinding(bind))
 	}

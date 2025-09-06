@@ -46,6 +46,15 @@ Default Value:
 unfocus_search = "esc"
 ```
 
+
+### Quick Quit 
+Sets the keybind for quitting application. Can be set using the `quick_quit` key. 
+
+Default Value:
+```toml
+quick_quit = "q"
+```
+
 ## Container 
 Denoted by `[keybinds.container]` toml tag.
 

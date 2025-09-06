@@ -60,6 +60,8 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return s, cmd
 		}
 		switch {
+		case key.Matches(msg, keymap.QuickQuitKey()):
+			return s, tea.Quit
 		case key.Matches(msg, s.Keymap.Remove):
 			err := docker.RemoveVolumes(s.List.GetCurrentItem().Name)
 			if err != nil {
