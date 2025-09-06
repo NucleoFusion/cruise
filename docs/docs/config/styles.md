@@ -1,5 +1,5 @@
 # Styles 
-Denoted by `[keybinds.styles]` toml tag.
+Denoted by `[styles]` toml tag.
 
 ## Text
 Sets the primary text color used throughout the interface. Can be set using the `text` key.
