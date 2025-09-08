@@ -2,6 +2,7 @@ package config
 
 type Keybinds struct {
 	Global        GlobalKeybinds        `mapstructure:"global" toml:"global"`
+	Nav           NavKeybinds           `mapstructure:"nav" toml:"nav"`
 	Container     ContainersKeybinds    `mapstructure:"container" toml:"container"`
 	Images        ImagesKeybinds        `mapstructure:"images" toml:"images"`
 	Fzf           FzfKeybinds           `mapstructure:"fzf" toml:"fzf"`
@@ -17,6 +18,17 @@ type GlobalKeybinds struct {
 	ListDown      string `mapstructure:"list_down" toml:"list_down"`
 	FocusSearch   string `mapstructure:"focus_search" toml:"focus_search"`
 	UnfocusSearch string `mapstructure:"unfocus_search" toml:"unfocus_search"`
+}
+
+type NavKeybinds struct {
+	Exit          string `mapstructure:"exit" toml:"exit"`
+	Dashboard     string `mapstructure:"dasboard" toml:"dasboard"`
+	Containers    string `mapstructure:"containers" toml:"containers"`
+	Images        string `mapstructure:"images" toml:"images"`
+	Networks      string `mapstructure:"networks" toml:"networks"`
+	Volumes       string `mapstructure:"volumes" toml:"volumes"`
+	Monitoring    string `mapstructure:"monitoring" toml:"monitoring"`
+	Vulnerability string `mapstructure:"vulnerability" toml:"vulnerability"`
 }
 
 type ContainersKeybinds struct {
