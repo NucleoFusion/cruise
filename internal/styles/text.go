@@ -62,6 +62,14 @@ var VolumesText = `
 |___/ \____//_/ \__,_//_/ /_/ /_/ \___//____/  
 `
 
+var NavText = `
+    _   __             
+   / | / /____ _ _   __
+  /  |/ // __ '/| | / /
+ / /|  // /_/ / | |/ / 
+/_/ |_/ \__,_/  |___/  
+`
+
 func TextStyle() lipgloss.Style {
 	return lipgloss.NewStyle().Foreground(colors.Load().Text)
 }
