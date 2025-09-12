@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/data"
+	"github.com/NucleoFusion/cruise/internal/enums"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
@@ -23,6 +24,11 @@ func TickDashboard() tea.Cmd {
 }
 
 type (
+	ChangePg struct {
+		Pg     enums.PageType
+		Exited bool
+	}
+
 	CloseDetails struct{}
 
 	PortMapMsg struct {

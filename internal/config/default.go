@@ -32,6 +32,16 @@ func Default() Config {
 				UnfocusSearch: "esc",
 				QuickQuit:     "q",
 			},
+			Nav: NavKeybinds{ // TODO: In Docs
+				Exit:          "esc",
+				Dashboard:     "d",
+				Containers:    "c",
+				Images:        "i",
+				Networks:      "n",
+				Volumes:       "v",
+				Monitoring:    "m",
+				Vulnerability: "s",
+			},
 			Fzf: FzfKeybinds{
 				Up:    "up",
 				Down:  "down",

@@ -7,11 +7,11 @@ import (
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/models/containers"
 	errorpopup "github.com/NucleoFusion/cruise/internal/models/error"
-	"github.com/NucleoFusion/cruise/internal/models/fzf"
 	"github.com/NucleoFusion/cruise/internal/models/home"
 	"github.com/NucleoFusion/cruise/internal/models/images"
 	"github.com/NucleoFusion/cruise/internal/models/monitoring"
 	msgpopup "github.com/NucleoFusion/cruise/internal/models/msg"
+	"github.com/NucleoFusion/cruise/internal/models/nav"
 	"github.com/NucleoFusion/cruise/internal/models/networks"
 	"github.com/NucleoFusion/cruise/internal/models/volumes"
 	"github.com/NucleoFusion/cruise/internal/models/vulnerability"
@@ -39,7 +39,7 @@ type Root struct {
 	Volumes       *volumes.Volumes
 	ErrorPopup    *errorpopup.ErrorPopup
 	MsgPopup      *msgpopup.MsgPopup
-	PageFzf       fzf.FuzzyFinder
+	Nav           *nav.Nav
 	Overlay       *overlay.Model
 }
 
@@ -126,8 +126,8 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		img, cmd := s.Images.Update(msg)
 		s.Images = img.(*images.Images)
 		return s, cmd
-	case messages.FzfSelection:
-		s.CurrentPage = s.PageItems[msg.Selection]
+	case messages.ChangePg:
+		s.CurrentPage = msg.Pg
 		s.IsChangingPage = false
 		var cmd tea.Cmd
 		switch s.CurrentPage {
@@ -159,7 +159,7 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s.Width = msg.Width
 		s.Height = msg.Height
 
-		s.PageFzf = fzf.NewFzf([]string{"Home", "Containers", "Images", "Vulnerability", "Monitoring", "Networks", "Volumes"}, msg.Width, msg.Height)
+		s.Nav = nav.NewNav(msg.Width, msg.Height)
 		s.Home = home.NewHome(msg.Width, msg.Height)
 		s.Containers = containers.NewContainers(msg.Width, msg.Height)
 		s.Images = images.NewImages(msg.Width, msg.Height)
@@ -176,7 +176,7 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	if s.IsChangingPage {
 		var cmd tea.Cmd
-		s.PageFzf, cmd = s.PageFzf.Update(msg)
+		s.Nav, cmd = s.Nav.Update(msg)
 		return s, cmd
 	}
 
@@ -224,7 +224,7 @@ func (s *Root) View() string {
 	}
 
 	if s.IsChangingPage {
-		return s.PageFzf.View()
+		return s.Nav.View()
 	}
 
 	switch s.CurrentPage {
