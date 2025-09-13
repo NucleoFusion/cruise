@@ -30,6 +30,7 @@ type NavKeybinds struct {
 	Volumes       string `mapstructure:"volumes" toml:"volumes"`
 	Monitoring    string `mapstructure:"monitoring" toml:"monitoring"`
 	Vulnerability string `mapstructure:"vulnerability" toml:"vulnerability"`
+	ComposeDash   string `mapstructure:"compose_dashboard" toml:"compose_dashboard"`
 }
 
 type ContainersKeybinds struct {

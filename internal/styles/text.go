@@ -70,6 +70,15 @@ var NavText = `
 /_/ |_/ \__,_/  |___/  
 `
 
+var ComposeText = `
+   ______                                          
+  / ____/____   ____ ___   ____   ____   _____ ___ 
+ / /    / __ \ / __ '__ \ / __ \ / __ \ / ___// _ \
+/ /___ / /_/ // / / / / // /_/ // /_/ /(__  )/  __/
+\____/ \____//_/ /_/ /_// .___/ \____//____/ \___/ 
+                       /_/                         
+`
+
 func TextStyle() lipgloss.Style {
 	return lipgloss.NewStyle().Foreground(colors.Load().Text)
 }

@@ -24,6 +24,14 @@ func TickDashboard() tea.Cmd {
 }
 
 type (
+	ComposeOverview struct {
+		Projects   int
+		Services   int
+		Containers int
+		Volumes    int
+		Networks   int
+	}
+
 	ChangePg struct {
 		Pg     enums.PageType
 		Exited bool
