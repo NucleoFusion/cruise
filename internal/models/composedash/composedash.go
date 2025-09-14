@@ -32,7 +32,7 @@ func NewComposeDash(w, h int) *Dash {
 		OverVp:          NewOverview(w/3, ht),
 		TrendVp:         NewTrends(w/3, ht),
 		HealthVp:        NewHealth(w/3, ht),
-		OverviewDetails: &OverviewDetails{},
+		OverviewDetails: &OverviewDetails{Width: w / 3},
 	}
 }
 

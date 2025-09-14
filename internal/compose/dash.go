@@ -45,3 +45,6 @@ func GetNumServices() (int, error) {
 
 	return n, nil
 }
+
+// func GetNumServiceHealth() (int, int, error) {
+// }
