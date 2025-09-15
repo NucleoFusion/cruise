@@ -17,15 +17,6 @@ type Project struct {
 	RegistryConfigured bool // Should be func
 }
 
-type ProjectSummary struct {
-	Name               string
-	Containers         int
-	Services           map[string]bool
-	Volumes            int
-	Networks           int
-	RegistryConfigured int
-}
-
 func GetProjects() ([]Project, error) {
 	projects := map[string]bool{}
 	res := make([]Project, 0)

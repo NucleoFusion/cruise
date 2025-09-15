@@ -5,7 +5,6 @@ import (
 
 	"github.com/NucleoFusion/cruise/internal/enums"
 	"github.com/NucleoFusion/cruise/internal/messages"
-	"github.com/NucleoFusion/cruise/internal/models/composedash"
 	"github.com/NucleoFusion/cruise/internal/models/containers"
 	errorpopup "github.com/NucleoFusion/cruise/internal/models/error"
 	"github.com/NucleoFusion/cruise/internal/models/home"
@@ -38,7 +37,6 @@ type Root struct {
 	Monitoring    *monitoring.Monitoring
 	Networks      *networks.Networks
 	Volumes       *volumes.Volumes
-	ComposeDash   *composedash.Dash
 	ErrorPopup    *errorpopup.ErrorPopup
 	MsgPopup      *msgpopup.MsgPopup
 	Nav           *nav.Nav
@@ -80,8 +78,6 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			curr = s.Networks
 		case enums.Volumes:
 			curr = s.Volumes
-		case enums.ComposeDash:
-			curr = s.ComposeDash
 		}
 
 		s.Overlay = overlay.New(s.ErrorPopup, curr, overlay.Right, overlay.Top, 2, 2)
@@ -109,8 +105,6 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			curr = s.Networks
 		case enums.Volumes:
 			curr = s.Volumes
-		case enums.ComposeDash:
-			curr = s.ComposeDash
 		}
 
 		s.Overlay = overlay.New(s.MsgPopup, curr, overlay.Right, overlay.Top, 2, 2)
@@ -142,8 +136,6 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmd = s.Networks.Init()
 		case enums.Volumes:
 			cmd = s.Volumes.Init()
-		case enums.ComposeDash:
-			cmd = s.ComposeDash.Init()
 		}
 		return s, cmd
 	case tea.KeyMsg:
@@ -166,7 +158,6 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s.Monitoring = monitoring.NewMonitoring(msg.Width, msg.Height)
 		s.Networks = networks.NewNetworks(msg.Width, msg.Height)
 		s.Volumes = volumes.NewVolumes(msg.Width, msg.Height)
-		s.ComposeDash = composedash.NewComposeDash(msg.Width, msg.Height)
 
 		cmd := s.Home.Init()
 
@@ -209,10 +200,6 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		img, cmd := s.Volumes.Update(msg)
 		s.Volumes = img.(*volumes.Volumes)
 		return s, cmd
-	case enums.ComposeDash:
-		img, cmd := s.ComposeDash.Update(msg)
-		s.ComposeDash = img.(*composedash.Dash)
-		return s, cmd
 	}
 
 	return s, nil
@@ -246,8 +233,6 @@ func (s *Root) View() string {
 		return s.Networks.View()
 	case enums.Volumes:
 		return s.Volumes.View()
-	case enums.ComposeDash:
-		return s.ComposeDash.View()
 	}
 
 	return "Cruise - A TUI Docker Client"

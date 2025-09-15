@@ -10,7 +10,6 @@ const (
 	Monitoring
 	Networks
 	Volumes
-	ComposeDash
 )
 
 type ErrorType int

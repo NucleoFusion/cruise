@@ -41,7 +41,6 @@ func Default() Config {
 				Volumes:       "v",
 				Monitoring:    "m",
 				Vulnerability: "s",
-				ComposeDash:   "o",
 			},
 			Fzf: FzfKeybinds{
 				Up:    "up",

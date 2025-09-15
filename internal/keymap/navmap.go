@@ -54,10 +54,6 @@ func NewNavMap() NavMap {
 			key.WithKeys(m.Vulnerability),
 			key.WithHelp(m.Vulnerability, "vulnerability"),
 		),
-		ComposeDash: key.NewBinding(
-			key.WithKeys(m.ComposeDash),
-			key.WithHelp(m.ComposeDash, "dashboard"),
-		),
 	}
 }
 
