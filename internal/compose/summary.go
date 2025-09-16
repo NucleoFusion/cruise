@@ -1,19 +1,16 @@
 package compose
 
-import "github.com/NucleoFusion/cruise/internal/docker"
+import (
+	"fmt"
+	"strings"
 
-type ProjectSummary struct {
-	Name               string
-	Containers         int
-	Services           map[string]bool
-	Volumes            int
-	Networks           int
-	RegistryConfigured bool
-}
+	"github.com/NucleoFusion/cruise/internal/docker"
+	"github.com/NucleoFusion/cruise/internal/types"
+)
 
 // TODO: Add RegistryConfigured
-func GetProjectSummaries() ([]*ProjectSummary, error) {
-	m := map[string]*ProjectSummary{}
+func GetProjectSummaries() ([]*types.ProjectSummary, error) {
+	m := map[string]*types.ProjectSummary{}
 
 	containers, err := docker.GetContainers()
 	if err != nil {
@@ -24,7 +21,7 @@ func GetProjectSummaries() ([]*ProjectSummary, error) {
 		if proj, ok := v.Labels["com.docker.compose.project"]; ok {
 			summary, ok := m[proj]
 			if !ok {
-				m[proj] = &ProjectSummary{
+				m[proj] = &types.ProjectSummary{
 					Name:     proj,
 					Services: make(map[string]bool),
 				}
@@ -60,10 +57,27 @@ func GetProjectSummaries() ([]*ProjectSummary, error) {
 		}
 	}
 
-	results := make([]*ProjectSummary, 0, len(m))
+	results := make([]*types.ProjectSummary, 0, len(m))
 	for _, v := range m {
 		results = append(results, v)
 	}
 
 	return results, nil
+}
+
+func ProjectHeaders(width int) string {
+	format := strings.Repeat(fmt.Sprintf("%%-%ds ", width), 6)
+
+	return fmt.Sprintf(format,
+		"Name",
+		"Services",
+		"Containers",
+		"Volumes",
+		"Networks",
+		"Configured",
+	)
+}
+
+func ProjectSummaryFormatted(proj *types.ProjectSummary, width int) string {
+	return ""
 }

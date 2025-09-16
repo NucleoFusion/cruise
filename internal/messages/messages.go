@@ -7,6 +7,7 @@ import (
 
 	"github.com/NucleoFusion/cruise/internal/data"
 	"github.com/NucleoFusion/cruise/internal/enums"
+	"github.com/NucleoFusion/cruise/internal/types"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
@@ -24,12 +25,8 @@ func TickDashboard() tea.Cmd {
 }
 
 type (
-	ComposeOverview struct {
-		Projects   int
-		Services   int
-		Containers int
-		Volumes    int
-		Networks   int
+	ProjectsReadyMsg struct {
+		Projects []*types.ProjectSummary
 	}
 
 	ChangePg struct {

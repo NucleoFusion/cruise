@@ -27,7 +27,7 @@ func NewNav(w, h int) *Nav {
 		"System":    {enums.Home},
 		"Artifacts": {enums.Containers, enums.Images, enums.Networks, enums.Volumes},
 		"Ops":       {enums.Vulnerability, enums.Monitoring},
-		"Compose":   {},
+		"Compose":   {enums.Projects},
 	}
 
 	km := keymap.NewNavMap()
@@ -40,6 +40,7 @@ func NewNav(w, h int) *Nav {
 		enums.Volumes:       km.Volumes,
 		enums.Monitoring:    km.Monitoring,
 		enums.Vulnerability: km.Vulnerability,
+		enums.Projects:      km.Projects,
 	}
 
 	pgNameMap := map[enums.PageType]string{
@@ -50,6 +51,7 @@ func NewNav(w, h int) *Nav {
 		enums.Volumes:       "Volumes",
 		enums.Monitoring:    "Monitoring",
 		enums.Vulnerability: "Vulnerability",
+		enums.Projects:      "Projects",
 	}
 
 	return &Nav{
@@ -84,6 +86,8 @@ func (s *Nav) Update(msg tea.Msg) (*Nav, tea.Cmd) {
 			return s, func() tea.Msg { return messages.ChangePg{Pg: enums.Monitoring, Exited: false} }
 		case key.Matches(msg, s.Keymap.Vulnerability):
 			return s, func() tea.Msg { return messages.ChangePg{Pg: enums.Vulnerability, Exited: false} }
+		case key.Matches(msg, s.Keymap.Projects):
+			return s, func() tea.Msg { return messages.ChangePg{Pg: enums.Projects, Exited: false} }
 		}
 	}
 	return s, nil

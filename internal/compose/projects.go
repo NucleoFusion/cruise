@@ -2,24 +2,13 @@ package compose
 
 import (
 	"github.com/NucleoFusion/cruise/internal/docker"
+	"github.com/NucleoFusion/cruise/internal/types"
 	"github.com/docker/docker/api/types/container"
 )
 
-type Project struct {
-	Name     string
-	Services map[string]ServiceSummary
-	// Should be functions
-	TotalNetworks      int
-	TotalVolumes       int
-	TotalContainers    int    // Should be func
-	Status             string // Should be func
-	LastUpdated        string
-	RegistryConfigured bool // Should be func
-}
-
-func GetProjects() ([]Project, error) {
+func GetProjects() ([]types.Project, error) {
 	projects := map[string]bool{}
-	res := make([]Project, 0)
+	res := make([]types.Project, 0)
 
 	containers, err := docker.GetContainers()
 	if err != nil {
@@ -44,18 +33,18 @@ func GetProjects() ([]Project, error) {
 	return res, nil
 }
 
-func GetSummary(proj string) (Project, error) {
-	summary := Project{Name: proj}
+func GetSummary(proj string) (types.Project, error) {
+	summary := types.Project{Name: proj}
 	containers := make([]container.Summary, 0)
 
 	// All services
-	serviceMap := map[string]ServiceSummary{}
+	serviceMap := map[string]types.ServiceSummary{}
 	for _, v := range containers {
 		if srv, ok := v.Labels["com.docker.compose.service"]; ok {
 			if _, ok := serviceMap[srv]; ok {
 				*serviceMap[srv].Containers = append(*serviceMap[srv].Containers, v)
 			} else {
-				serviceMap[srv] = ServiceSummary{
+				serviceMap[srv] = types.ServiceSummary{
 					Name:       srv,
 					Containers: &[]container.Summary{v},
 				}
