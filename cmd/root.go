@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"runtime/debug"
 
 	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/spf13/cobra"
@@ -22,6 +24,13 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("PANIC: %v", r)
+			log.Printf("STACK:\n%s", debug.Stack())
+		}
+	}()
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

@@ -130,21 +130,19 @@ func (s *ProjectList) View() string {
 }
 
 func (s *ProjectList) UpdateList() {
-	w := (s.Width)/6 - 1
+	text := lipgloss.NewStyle().Bold(true).Render(compose.ProjectHeaders(s.Width)+"\n") + "\n"
+	//
+	for k, v := range s.FilteredItems {
+		line := compose.ProjectSummaryFormatted(v, s.Width)
 
-	text := lipgloss.NewStyle().Bold(true).Render(compose.ProjectHeaders(w)+"\n") + "\n"
-	//
-	// for k, v := range s.FilteredItems {
-	// 	line := docker.ContainerFormattedSummary(v, w)
-	//
-	// 	if k == s.SelectedIndex {
-	// 		line = styles.SelectedStyle().Render(line)
-	// 	} else {
-	// 		line = styles.TextStyle().Render(line)
-	// 	}
-	//
-	// 	text += line + "\n"
-	// }
+		if k == s.SelectedIndex {
+			line = styles.SelectedStyle().Render(line)
+		} else {
+			line = styles.TextStyle().Render(line)
+		}
+
+		text += line + "\n"
+	}
 	//
 	s.Vp.SetContent(text)
 }

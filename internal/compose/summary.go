@@ -2,7 +2,6 @@ package compose
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/types"
@@ -25,6 +24,7 @@ func GetProjectSummaries() ([]*types.ProjectSummary, error) {
 					Name:     proj,
 					Services: make(map[string]bool),
 				}
+				summary = m[proj]
 			}
 
 			summary.Containers += 1
@@ -42,7 +42,12 @@ func GetProjectSummaries() ([]*types.ProjectSummary, error) {
 
 	for _, v := range vols.Volumes {
 		if proj, ok := v.Labels["com.docker.compose.project"]; ok {
-			m[proj].Volumes += 1
+			summary, ok := m[proj]
+			if !ok {
+				continue
+			}
+
+			summary.Volumes += 1
 		}
 	}
 
@@ -53,7 +58,12 @@ func GetProjectSummaries() ([]*types.ProjectSummary, error) {
 
 	for _, v := range nets {
 		if proj, ok := v.Labels["com.docker.compose.project"]; ok {
-			m[proj].Networks += 1
+			summary, ok := m[proj]
+			if !ok {
+				continue
+			}
+
+			summary.Networks += 1
 		}
 	}
 
@@ -66,18 +76,30 @@ func GetProjectSummaries() ([]*types.ProjectSummary, error) {
 }
 
 func ProjectHeaders(width int) string {
-	format := strings.Repeat(fmt.Sprintf("%%-%ds ", width), 6)
-
-	return fmt.Sprintf(format,
-		"Name",
-		"Services",
-		"Containers",
-		"Volumes",
-		"Networks",
-		"Configured",
+	w := width / 7
+	return fmt.Sprintf("%-*s %-*s %-*s %-*s %-*s %-*s",
+		2*w, "Name",
+		1*w, "Containers",
+		1*w, "Services",
+		1*w, "Volumes",
+		1*w, "Networks",
+		1*w, "Configured",
 	)
 }
 
 func ProjectSummaryFormatted(proj *types.ProjectSummary, width int) string {
-	return ""
+	configured := "\u2714" // Tick
+	if proj.RegistryConfigured {
+		configured = "\u2716" // Cross
+	}
+	w := width / 7
+
+	return fmt.Sprintf("%-*s %-*d %-*d %-*d %-*d %-*s",
+		2*w, proj.Name,
+		1*w, proj.Containers,
+		1*w, proj.NumServices(),
+		1*w, proj.Volumes,
+		1*w, proj.Networks,
+		1*w, configured,
+	)
 }

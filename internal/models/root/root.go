@@ -1,6 +1,7 @@
 package root
 
 import (
+	"log"
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/enums"
@@ -143,6 +144,7 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case enums.Volumes:
 			cmd = s.Volumes.Init()
 		case enums.Projects:
+			log.Println("Switched to Projects")
 			cmd = s.Projects.Init()
 		}
 		return s, cmd

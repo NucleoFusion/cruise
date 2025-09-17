@@ -87,13 +87,13 @@ func (s *Nav) Update(msg tea.Msg) (*Nav, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Vulnerability):
 			return s, func() tea.Msg { return messages.ChangePg{Pg: enums.Vulnerability, Exited: false} }
 		case key.Matches(msg, s.Keymap.Projects):
+			fmt.Println("Sending to Projects")
 			return s, func() tea.Msg { return messages.ChangePg{Pg: enums.Projects, Exited: false} }
 		}
 	}
 	return s, nil
 }
 
-// TODO: uild View
 func (s *Nav) View() string {
 	h := s.Height - strings.Count(styles.NavText, "\n")
 	return lipgloss.JoinVertical(lipgloss.Center,
