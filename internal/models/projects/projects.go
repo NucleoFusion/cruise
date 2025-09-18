@@ -1,7 +1,6 @@
 package projects
 
 import (
-	"log"
 	"strings"
 
 	"github.com/NucleoFusion/cruise/internal/keymap"
@@ -13,21 +12,24 @@ import (
 )
 
 type Projects struct {
-	Width     int
-	Height    int
-	List      *ProjectList
-	Keymap    keymap.ContainersMap
-	Help      styledhelp.StyledHelp
-	IsLoading bool
+	Width       int
+	Height      int
+	List        *ProjectList
+	Keymap      keymap.ContainersMap
+	Help        styledhelp.StyledHelp
+	DetailsPg   *ProjectDetails
+	ShowDetails bool
+	IsLoading   bool
 }
 
 func NewProjects(w int, h int) *Projects {
 	return &Projects{
-		Width:     w,
-		Height:    h,
-		IsLoading: true,
-		List:      NewProjectList(w-4, h-3-strings.Count(styles.ProjectsText, "\n")),
-		Help:      styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w),
+		Width:       w,
+		Height:      h,
+		IsLoading:   true,
+		List:        NewProjectList(w-4, h-3-strings.Count(styles.ProjectsText, "\n")),
+		ShowDetails: false,
+		Help:        styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w),
 	}
 }
 
@@ -36,8 +38,6 @@ func (s *Projects) Init() tea.Cmd {
 }
 
 func (s *Projects) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Println("Updating Projects")
-	defer log.Println("Completed Projects Update")
 	switch msg := msg.(type) {
 	case messages.ProjectsReadyMsg:
 		s.IsLoading = false
@@ -45,10 +45,33 @@ func (s *Projects) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
+	case messages.ShowProjectDetails:
+		s.ShowDetails = true
+		s.DetailsPg = NewProjectDetails(s.Width, s.Height, msg.Summary)
+		return s, nil
+	case messages.CloseProjectDetails:
+		s.ShowDetails = false
+		return s, nil
+	case messages.ProjectInspectResult:
+		if !s.ShowDetails {
+			return s, nil
+		}
+
+		var cmd tea.Cmd
+		s.DetailsPg, cmd = s.DetailsPg.Update(msg)
+		return s, cmd
 	case tea.KeyMsg:
 		if s.List.Ti.Focused() {
 			var cmd tea.Cmd
 			s.List, cmd = s.List.Update(msg)
+			return s, cmd
+		} else if s.ShowDetails {
+			if msg.String() == "esc" { // TODO: Use keymap
+				s.ShowDetails = false
+				return s, nil
+			}
+			var cmd tea.Cmd
+			s.DetailsPg, cmd = s.DetailsPg.Update(msg)
 			return s, cmd
 		}
 	}
@@ -59,16 +82,15 @@ func (s *Projects) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *Projects) View() string {
-	log.Println("Viewing Projects")
-	defer log.Println("Printed Projects")
+	if s.ShowDetails {
+		return s.DetailsPg.View()
+	}
 
 	return lipgloss.JoinVertical(lipgloss.Center,
 		styles.TextStyle().Render(styles.ProjectsText), s.GetListText(), s.Help.View())
 }
 
 func (s *Projects) GetListText() string {
-	log.Println("Got Text")
-	defer log.Println("Returned Text")
 	if s.IsLoading {
 		return lipgloss.Place(s.Width-2, s.Height-4-strings.Count(styles.ContainersText, "\n"),
 			lipgloss.Center, lipgloss.Top, "Loading...")

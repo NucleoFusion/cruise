@@ -106,6 +106,12 @@ func (s *ProjectList) Update(msg tea.Msg) (*ProjectList, tea.Cmd) {
 			}
 			s.UpdateList()
 			return s, nil
+		case "enter": // TODO: use keymap
+			return s, func() tea.Msg {
+				return messages.ShowProjectDetails{
+					Summary: s.GetCurrentItem(),
+				}
+			}
 		}
 	}
 	return s, nil

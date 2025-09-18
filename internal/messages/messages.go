@@ -29,6 +29,16 @@ type (
 		Projects []*types.ProjectSummary
 	}
 
+	ProjectInspectResult struct {
+		Project *types.Project
+	}
+
+	ShowProjectDetails struct {
+		Summary *types.ProjectSummary
+	}
+
+	CloseProjectDetails struct{}
+
 	ChangePg struct {
 		Pg     enums.PageType
 		Exited bool
