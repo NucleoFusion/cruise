@@ -48,7 +48,7 @@ func (s *Projects) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.ShowProjectDetails:
 		s.ShowDetails = true
 		s.DetailsPg = NewProjectDetails(s.Width, s.Height, msg.Summary)
-		return s, nil
+		return s, s.DetailsPg.Init()
 	case messages.CloseProjectDetails:
 		s.ShowDetails = false
 		return s, nil

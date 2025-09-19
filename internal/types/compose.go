@@ -21,7 +21,7 @@ type ProjectSummary struct {
 
 type ServiceSummary struct {
 	Name       string
-	Containers *[]container.Summary
+	Containers *[]container.InspectResponse
 }
 
 func (s *ProjectSummary) NumServices() int {
