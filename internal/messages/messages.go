@@ -7,6 +7,7 @@ import (
 
 	"github.com/NucleoFusion/cruise/internal/data"
 	"github.com/NucleoFusion/cruise/internal/enums"
+	"github.com/NucleoFusion/cruise/internal/types"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
@@ -24,6 +25,20 @@ func TickDashboard() tea.Cmd {
 }
 
 type (
+	ProjectsReadyMsg struct {
+		Projects []*types.ProjectSummary
+	}
+
+	ProjectInspectResult struct {
+		Project *types.Project
+	}
+
+	ShowProjectDetails struct {
+		Summary *types.ProjectSummary
+	}
+
+	CloseProjectDetails struct{}
+
 	ChangePg struct {
 		Pg     enums.PageType
 		Exited bool
