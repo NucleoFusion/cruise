@@ -1,11 +1,11 @@
 package compose
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/types"
-	"github.com/docker/docker/api/types/container"
 )
 
 func Inspect(s *types.ProjectSummary) (*types.Project, error) {
@@ -29,7 +29,7 @@ func Inspect(s *types.ProjectSummary) (*types.Project, error) {
 
 		service, ok := project.Services[srv]
 		if !ok {
-			cntrs := make([]container.InspectResponse, 0)
+			cntrs := make([]types.ServiceContainer, 0)
 			project.Services[srv] = &types.ServiceSummary{
 				Name:       srv,
 				Containers: &cntrs,
@@ -43,7 +43,23 @@ func Inspect(s *types.ProjectSummary) (*types.Project, error) {
 			return nil, err
 		}
 
-		*service.Containers = append(*service.Containers, insp)
+		stat, err := docker.GetContainerStats(v.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		dec := json.NewDecoder(stat.Body)
+
+		*service.Containers = append(*service.Containers, types.ServiceContainer{
+			Inspect: insp,
+			Stats:   &stat,
+			Decoder: dec,
+		})
+	}
+
+	err = project.AggregateStats()
+	if err != nil {
+		return nil, err
 	}
 
 	return &project, nil
@@ -58,7 +74,7 @@ func Status(s *types.Project) string {
 
 	for _, srv := range s.Services {
 		for _, v := range *srv.Containers {
-			if v.State.Running {
+			if v.Inspect.State.Running {
 				running++
 			}
 
@@ -84,7 +100,7 @@ func StartedAt(s *types.Project) string {
 	startedAt := time.Unix(1<<63-1, 0) // Max Time
 	for _, srv := range s.Services {
 		for _, v := range *srv.Containers {
-			t, err := time.Parse(time.RFC3339Nano, v.State.StartedAt)
+			t, err := time.Parse(time.RFC3339Nano, v.Inspect.State.StartedAt)
 			if err != nil {
 				continue
 			}

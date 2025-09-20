@@ -78,6 +78,8 @@ func (s *ProjectDetails) Update(msg tea.Msg) (*ProjectDetails, tea.Cmd) {
 	case messages.ProjectInspectResult:
 		s.Inspect = msg.Project
 
+		s.YmlVp.SetContent(s.GetYAMLView())
+		s.ResourceVp.SetContent(s.GetResourcesView())
 		s.DetailsVp.SetContent(s.GetDetailsView())
 
 		s.IsLoading = false
@@ -109,5 +111,33 @@ func (s *ProjectDetails) GetDetailsView() string {
 		styles.DetailKeyStyle().Render(" Networks: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", s.Summary.Networks), w/3-15)),
 		styles.DetailKeyStyle().Render(" Volumes: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", s.Summary.Volumes), w/3-15)))
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Volume Details ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Project Details ")), "\n\n", text)
+}
+
+func (s *ProjectDetails) GetResourcesView() string {
+	w := s.Width
+
+	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s \n\n%s %s \n\n%s %s \n\n%s %s \n\n%s %s",
+		styles.DetailKeyStyle().Render(" CPU: "), styles.TextStyle().Render(fmt.Sprintf("%d", s.Inspect.AggregatedStats.CPU)),
+		styles.DetailKeyStyle().Render(" Memory: "), styles.TextStyle().Render(fmt.Sprintf("%d", s.Inspect.AggregatedStats.Mem)),
+		styles.DetailKeyStyle().Render(" Memory Limit: "), styles.TextStyle().Render(fmt.Sprintf("%d", s.Inspect.AggregatedStats.MemLimit)),
+		styles.DetailKeyStyle().Render(" Net Rx: "), styles.TextStyle().Render(fmt.Sprintf("%d", s.Inspect.AggregatedStats.NetRx)),
+		styles.DetailKeyStyle().Render(" Net Tx: "), styles.TextStyle().Render(fmt.Sprintf("%d", s.Inspect.AggregatedStats.NetTx)),
+		styles.DetailKeyStyle().Render(" Block Read: "), styles.TextStyle().Render(fmt.Sprintf("%d", s.Inspect.AggregatedStats.BlkRead)),
+		styles.DetailKeyStyle().Render(" Block Write: "), styles.TextStyle().Render(fmt.Sprintf("%d", s.Inspect.AggregatedStats.BlkWrite)))
+
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Project Details ")), "\n\n", text)
+}
+
+func (s *ProjectDetails) GetYAMLView() string {
+	w := s.Width
+
+	var text string
+	if !s.Summary.RegistryConfigured {
+		text = lipgloss.PlaceHorizontal(w/3-2, lipgloss.Center, "Registry Not Configured")
+	} else {
+		text = lipgloss.PlaceHorizontal(w/3-2, lipgloss.Center, "TODO: Configure Registry")
+	}
+
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" YAML Details ")), "\n\n", text)
 }
