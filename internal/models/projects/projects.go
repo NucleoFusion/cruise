@@ -47,10 +47,12 @@ func (s *Projects) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return s, cmd
 	case messages.ShowProjectDetails:
 		s.ShowDetails = true
+		s.List.Ti.Blur()
 		s.DetailsPg = NewProjectDetails(s.Width, s.Height, msg.Summary)
 		return s, s.DetailsPg.Init()
 	case messages.CloseProjectDetails:
 		s.ShowDetails = false
+		s.List.Ti.Blur()
 		return s, nil
 	case messages.ProjectInspectResult:
 		if !s.ShowDetails {
@@ -61,17 +63,18 @@ func (s *Projects) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s.DetailsPg, cmd = s.DetailsPg.Update(msg)
 		return s, cmd
 	case tea.KeyMsg:
-		if s.List.Ti.Focused() {
-			var cmd tea.Cmd
-			s.List, cmd = s.List.Update(msg)
-			return s, cmd
-		} else if s.ShowDetails {
+		if s.ShowDetails {
 			if msg.String() == "esc" { // TODO: Use keymap
 				s.ShowDetails = false
+				s.List.Ti.Focus()
 				return s, nil
 			}
 			var cmd tea.Cmd
 			s.DetailsPg, cmd = s.DetailsPg.Update(msg)
+			return s, cmd
+		} else if s.List.Ti.Focused() {
+			var cmd tea.Cmd
+			s.List, cmd = s.List.Update(msg)
 			return s, cmd
 		}
 	}

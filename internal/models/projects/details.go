@@ -19,7 +19,9 @@ type ProjectDetails struct {
 	Height    int
 	Summary   *types.ProjectSummary
 	Inspect   *types.Project
+	Services  []string
 	IsLoading bool
+	Current   int
 	// Viewports
 	DetailsVp  viewport.Model
 	ServicesVp viewport.Model
@@ -48,10 +50,17 @@ func NewProjectDetails(w, h int, s *types.ProjectSummary) *ProjectDetails {
 	yvp.Style = styles.PageStyle().Padding(1, 2)
 	// dvp.SetContent(getLabelView(v, labels, w))
 
+	srvc := make([]string, 0, len(s.Services))
+	for k := range s.Services {
+		srvc = append(srvc, k)
+	}
+
 	return &ProjectDetails{
 		Width:      w,
 		Height:     h,
 		Summary:    s,
+		Current:    0,
+		Services:   srvc,
 		ResourceVp: rvp,
 		ServicesVp: svp,
 		DetailsVp:  dvp,
@@ -81,9 +90,26 @@ func (s *ProjectDetails) Update(msg tea.Msg) (*ProjectDetails, tea.Cmd) {
 		s.YmlVp.SetContent(s.GetYAMLView())
 		s.ResourceVp.SetContent(s.GetResourcesView())
 		s.DetailsVp.SetContent(s.GetDetailsView())
+		s.ServicesVp.SetContent(s.GetServicesView())
 
 		s.IsLoading = false
 		return s, nil
+	case tea.KeyMsg:
+		// TODO: Use Keymap
+		switch msg.String() {
+		case "up":
+			if s.Current > 0 {
+				s.Current--
+				s.ServicesVp.SetContent(s.GetServicesView())
+			}
+			return s, nil
+		case "down":
+			if s.Current < len(s.Services)-1 {
+				s.Current++
+				s.ServicesVp.SetContent(s.GetServicesView())
+			}
+			return s, nil
+		}
 	}
 	return s, nil
 }
@@ -107,7 +133,7 @@ func (s *ProjectDetails) GetDetailsView() string {
 		styles.DetailKeyStyle().Render(" Status: "), styles.TextStyle().Render(utils.Shorten(compose.Status(s.Inspect), w/3-15)),
 		styles.DetailKeyStyle().Render(" Last Updated: "), styles.TextStyle().Render(utils.Shorten(compose.StartedAt(s.Inspect), w/3-15)),
 		styles.DetailKeyStyle().Render(" Containers: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", s.Summary.Containers), w/3-15)),
-		styles.DetailKeyStyle().Render(" Summary: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", s.Summary.NumServices()), w/3-15)),
+		styles.DetailKeyStyle().Render(" Services: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", s.Summary.NumServices()), w/3-15)),
 		styles.DetailKeyStyle().Render(" Networks: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", s.Summary.Networks), w/3-15)),
 		styles.DetailKeyStyle().Render(" Volumes: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", s.Summary.Volumes), w/3-15)))
 
@@ -129,6 +155,7 @@ func (s *ProjectDetails) GetResourcesView() string {
 	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Project Details ")), "\n\n", text)
 }
 
+// TODO: Configure Registry
 func (s *ProjectDetails) GetYAMLView() string {
 	w := s.Width
 
@@ -140,4 +167,21 @@ func (s *ProjectDetails) GetYAMLView() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" YAML Details ")), "\n\n", text)
+}
+
+func (s *ProjectDetails) GetServicesView() string {
+	w := s.Width
+
+	text := compose.ServiceHeaders(w) + "\n\n"
+	for k, v := range s.Services {
+		if k == s.Current {
+			text += styles.SelectedStyle().Render(compose.ServiceFormatted(w, s.Inspect.Services[v]))
+		} else {
+			text += styles.TextStyle().Render(compose.ServiceFormatted(w, s.Inspect.Services[v]))
+		}
+
+		text += "\n"
+	}
+
+	return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w-4, lipgloss.Center, styles.TitleStyle().Render(" Service Details ")), "\n\n", text)
 }
