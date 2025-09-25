@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 
 	"github.com/NucleoFusion/cruise/cmd"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -16,6 +18,7 @@ func main() {
 	}
 
 	log.SetOutput(f)
+	logrus.SetOutput(io.Discard)
 
 	cmd.Execute()
 }

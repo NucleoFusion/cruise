@@ -1,6 +1,7 @@
 package projects
 
 import (
+	"log"
 	"sort"
 	"time"
 
@@ -9,21 +10,21 @@ import (
 	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
-	"github.com/NucleoFusion/cruise/internal/types"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 type ProjectList struct {
 	Width         int
 	Height        int
-	Items         []*types.ProjectSummary
+	Items         []*types.Project
 	Err           error
-	FilteredItems []*types.ProjectSummary
+	FilteredItems []*types.Project
 	SelectedIndex int
 	Ti            textinput.Model
 	Vp            viewport.Model
@@ -54,11 +55,15 @@ func NewProjectList(w int, h int) *ProjectList {
 
 func (s *ProjectList) Init() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		items, err := compose.GetProjectSummaries()
+		log.Println("Getting Projects")
+		items, err := compose.GetProjects()
+		log.Println("Got Projects")
 		if err != nil {
+			log.Println("Errored Projects", err)
 			return utils.ReturnError("Projects List", "Error Getting Project Summaries", err)
 		}
 
+		log.Println("Returned Projects")
 		return messages.ProjectsReadyMsg{
 			Projects: items,
 		}
@@ -139,7 +144,7 @@ func (s *ProjectList) UpdateList() {
 	text := lipgloss.NewStyle().Bold(true).Render(compose.ProjectHeaders(s.Width)+"\n") + "\n"
 	//
 	for k, v := range s.FilteredItems {
-		line := compose.ProjectSummaryFormatted(v, s.Width)
+		line := compose.ProjectFormatted(v, s.Width)
 
 		if k == s.SelectedIndex {
 			line = styles.SelectedStyle().Render(line)
@@ -157,10 +162,10 @@ func (s *ProjectList) Filter(val string) {
 	w := (s.Width)/9 - 1
 
 	formatted := make([]string, len(s.Items))
-	originals := make([]*types.ProjectSummary, len(s.Items))
+	originals := make([]*types.Project, len(s.Items))
 
 	for i, v := range s.Items {
-		str := compose.ProjectSummaryFormatted(v, w)
+		str := compose.ProjectFormatted(v, w)
 		formatted[i] = str
 		originals[i] = v
 	}
@@ -168,7 +173,7 @@ func (s *ProjectList) Filter(val string) {
 	ranked := fuzzy.RankFindFold(val, formatted)
 	sort.Sort(ranked)
 
-	result := make([]*types.ProjectSummary, len(ranked))
+	result := make([]*types.Project, len(ranked))
 	for i, r := range ranked {
 		result[i] = originals[r.OriginalIndex]
 	}
@@ -180,6 +185,6 @@ func (s *ProjectList) Filter(val string) {
 	}
 }
 
-func (s *ProjectList) GetCurrentItem() *types.ProjectSummary {
+func (s *ProjectList) GetCurrentItem() *types.Project {
 	return s.FilteredItems[s.SelectedIndex]
 }
