@@ -10,21 +10,21 @@ import (
 	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	"github.com/NucleoFusion/cruise/internal/styles"
+	internaltypes "github.com/NucleoFusion/cruise/internal/types"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 type ProjectList struct {
 	Width         int
 	Height        int
-	Items         []*types.Project
+	Items         []*internaltypes.Project
 	Err           error
-	FilteredItems []*types.Project
+	FilteredItems []*internaltypes.Project
 	SelectedIndex int
 	Ti            textinput.Model
 	Vp            viewport.Model
@@ -114,7 +114,7 @@ func (s *ProjectList) Update(msg tea.Msg) (*ProjectList, tea.Cmd) {
 		case "enter": // TODO: use keymap
 			return s, func() tea.Msg {
 				return messages.ShowProjectDetails{
-					Summary: s.GetCurrentItem(),
+					Project: s.GetCurrentItem(),
 				}
 			}
 		}
@@ -162,7 +162,7 @@ func (s *ProjectList) Filter(val string) {
 	w := (s.Width)/9 - 1
 
 	formatted := make([]string, len(s.Items))
-	originals := make([]*types.Project, len(s.Items))
+	originals := make([]*internaltypes.Project, len(s.Items))
 
 	for i, v := range s.Items {
 		str := compose.ProjectFormatted(v, w)
@@ -173,7 +173,7 @@ func (s *ProjectList) Filter(val string) {
 	ranked := fuzzy.RankFindFold(val, formatted)
 	sort.Sort(ranked)
 
-	result := make([]*types.Project, len(ranked))
+	result := make([]*internaltypes.Project, len(ranked))
 	for i, r := range ranked {
 		result[i] = originals[r.OriginalIndex]
 	}
@@ -185,6 +185,6 @@ func (s *ProjectList) Filter(val string) {
 	}
 }
 
-func (s *ProjectList) GetCurrentItem() *types.Project {
+func (s *ProjectList) GetCurrentItem() *internaltypes.Project {
 	return s.FilteredItems[s.SelectedIndex]
 }

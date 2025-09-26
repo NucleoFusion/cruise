@@ -7,8 +7,8 @@ import (
 
 	"github.com/NucleoFusion/cruise/internal/data"
 	"github.com/NucleoFusion/cruise/internal/enums"
+	internaltypes "github.com/NucleoFusion/cruise/internal/types"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/image"
@@ -26,15 +26,11 @@ func TickDashboard() tea.Cmd {
 
 type (
 	ProjectsReadyMsg struct {
-		Projects []*types.Project
-	}
-
-	ProjectInspectResult struct {
-		Project *types.Project
+		Projects []*internaltypes.Project
 	}
 
 	ShowProjectDetails struct {
-		Summary *types.Project
+		Project *internaltypes.Project
 	}
 
 	CloseProjectDetails struct{}
