@@ -28,6 +28,7 @@ type ProjectList struct {
 	SelectedIndex int
 	Ti            textinput.Model
 	Vp            viewport.Model
+	IsLoading     bool
 }
 
 func NewProjectList(w int, h int) *ProjectList {
@@ -50,6 +51,7 @@ func NewProjectList(w int, h int) *ProjectList {
 		Ti:            ti,
 		SelectedIndex: 0,
 		Vp:            vp,
+		IsLoading:     true,
 	}
 }
 
@@ -75,6 +77,7 @@ func (s *ProjectList) Update(msg tea.Msg) (*ProjectList, tea.Cmd) {
 	case messages.ProjectsReadyMsg:
 		s.Items = msg.Projects
 		s.FilteredItems = msg.Projects
+		s.IsLoading = false
 		return s, nil
 
 	case tea.KeyMsg:
@@ -123,6 +126,10 @@ func (s *ProjectList) Update(msg tea.Msg) (*ProjectList, tea.Cmd) {
 }
 
 func (s *ProjectList) View() string {
+	if s.IsLoading {
+		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height-2, lipgloss.Center, lipgloss.Center, "Loading..."))
+	}
+
 	if s.Err != nil {
 		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height-2, lipgloss.Center, lipgloss.Center, "Error: "+s.Err.Error()))
 	}

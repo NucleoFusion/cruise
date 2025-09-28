@@ -19,14 +19,12 @@ type Projects struct {
 	Help        styledhelp.StyledHelp
 	DetailsPg   *ProjectDetails
 	ShowDetails bool
-	IsLoading   bool
 }
 
 func NewProjects(w int, h int) *Projects {
 	return &Projects{
 		Width:       w,
 		Height:      h,
-		IsLoading:   true,
 		List:        NewProjectList(w-4, h-3-strings.Count(styles.ProjectsText, "\n")),
 		ShowDetails: false,
 		Help:        styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w),
@@ -40,8 +38,6 @@ func (s *Projects) Init() tea.Cmd {
 func (s *Projects) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.ProjectsReadyMsg:
-		s.IsLoading = false
-
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
@@ -86,10 +82,5 @@ func (s *Projects) View() string {
 }
 
 func (s *Projects) GetListText() string {
-	if s.IsLoading {
-		return lipgloss.Place(s.Width-2, s.Height-4-strings.Count(styles.ContainersText, "\n"),
-			lipgloss.Center, lipgloss.Top, "Loading...")
-	}
-
 	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
 }

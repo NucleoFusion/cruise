@@ -3,6 +3,7 @@ package projects
 import (
 	"fmt"
 
+	"github.com/NucleoFusion/cruise/internal/compose"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	internaltypes "github.com/NucleoFusion/cruise/internal/types"
 	"github.com/NucleoFusion/cruise/internal/utils"
@@ -46,8 +47,8 @@ func NewProjectDetails(w, h int, s *internaltypes.Project) *ProjectDetails {
 	yvp.Style = styles.PageStyle().Padding(1, 2)
 	// dvp.SetContent(getLabelView(v, labels, w))
 
-	srvc := make([]string, 0, len(s.Services))
-	for k := range s.Services {
+	srvc := make([]string, 0, len(s.Inspect.Services))
+	for k := range s.Inspect.Services {
 		srvc = append(srvc, k)
 	}
 
@@ -144,7 +145,7 @@ func (s *ProjectDetails) GetDetailsView() string {
 func (s *ProjectDetails) GetYAMLView() string {
 	w := s.Width
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" YAML Details ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" YAML Details ")), "\n\n", "TBD")
 }
 
 func (s *ProjectDetails) GetServicesView() string {
@@ -153,9 +154,9 @@ func (s *ProjectDetails) GetServicesView() string {
 	text := compose.ServiceHeaders(w) + "\n\n"
 	for k, v := range s.Services {
 		if k == s.Current {
-			text += styles.SelectedStyle().Render(compose.ServiceFormatted(w, s.Inspect.Services[v]))
+			text += styles.SelectedStyle().Render(compose.ServiceFormatted(w, s.Project, v))
 		} else {
-			text += styles.TextStyle().Render(compose.ServiceFormatted(w, s.Inspect.Services[v]))
+			text += styles.TextStyle().Render(compose.ServiceFormatted(w, s.Project, v))
 		}
 
 		text += "\n"
