@@ -57,15 +57,14 @@ func NewProjectList(w int, h int) *ProjectList {
 
 func (s *ProjectList) Init() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		log.Println("Getting Projects")
+		log.Println("Calc ProjectsReadyMsg")
 		items, err := compose.GetProjects()
-		log.Println("Got Projects")
 		if err != nil {
-			log.Println("Errored Projects", err)
+			log.Println("Showing Error", err.Error())
 			return utils.ReturnError("Projects List", "Error Getting Project Summaries", err)
 		}
 
-		log.Println("Returned Projects")
+		log.Println("Error Sending ProjectsReadyMsg")
 		return messages.ProjectsReadyMsg{
 			Projects: items,
 		}
@@ -138,9 +137,13 @@ func (s *ProjectList) View() string {
 		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height-2, lipgloss.Center, lipgloss.Center, "No Containers Found!"))
 	}
 
+	log.Println("Showing List")
+
 	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder)
 
 	s.UpdateList()
+
+	log.Println("Updated List")
 
 	return lipgloss.JoinVertical(lipgloss.Center,
 		style.Render(s.Ti.View()),
