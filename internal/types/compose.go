@@ -1,6 +1,7 @@
 package internaltypes
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -14,7 +15,77 @@ type Project struct {
 }
 
 type Service struct {
-	Containers *[]container.InspectResponse
+	Containers *[]ContainerDetails
+}
+
+type ContainerDetails struct {
+	Inspect *container.InspectResponse
+	Stats   *container.StatsResponseReader
+	Decoder *json.Decoder
+}
+
+type StatsDetails struct {
+	CPU      uint64
+	Mem      int64
+	MemLimit int64
+	NetRx    int
+	NetTx    int
+}
+
+func (s *Project) AggStats() (*StatsDetails, error) {
+	var agg StatsDetails
+	n := len(*s.Services)
+
+	for _, v := range *s.Services {
+		stats, err := v.AggStats()
+		if err != nil {
+			continue
+		}
+
+		agg.CPU += stats.CPU / uint64(n)
+		agg.Mem += int64(stats.Mem) / int64(n)
+		agg.MemLimit += int64(stats.MemLimit) / int64(n)
+		agg.NetRx += stats.NetRx / n
+		agg.NetTx += stats.NetTx / n
+	}
+
+	return &agg, nil
+}
+
+func (s *Service) AggStats() (*StatsDetails, error) {
+	var agg StatsDetails
+	n := len(*s.Containers)
+
+	for _, v := range *s.Containers {
+		stats, err := v.AggStats()
+		if err != nil {
+			continue
+		}
+
+		netRx, netTx := 0, 0
+		for _, net := range stats.Networks {
+			netRx += int(net.RxBytes)
+			netTx += int(net.TxBytes)
+		}
+
+		agg.CPU += stats.CPUStats.CPUUsage.TotalUsage / uint64(n)
+		agg.Mem += int64(stats.MemoryStats.Usage) / int64(n)
+		agg.MemLimit += int64(stats.MemoryStats.Limit) / int64(n)
+		agg.NetRx += netRx / n
+		agg.NetTx += netTx / n
+	}
+
+	return &agg, nil
+}
+
+func (s *ContainerDetails) AggStats() (*container.StatsResponse, error) {
+	var t container.StatsResponse
+	err := s.Decoder.Decode(&t)
+	if err != nil {
+		return nil, err
+	}
+
+	return &t, nil
 }
 
 func (s *Project) NumContainers() int {
@@ -48,11 +119,11 @@ func (s *Service) LatestStartedAt() (time.Time, error) {
 
 	for _, c := range *s.Containers {
 		// Parse RFC3339 string from container state
-		if c.State == nil || c.State.StartedAt == "" {
+		if c.Inspect.State == nil || c.Inspect.State.StartedAt == "" {
 			continue
 		}
 
-		started, err := time.Parse(time.RFC3339Nano, c.State.StartedAt)
+		started, err := time.Parse(time.RFC3339Nano, c.Inspect.State.StartedAt)
 		if err != nil {
 			return time.Time{}, err
 		}
@@ -108,13 +179,13 @@ func (s *Service) Status() string {
 
 	for _, c := range *s.Containers {
 		switch {
-		case c.State.Running:
+		case c.Inspect.State.Running:
 			running++
-		case c.State.Dead:
+		case c.Inspect.State.Dead:
 			exited++
-		case c.State.Restarting:
+		case c.Inspect.State.Restarting:
 			restarting++
-		case c.State.Paused:
+		case c.Inspect.State.Paused:
 			paused++
 		}
 	}

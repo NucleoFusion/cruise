@@ -29,6 +29,8 @@ type (
 		Projects []*internaltypes.Project
 	}
 
+	ProjectsDetailsUpdate struct{}
+
 	ShowProjectDetails struct {
 		Project *internaltypes.Project
 	}

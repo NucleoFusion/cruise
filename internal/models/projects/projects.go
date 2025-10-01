@@ -39,10 +39,15 @@ func (s *Projects) Init() tea.Cmd {
 func (s *Projects) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.ProjectsReadyMsg:
-		log.Println("Error showing Projects Ready")
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
+	case messages.ProjectsDetailsUpdate:
+		if s.ShowDetails {
+			var cmd tea.Cmd
+			s.DetailsPg, cmd = s.DetailsPg.Update(msg)
+			return s, cmd
+		}
 	case messages.ShowProjectDetails:
 		s.ShowDetails = true
 		s.List.Ti.Blur()

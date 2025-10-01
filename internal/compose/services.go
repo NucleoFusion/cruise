@@ -20,9 +20,17 @@ func ServiceHeaders(width int) string {
 
 func ServiceFormatted(width int, s *internaltypes.Project, srv string) string {
 	w := width / 7
-	service := (*s.Services)[srv]
+	service, ok := (*s.Services)[srv]
+	if !ok {
+		return ""
+	}
 
-	lim := s.Inspect.Services[srv].Deploy.Resources.Limits
+	inspectedService, ok := s.Inspect.Services[srv]
+	if !ok {
+		return ""
+	}
+
+	lim := inspectedService.Deploy.Resources.Limits
 	limits := fmt.Sprintf("%.2f nCPUs - %d bytes", lim.NanoCPUs.Value(), int64(lim.MemoryBytes))
 
 	startedAt := "NA"
