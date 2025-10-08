@@ -61,21 +61,10 @@ yay -S cruise
 ```
 
 ## NixOS
-NixOS users can install __cruise__ by adding it to their `systemPackages` and enableing the `unstable channel`
-```bash
-sudo nix-channel --add https://nixos.org/channels/nixos-unstable nixos-unstable
-sudo nix-channel --update
-```
+NixOS users can install __cruise__ by adding it to their `systemPackages`:
 ```nix
-{ pkgs, ... }:
-
-let
-  unstable = import <nixos-unstable>;
-in
-{
   environment.systemPackages = with pkgs; [
-    unstable.cruise
+    cruise
   ];
-}
 ```
 
