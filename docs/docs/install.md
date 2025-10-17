@@ -60,3 +60,11 @@ Arch users can install _cruise_ through the AUR. using any AUR Helper.
 yay -S cruise
 ```
 
+## NixOS
+NixOS users can install __cruise__ by adding it to their `systemPackages`:
+```nix
+  environment.systemPackages = with pkgs; [
+    cruise
+  ];
+```
+
