@@ -1,36 +1,10 @@
-# Cruise – Docker TUI Client
+# Cruise – Container Management Client 
 
-> Terminal UI for managing Docker with style and speed.
+> Terminal UI for managing containers with style and speed.
 
-**Cruise** is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for interacting with Docker. Built with Go and [Bubbletea](https://github.com/charmbracelet/bubbletea), it offers a visually rich, keyboard-first experience for managing containers, images, volumes, networks, logs and more — all from your terminal.
+**Cruise** is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for interacting with Containers. Built with Go and [Bubbletea](https://github.com/charmbracelet/bubbletea), it offers a visually rich, keyboard-first experience for managing containers, images, volumes, networks, logs and more — all from your terminal.
 
-
-## Description
-
-Ever felt that docker CLI is too lengthy or limited? Find yourself executing commands again and again for stats? Or wrote a full multiline command just for a typo to ruin it? Well... Fret no more. Cruise - Is a TUI Docker Client, fitting easily in your terminal-first dev workflow, while making repetitive Docker work easy and fun.
-
-> How is _cruise_ different from existing solutions?
-
-Existing applications are limited in what they do, they serve as mostly a monitoring service, _not_ a management service let alone a Client.
-
-With Cruise you can:
-- Manage Lifecycles of Containers, Images, Volumes, Networks.
-- Have a centralized Monitoring service
-- Scan images for vulnerabilities
-- Get Detailed view on Docker Artifacts
-- and more to come!
-
-### Tech Stack
-
-- **Go** – High performance, robust concurrency
-- **Bubbletea** – Elegant terminal UI framework
-- **Charm ecosystem** – [Lipgloss](https://github.com/charmbracelet/lipgloss), [Bubbles](https://github.com/charmbracelet/bubbles), [Glamour](https://github.com/charmbracelet/glamour)
-- **Docker SDK for Go** – Deep Docker integration
-- **Trivy / Grype** – Vulnerability scanning
-- **Viper** – Configuration management
-
-
-## Usage
+## Screenshots & Usage
 
 <details>
   <summary>Screenshots</summary>
@@ -46,11 +20,58 @@ With Cruise you can:
 <img width="1827" height="1013" alt="7" src="https://github.com/user-attachments/assets/bed515da-0c5d-4f72-b771-4f6afcfc35c4" />
 <img width="1827" height="1013" alt="6" src="https://github.com/user-attachments/assets/c1999901-c2de-416c-8bc1-cfea2d368d31" />
 <img width="1827" height="1013" alt="5" src="https://github.com/user-attachments/assets/fc118e59-781e-412b-b787-82f497084587" />
-
 </details>
 
 Once [installed](#installation). You can run the app with `cruise`.
 
+
+## Description
+
+Ever felt that CLI's for containerization tools are too lengthy or limited? Find yourself executing commands again and again for simple things? Wrote multiline commands just for a typo to ruin it? Well... Fret no more. Cruise - Is a TUI Container Management Client, fitting easily in your terminal-first dev workflow, while making repetitive work easy and interactive.
+
+> How is _cruise_ different from existing solutions?
+
+Existing applications are limited in what they do, they serve as mostly a monitoring service, _not_ a management service let alone a Client.
+
+With Cruise you can:
+- Manage Lifecycles of Containers, Images, Volumes, Networks.
+- Have a centralized Monitoring service
+- Scan images for vulnerabilities
+- Get Detailed view on Docker Artifacts
+- and more to come!
+
+**NOTE**: Although cruise currently only supports docker, through some more refactor and expansion we plan to expand the scope of cruise to support multiple containerization tools and also several other QoL features.
+
+### Tech Stack
+
+- **Go** – High performance, robust concurrency
+- **Bubbletea** – Elegant terminal UI framework
+- **Charm ecosystem** – [Lipgloss](https://github.com/charmbracelet/lipgloss), [Bubbles](https://github.com/charmbracelet/bubbles), [Glamour](https://github.com/charmbracelet/glamour)
+- **Docker SDK for Go** – Deep Docker integration
+- **Trivy / Grype** – Vulnerability scanning
+- **Viper** – Configuration management
+
+## Future Plans
+
+Please check out the roadmap [here](ROADMAP.md).
+
+### Expected Growth Plan
+
+- Support multiple popular containerization tools
+- Special Support for Docker Compose.
+  - Support Managing Compose Lifecycles
+  - Compose Editing
+  - and more...
+- Support Advanced Image Manipulation.
+- Advanced Monitoring Support
+  - Notifications/Alerts
+  - A standalone/integrated daemon service for live log/monitoring
+- Registry & Image Build Configuration
+  - Harbor Support?
+
+- Support for Container Orchestration tools
+
+**This list is just specs I can list from the top of my head, actual integration and selection will vary.**
 
 ## Installation
 
