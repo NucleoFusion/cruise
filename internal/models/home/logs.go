@@ -64,8 +64,10 @@ func (s *Logs) Update(msg tea.Msg) (*Logs, tea.Cmd) {
 func (s Logs) View() string {
 	return styles.SubpageStyle().PaddingTop(1).PaddingLeft(4).Render(lipgloss.JoinVertical(lipgloss.Center,
 		styles.TitleStyle().Render("Event Logs"),
-		lipgloss.Place(s.Width*2/3-4, s.Height/3-4,
-			lipgloss.Left, lipgloss.Bottom, s.FormattedView())))
+		lipgloss.NewStyle().Width((s.Width-14-(s.Width-14)/4)).
+			Height(s.Height/3-4).
+			Align(lipgloss.Left, lipgloss.Center).
+			Render(s.FormattedView())))
 }
 
 func (s *Logs) FormattedView() string {
