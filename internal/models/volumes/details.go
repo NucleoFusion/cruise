@@ -48,27 +48,27 @@ func NewDetail(w int, h int, vol volume.Volume) *VolumeDetail {
 	// Label VP
 	lvp := viewport.New((w-2)/3, h-h*3/5)
 	lvp.Style = styles.PageStyle().Padding(1, 2)
-	lvp.SetContent(getLabelView(v, labels, w))
+	lvp.SetContent(getLabelView(v, labels, (w-2)/3-5))
 
 	// Dash VP
 	dvp := viewport.New((w-2)/3, h*3/5)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
-	dvp.SetContent(getDashboardView(v, w))
+	dvp.SetContent(getDashboardView(v, (w-2)/3-5))
 
 	// Status VP
 	svp := viewport.New(w-2-(w-2)*2/3, h)
 	svp.Style = styles.PageStyle().Padding(1, 2)
-	svp.SetContent(getStatusView(v, status, w))
+	svp.SetContent(getStatusView(v, status, w-2-(w-2)*2/3-5))
 
 	// Usage VP
 	uvp := viewport.New((w-2)/3, h/2)
 	uvp.Style = styles.PageStyle().Padding(1, 2)
-	uvp.SetContent(getUsageView(v, w))
+	uvp.SetContent(getUsageView(v, (w-2)/3-5))
 
 	// Options VP
-	ovp := viewport.New((w-2)/3, h-h/2)
+	ovp := viewport.New((w-2)/3, h/2)
 	ovp.Style = styles.PageStyle().Padding(1, 2)
-	ovp.SetContent(getOptionsView(v, opts, w))
+	ovp.SetContent(getOptionsView(v, opts, (w-2)/3-5))
 
 	return &VolumeDetail{
 		Width:    w,
@@ -98,66 +98,66 @@ func (s *VolumeDetail) View() string {
 func getDashboardView(vol volume.Volume, w int) string {
 	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s \n\n%s %s \n\n%s %s",
 		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(vol.Name),
-		styles.DetailKeyStyle().Render(" Scope: "), styles.TextStyle().Render(utils.Shorten(vol.Scope, w/3-15)),
+		styles.DetailKeyStyle().Render(" Scope: "), styles.TextStyle().Render(utils.Shorten(vol.Scope, w-10)),
 		styles.DetailKeyStyle().Render(" Driver: "), styles.TextStyle().Render(vol.Driver),
-		styles.DetailKeyStyle().Render(" MountPoint: "), styles.TextStyle().Render(utils.Shorten(vol.Mountpoint, w/3-15)),
-		styles.DetailKeyStyle().Render(" Created: "), styles.TextStyle().Render(utils.Shorten(vol.CreatedAt, w/3-15)))
+		styles.DetailKeyStyle().Render(" MountPoint: "), styles.TextStyle().Render(utils.Shorten(vol.Mountpoint, w-10)),
+		styles.DetailKeyStyle().Render(" Created: "), styles.TextStyle().Render(utils.Shorten(vol.CreatedAt, w-10)))
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Volume Details ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Volume Details ")), "\n\n", text)
 }
 
 func getUsageView(vol volume.Volume, w int) string {
 	if vol.UsageData == nil {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Usage ")), "\n\n", "NA")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Usage ")), "\n\n", "NA")
 	}
 
 	text := fmt.Sprintf("%s %s \n\n%s %sKb ",
 		styles.DetailKeyStyle().Render(" RefCount: "), styles.TextStyle().Render(fmt.Sprintf("%d", vol.UsageData.RefCount)),
 		styles.DetailKeyStyle().Render(" Size: "), styles.TextStyle().Render(fmt.Sprintf("%d", vol.UsageData.Size/1024)))
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w*2/3-4, lipgloss.Center, styles.TitleStyle().Render(" Usage ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Usage ")), "\n\n", text)
 }
 
 func getLabelView(vol volume.Volume, labels []string, w int) string {
 	text := ""
 
 	if len(labels) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render("Labels")), "\n\n", "No Labels Found")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render("Labels")), "\n\n", "No Labels Found")
 	}
 
 	for _, v := range labels {
 		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(strings.TrimPrefix(v, "com.docker."), 25))),
-			styles.TextStyle().Render(utils.Shorten(vol.Labels[v], w/3-8-len(v))))
+			styles.TextStyle().Render(utils.Shorten(vol.Labels[v], w-8-len(v))))
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Labels ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Labels ")), "\n\n", text)
 }
 
 func getStatusView(vol volume.Volume, opts []string, w int) string {
 	text := ""
 
 	if len(opts) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Status ")), "\n\n", "No Status' Found")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Status ")), "\n\n", "No Status' Found")
 	}
 
 	for _, v := range opts {
 		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", v)),
-			styles.TextStyle().Render(utils.Shorten(vol.Options[v], w/3-8-len(v))))
+			styles.TextStyle().Render(utils.Shorten(vol.Options[v], w-8-len(v))))
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Status ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Status ")), "\n\n", text)
 }
 
 func getOptionsView(vol volume.Volume, opts []string, w int) string {
 	text := ""
 
 	if len(opts) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w/3-6, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "No Options Found")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "No Options Found")
 	}
 
 	for _, v := range opts {
 		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(v, 25))),
-			styles.TextStyle().Render(utils.Shorten(vol.Options[v], w/3-8-len(v))))
+			styles.TextStyle().Render(utils.Shorten(vol.Options[v], w-8-len(v))))
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-6, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "Check")
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "Check")
 }
