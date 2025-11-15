@@ -43,22 +43,22 @@ func NewDetail(w int, h int, cnt container.Summary) *ContainerDetail {
 	insp, _ := docker.InspectContainer(cnt.ID)
 
 	// Dash VP
-	dvp := viewport.New(w/4, h/2)
+	dvp := viewport.New(w-2-(w-2)*3/4, h/2)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
 	dvp.SetContent(getDashboardView(cnt, insp, w))
 
 	// Resource VP
-	rvp := viewport.New(w/4, h/2)
+	rvp := viewport.New((w-2)/4, h/2)
 	rvp.Style = styles.PageStyle().Padding(1, 2)
 	rvp.SetContent(getResourceView(insp, container.StatsResponse{}, w))
 
 	// Network VP
-	nvp := viewport.New(w/4, h/2)
+	nvp := viewport.New((w-2)/4, h/2)
 	nvp.Style = styles.PageStyle().Padding(1, 2)
 	nvp.SetContent(getNetworksView(insp, w))
 
 	// Volumes VP
-	vvp := viewport.New(w/4, h/2)
+	vvp := viewport.New((w-2)/4, h/2)
 	vvp.Style = styles.PageStyle().Padding(1, 2)
 	vvp.SetContent(getVolumeView(insp, w))
 
@@ -151,7 +151,8 @@ func (s *ContainerDetail) Update(msg tea.Msg) (*ContainerDetail, tea.Cmd) {
 }
 
 func (s *ContainerDetail) View() string {
-	return lipgloss.JoinVertical(lipgloss.Center, lipgloss.JoinHorizontal(lipgloss.Center, s.DashVp.View(), s.ResourceVp.View(), s.NetVp.View(), s.VolVp.View()),
+	return lipgloss.JoinVertical(lipgloss.Center,
+		lipgloss.JoinHorizontal(lipgloss.Center, s.DashVp.View(), s.ResourceVp.View(), s.NetVp.View(), s.VolVp.View()),
 		s.LogsVp.View())
 }
 
