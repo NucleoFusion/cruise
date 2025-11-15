@@ -38,7 +38,7 @@ func NewImages(w int, h int) *Images {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewImageList(w-4, h-3-strings.Count(styles.ImagesText, "\n")),
+		List:      NewImageList(w-2, h-3-strings.Count(styles.ImagesText, "\n")),
 		Keymap:    keymap.NewImagesMap(),
 		Help:      styledhelp.NewStyledHelp(keymap.NewImagesMap().Bindings(), w),
 		Vp:        vp,

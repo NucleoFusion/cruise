@@ -28,7 +28,7 @@ func NewHome(w int, h int) *Home {
 		Daemon:     NewDaemon((w-2)/4, (h-15)-(h-15)/2),
 		SysRes:     NewSysRes((w-2)-(w-2)/4, (h-15)/2),
 		QuickStats: NewQuickStats((w-2)/4, (h-15)/2),
-		Help:       styledhelp.NewStyledHelp([]key.Binding{}, w),
+		Help:       styledhelp.NewStyledHelp([]key.Binding{}, w-2),
 	}
 }
 

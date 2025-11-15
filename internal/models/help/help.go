@@ -9,6 +9,7 @@ import (
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -16,6 +17,7 @@ type StyledHelp struct {
 	Width      int
 	styledhelp help.Model
 	kmap       help.KeyMap
+	vp         viewport.Model
 }
 
 func NewStyledHelp(b []key.Binding, w int) StyledHelp {
@@ -31,16 +33,20 @@ func NewStyledHelp(b []key.Binding, w int) StyledHelp {
 		newk = append(newk, padBinding(bind))
 	}
 
+	vp := viewport.New(w, 3)
+	vp.Style = styles.SubpageStyle()
+
 	return StyledHelp{
 		Width:      w - 4,
 		styledhelp: h,
 		kmap:       keymap.NewDynamic(newk),
+		vp:         vp,
 	}
 }
 
 func (s *StyledHelp) View() string {
-	return styles.SubpageStyle().Render(lipgloss.Place(s.Width, 1, lipgloss.Center, lipgloss.Center,
-		strings.Trim(s.styledhelp.View(s.kmap), "\n")))
+	s.vp.SetContent(lipgloss.PlaceHorizontal(s.Width-2, lipgloss.Center, strings.Trim(s.styledhelp.View(s.kmap), "\n")))
+	return s.vp.View()
 }
 
 func padBinding(b key.Binding) key.Binding {

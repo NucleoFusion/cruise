@@ -42,9 +42,9 @@ func NewContainers(w int, h int) *Containers {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewContainerList(w-4, h-3-strings.Count(styles.ContainersText, "\n")),
+		List:      NewContainerList(w-2, h-3-strings.Count(styles.ContainersText, "\n")), //h-3 to account for styled help
 		Keymap:    keymap.NewContainersMap(),
-		Help:      styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w),
+		Help:      styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w-2),
 		Vp:        vp,
 	}
 }
