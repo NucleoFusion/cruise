@@ -30,7 +30,7 @@ type NetworkList struct {
 
 func NewNetworkList(w int, h int) *NetworkList {
 	ti := textinput.New()
-	ti.Width = w - 9
+	ti.Width = w - 10
 	ti.Prompt = " Search: "
 	ti.Placeholder = "Press '/' to search..."
 
@@ -38,7 +38,7 @@ func NewNetworkList(w int, h int) *NetworkList {
 	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().PlaceholderText)
 	ti.TextStyle = styles.TextStyle()
 
-	vp := viewport.New(w+3, h+1)
+	vp := viewport.New(w+2, h-4)
 	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 

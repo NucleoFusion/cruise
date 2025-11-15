@@ -33,7 +33,7 @@ func NewVolumes(w int, h int) *Volumes {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewVolumeList(w-4, h-8-strings.Count(styles.VolumesText, "\n")),
+		List:       NewVolumeList(w-4, h-3-strings.Count(styles.VolumesText, "\n")),
 		Keymap:     keymap.NewVolMap(),
 		Help:       styledhelp.NewStyledHelp(keymap.NewVolMap().Bindings(), w),
 	}
@@ -98,8 +98,9 @@ func (s *Volumes) View() string {
 		return s.Details.View()
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.VolumesText), s.GetListText(), s.Help.View())
+	return styles.SceneStyle().Render(
+		lipgloss.JoinVertical(lipgloss.Center,
+			styles.TextStyle().Render(styles.VolumesText), s.GetListText(), s.Help.View()))
 }
 
 func (s *Volumes) GetListText() string {

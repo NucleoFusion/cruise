@@ -33,7 +33,7 @@ func NewNetworks(w int, h int) *Networks {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewNetworkList(w-4, h-8-strings.Count(styles.NetworksText, "\n")),
+		List:       NewNetworkList(w-4, h-3-strings.Count(styles.NetworksText, "\n")),
 		Keymap:     keymap.NewNetMap(),
 		Help:       styledhelp.NewStyledHelp(keymap.NewNetMap().Bindings(), w),
 	}
@@ -103,8 +103,9 @@ func (s *Networks) View() string {
 		return s.Details.View()
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.NetworksText), s.GetListText(), s.Help.View())
+	return styles.SceneStyle().Render(
+		lipgloss.JoinVertical(lipgloss.Center,
+			styles.TextStyle().Render(styles.NetworksText), s.GetListText(), s.Help.View()))
 }
 
 func (s *Networks) GetListText() string {

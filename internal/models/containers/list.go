@@ -123,11 +123,11 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 
 func (s *ContainerList) View() string {
 	if s.Err != nil {
-		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height-2, lipgloss.Center, lipgloss.Center, "Error: "+s.Err.Error()))
+		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, "Error: "+s.Err.Error()))
 	}
 
 	if len(s.Items) == 0 {
-		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height-2, lipgloss.Center, lipgloss.Center, "No Containers Found!"))
+		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, "No Containers Found!"))
 	}
 
 	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder)
