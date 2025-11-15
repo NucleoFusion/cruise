@@ -45,27 +45,27 @@ func NewDetail(w int, h int, cnt container.Summary) *ContainerDetail {
 	// Dash VP
 	dvp := viewport.New(w-2-(w-2)*3/4, h/2)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
-	dvp.SetContent(getDashboardView(cnt, insp, w))
+	dvp.SetContent(getDashboardView(cnt, insp, w-2-(w-2)*3/4))
 
 	// Resource VP
 	rvp := viewport.New((w-2)/4, h/2)
 	rvp.Style = styles.PageStyle().Padding(1, 2)
-	rvp.SetContent(getResourceView(insp, container.StatsResponse{}, w))
+	rvp.SetContent(getResourceView(insp, container.StatsResponse{}, (w-2)/4-5))
 
 	// Network VP
 	nvp := viewport.New((w-2)/4, h/2)
 	nvp.Style = styles.PageStyle().Padding(1, 2)
-	nvp.SetContent(getNetworksView(insp, w))
+	nvp.SetContent(getNetworksView(insp, (w-2)/4-5))
 
 	// Volumes VP
 	vvp := viewport.New((w-2)/4, h/2)
 	vvp.Style = styles.PageStyle().Padding(1, 2)
-	vvp.SetContent(getVolumeView(insp, w))
+	vvp.SetContent(getVolumeView(insp, (w-2)/4-5))
 
 	// Logs VP
-	lvp := viewport.New(w-2, h/2)
+	lvp := viewport.New(w-2, h-h/2)
 	lvp.Style = styles.PageStyle().Padding(1, 2)
-	lvp.SetContent(getLogsView(make([]string, 0), w, h))
+	lvp.SetContent(getLogsView(make([]string, 0), w-2-5, h-h/2))
 
 	return &ContainerDetail{
 		Width:      w,
@@ -163,20 +163,20 @@ func getDashboardView(cnt container.Summary, insp container.InspectResponse, w i
 	}
 	created := time.Unix(cnt.Created, 0)
 	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s \n\n%s %s \n\n%s %s\n\n%s %s\n\n%s %s",
-		styles.DetailKeyStyle().Render(" ID: "), styles.TextStyle().Render(utils.Shorten(cnt.ID, w/4-10)),
-		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(name, w/4-10)),
-		styles.DetailKeyStyle().Render(" Command: "), styles.TextStyle().Render(utils.Shorten(cnt.Command, w/4-10)),
+		styles.DetailKeyStyle().Render(" ID: "), styles.TextStyle().Render(utils.Shorten(cnt.ID, w-10)),
+		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(name, w-10)),
+		styles.DetailKeyStyle().Render(" Command: "), styles.TextStyle().Render(utils.Shorten(cnt.Command, w-10)),
 		styles.DetailKeyStyle().Render(" Image: "), styles.TextStyle().Render(cnt.Image),
-		styles.DetailKeyStyle().Render(" Status: "), styles.TextStyle().Render(utils.Shorten(cnt.Status, w/4-10)),
-		styles.DetailKeyStyle().Render(" Restart Policy: "), styles.TextStyle().Render(utils.Shorten(string(insp.HostConfig.RestartPolicy.Name), w/4-10)),
-		styles.DetailKeyStyle().Render(" Uptime: "), styles.TextStyle().Render(utils.Shorten(utils.FormatDuration(time.Since(created)), w/4-10)))
+		styles.DetailKeyStyle().Render(" Status: "), styles.TextStyle().Render(utils.Shorten(cnt.Status, w-10)),
+		styles.DetailKeyStyle().Render(" Restart Policy: "), styles.TextStyle().Render(utils.Shorten(string(insp.HostConfig.RestartPolicy.Name), w-10)),
+		styles.DetailKeyStyle().Render(" Uptime: "), styles.TextStyle().Render(utils.Shorten(utils.FormatDuration(time.Since(created)), w-10)))
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Container Details ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Container Details ")), "\n\n", text)
 }
 
 func getResourceView(cnt container.InspectResponse, stats container.StatsResponse, w int) string {
 	if stats.ID == "" {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Resources ")), "\n\n", "Loading...")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Resources ")), "\n\n", "Loading...")
 	}
 
 	ps := stats.PidsStats.Current
@@ -192,7 +192,7 @@ func getResourceView(cnt container.InspectResponse, stats container.StatsRespons
 		styles.DetailKeyStyle().Render(" Processes: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", ps), w/4-10)),
 		styles.DetailKeyStyle().Render(" Blkio: "), styles.TextStyle().Render(fmt.Sprintf("%dRx / %dWx", rx, wx)))
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Resource ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Resource ")), "\n\n", text)
 }
 
 func getNetworksView(insp container.InspectResponse, w int) string {
@@ -214,26 +214,26 @@ func getNetworksView(insp container.InspectResponse, w int) string {
 		styles.DetailKeyStyle().Render(" Networks: "), styles.TextStyle().Render(nets),
 		styles.DetailKeyStyle().Render(" Ports:- "), styles.TextStyle().Render(ports))
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Networks ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Networks ")), "\n\n", text)
 }
 
 func getVolumeView(cnt container.InspectResponse, w int) string {
 	if len(cnt.Mounts) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Volume ")), "\n\n", "No Mounts Found")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Volume ")), "\n\n", "No Mounts Found")
 	}
 	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s \n\n%s %s \n\n%s %s ",
-		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Name, w/4-10)),
-		styles.DetailKeyStyle().Render(" Dest: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Destination, w/4-10)),
-		styles.DetailKeyStyle().Render(" Source: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Source, w/4-10)),
-		styles.DetailKeyStyle().Render(" Type: "), styles.TextStyle().Render(utils.Shorten(string(cnt.Mounts[0].Type), w/4-10)),
+		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Name, w-10)),
+		styles.DetailKeyStyle().Render(" Dest: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Destination, w-10)),
+		styles.DetailKeyStyle().Render(" Source: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Source, w-10)),
+		styles.DetailKeyStyle().Render(" Type: "), styles.TextStyle().Render(utils.Shorten(string(cnt.Mounts[0].Type), w-10)),
 		styles.DetailKeyStyle().Render(" Mode: "), styles.TextStyle().Render(cnt.Mounts[0].Mode))
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/4-6, lipgloss.Center, styles.TitleStyle().Render(" Volume ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Volume ")), "\n\n", text)
 }
 
 func getLogsView(items []string, w int, h int) string {
 	if len(items) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w-6, lipgloss.Center, styles.TitleStyle().Render(" Logs ")), "\n\n", "No Logs yet...")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Logs ")), "\n\n", "No Logs yet...")
 	}
 
 	its := items
@@ -241,7 +241,7 @@ func getLogsView(items []string, w int, h int) string {
 		its = items[len(items)-(h-7):]
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w-6, lipgloss.Center, styles.TitleStyle().Render(" Logs ")), "\n\n", strings.Join(its, "\n"))
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Logs ")), "\n\n", strings.Join(its, "\n"))
 }
 
 func (s *ContainerDetail) UpdateVP() {
