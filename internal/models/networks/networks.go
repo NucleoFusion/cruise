@@ -100,7 +100,7 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (s *Networks) View() string {
 	if s.ShowDetail {
-		return s.Details.View()
+		return styles.SceneStyle().Render(s.Details.View())
 	}
 
 	return styles.SceneStyle().Render(

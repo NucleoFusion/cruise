@@ -95,7 +95,7 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (s *Volumes) View() string {
 	if s.ShowDetail {
-		return s.Details.View()
+		return styles.SceneStyle().Render(s.Details.View())
 	}
 
 	return styles.SceneStyle().Render(

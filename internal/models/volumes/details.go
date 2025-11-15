@@ -46,27 +46,27 @@ func NewDetail(w int, h int, vol volume.Volume) *VolumeDetail {
 	}
 
 	// Label VP
-	lvp := viewport.New(w/3, h*2/5+1)
+	lvp := viewport.New((w-2)/3, h-h*3/5)
 	lvp.Style = styles.PageStyle().Padding(1, 2)
 	lvp.SetContent(getLabelView(v, labels, w))
 
 	// Dash VP
-	dvp := viewport.New(w/3, h*3/5)
+	dvp := viewport.New((w-2)/3, h*3/5)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
 	dvp.SetContent(getDashboardView(v, w))
 
 	// Status VP
-	svp := viewport.New(w/3+1, h)
+	svp := viewport.New(w-2-(w-2)*2/3, h)
 	svp.Style = styles.PageStyle().Padding(1, 2)
 	svp.SetContent(getStatusView(v, status, w))
 
 	// Usage VP
-	uvp := viewport.New(w/3+1, h/2)
+	uvp := viewport.New((w-2)/3, h/2)
 	uvp.Style = styles.PageStyle().Padding(1, 2)
 	uvp.SetContent(getUsageView(v, w))
 
 	// Options VP
-	ovp := viewport.New(w/3+1, h/2)
+	ovp := viewport.New((w-2)/3, h-h/2)
 	ovp.Style = styles.PageStyle().Padding(1, 2)
 	ovp.SetContent(getOptionsView(v, opts, w))
 
