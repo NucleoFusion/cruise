@@ -46,29 +46,29 @@ func NewDetail(w int, h int, ntw network.Summary) *NetworkDetail {
 	}
 
 	// Label VP
-	lvp := viewport.New(w/3, h*2/5)
+	lvp := viewport.New((w-2)/3, h*2/5)
 	lvp.Style = styles.PageStyle().Padding(1, 2)
-	lvp.SetContent(getLabelView(ntw, labels, w))
+	lvp.SetContent(getLabelView(ntw, labels, w/3-5))
 
 	// Dash VP
-	dvp := viewport.New(w/3, h*3/5)
+	dvp := viewport.New((w-2)/3, h*3/5)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
-	dvp.SetContent(getDashboardView(ntw, w))
+	dvp.SetContent(getDashboardView(ntw, w/3-5))
 
 	// Cont VP
-	cvp := viewport.New(w*2/3, h/2)
+	cvp := viewport.New((w-2)-(w-2)/3, h/2)
 	cvp.Style = styles.PageStyle().Padding(1, 2)
-	cvp.SetContent(getContainerView(ntw, containers, w))
+	cvp.SetContent(getContainerView(ntw, containers, (w-2)-(w-2)/3-5))
 
 	// IPAM VP
-	ivp := viewport.New(w/3, h/2)
+	ivp := viewport.New((w-2)/3, h/2)
 	ivp.Style = styles.PageStyle().Padding(1, 2)
-	ivp.SetContent(getIPAMView(ntw, ipamOpts, w))
+	ivp.SetContent(getIPAMView(ntw, ipamOpts, (w-2)/3-5))
 
 	// Options VP
-	ovp := viewport.New(w/3, h/2)
+	ovp := viewport.New((w-2)-(w-2)*2/3, h/2)
 	ovp.Style = styles.PageStyle().Padding(1, 2)
-	ovp.SetContent(getOptionsView(ntw, opts, w))
+	ovp.SetContent(getOptionsView(ntw, opts, (w-2)-(w-2)*2/3-5))
 
 	return &NetworkDetail{
 		Width:    w,
@@ -107,22 +107,22 @@ func getDashboardView(ntw network.Summary, w int) string {
 	}
 	text := fmt.Sprintf("%s   %s \n\n%s        %s \n\n%s   %s \n\n%s    %s \n\n%s     %s \n\n%s  %s \n\n%s   %s",
 		styles.DetailKeyStyle().Render(" Network: "), styles.TextStyle().Render(ntw.Name),
-		styles.DetailKeyStyle().Render(" ID: "), styles.TextStyle().Render(utils.Shorten(ntw.ID, w/3-15)),
-		styles.DetailKeyStyle().Render(" Created: "), styles.TextStyle().Render(utils.Shorten(ntw.Created.Format(time.DateOnly)+" "+ntw.Created.Format(time.Kitchen), w/3-15)),
+		styles.DetailKeyStyle().Render(" ID: "), styles.TextStyle().Render(utils.Shorten(ntw.ID, w-10)),
+		styles.DetailKeyStyle().Render(" Created: "), styles.TextStyle().Render(utils.Shorten(ntw.Created.Format(time.DateOnly)+" "+ntw.Created.Format(time.Kitchen), w-15)),
 		styles.DetailKeyStyle().Render(" Driver: "), styles.TextStyle().Render(ntw.Driver),
 		styles.DetailKeyStyle().Render(" Scope: "), styles.TextStyle().Render(ntw.Scope),
 		styles.DetailKeyStyle().Render(" Internal: "), styles.TextStyle().Render(intrn),
 		styles.DetailKeyStyle().Render(" Ingress: "), styles.TextStyle().Render(ingr))
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Network Details ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Network Details ")), "\n\n", text)
 }
 
 func getContainerView(ntw network.Summary, cntnrs []string, w int) string {
 	if len(cntnrs) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w*2/3-4, lipgloss.Center, styles.TitleStyle().Render(" Network Details ")), "\n\n", "No Connected Containers")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Network Details ")), "\n\n", "No Connected Containers")
 	}
 
-	ln := w*2/3 - 2
+	ln := w - 2
 	text := lipgloss.NewStyle().Bold(true).Render(fmt.Sprintf("%-*s %-*s %-*s %-*s %-*s\n\n",
 		ln/5, "ID",
 		ln/5, "Name",
@@ -141,22 +141,22 @@ func getContainerView(ntw network.Summary, cntnrs []string, w int) string {
 		)
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w*2/3-4, lipgloss.Center, styles.TitleStyle().Render(" Containers ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Containers ")), "\n\n", text)
 }
 
 func getLabelView(ntw network.Summary, labels []string, w int) string {
 	text := ""
 
 	if len(labels) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render("Labels")), "\n\n", "No Labels Found")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render("Labels")), "\n\n", "No Labels Found")
 	}
 
 	for _, v := range labels {
 		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(strings.TrimPrefix(v, "com.docker."), 25))),
-			styles.TextStyle().Render(utils.Shorten(ntw.Labels[v], w/3-8-len(v))))
+			styles.TextStyle().Render(utils.Shorten(ntw.Labels[v], w-4-len(v))))
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" Labels ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Labels ")), "\n\n", text)
 }
 
 func getIPAMView(ntw network.Summary, opts []string, w int) string {
@@ -165,23 +165,23 @@ func getIPAMView(ntw network.Summary, opts []string, w int) string {
 
 	for _, v := range opts {
 		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(v, 25))),
-			styles.TextStyle().Render(utils.Shorten(ntw.IPAM.Options[v], w/3-8-len(v))))
+			styles.TextStyle().Render(utils.Shorten(ntw.IPAM.Options[v], w-4-len(v))))
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-4, lipgloss.Center, styles.TitleStyle().Render(" IPAM ")), "\n\n", text)
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" IPAM ")), "\n\n", text)
 }
 
 func getOptionsView(ntw network.Summary, opts []string, w int) string {
 	text := ""
 
 	if len(opts) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w/3-6, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "No Options Found")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "No Options Found")
 	}
 
 	for _, v := range opts {
 		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(v, 25))),
-			styles.TextStyle().Render(utils.Shorten(ntw.Options[v], w/3-8-len(v))))
+			styles.TextStyle().Render(utils.Shorten(ntw.Options[v], w-4-len(v))))
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w/3-6, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "Check")
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "Check")
 }
