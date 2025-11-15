@@ -30,8 +30,10 @@ func (s QuickStats) Update(msg tea.Msg) (QuickStats, tea.Cmd) {
 func (s QuickStats) View() string {
 	return styles.SubpageStyle().PaddingTop(1).PaddingLeft(4).Render(lipgloss.JoinVertical(lipgloss.Center,
 		styles.TitleStyle().Render("Docker Stats"),
-		lipgloss.Place(s.Width/4-2, s.Height/3-4,
-			lipgloss.Left, lipgloss.Center, s.GetFormattedView())))
+		lipgloss.NewStyle().Width((s.Width-14)/4).
+			Height(s.Height/3-4).
+			Align(lipgloss.Left, lipgloss.Center).
+			Render(s.GetFormattedView())))
 }
 
 func (s QuickStats) GetFormattedView() string {

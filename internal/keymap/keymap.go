@@ -1,6 +1,8 @@
 package keymap
 
 import (
+	"fmt"
+
 	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
 )
@@ -12,7 +14,7 @@ type DynamicMap struct {
 func QuickQuitKey() key.Binding {
 	q := config.Cfg.Keybinds.Global.QuickQuit
 	return key.NewBinding(key.WithKeys(q),
-		key.WithHelp(q, "quit"))
+		key.WithHelp(fmt.Sprintf(" %s ", q), "quit"))
 }
 
 func NewDynamic(keys []key.Binding) *DynamicMap {

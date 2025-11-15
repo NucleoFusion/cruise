@@ -67,8 +67,10 @@ func (s *SysRes) Update(msg tea.Msg) (*SysRes, tea.Cmd) {
 func (s *SysRes) View() string {
 	return styles.SubpageStyle().PaddingTop(1).PaddingLeft(4).Render(lipgloss.JoinVertical(lipgloss.Center,
 		styles.TitleStyle().Render("System Resources"),
-		lipgloss.Place(s.Width*2/3-2, s.Height/3-4,
-			lipgloss.Left, lipgloss.Center, s.FormattedView())))
+		lipgloss.NewStyle().Width((s.Width-14-(s.Width-14)/4)).
+			Height(s.Height/3-4).
+			Align(lipgloss.Left, lipgloss.Center).
+			Render(s.FormattedView())))
 }
 
 func (s SysRes) FormattedView() string {

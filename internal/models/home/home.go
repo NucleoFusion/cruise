@@ -3,6 +3,7 @@ package home
 import (
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
+	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -16,6 +17,7 @@ type Home struct {
 	Daemon     *Daemon
 	SysRes     *SysRes
 	QuickStats *QuickStats
+	Help       styledhelp.StyledHelp
 }
 
 func NewHome(w int, h int) *Home {
@@ -26,6 +28,7 @@ func NewHome(w int, h int) *Home {
 		Daemon:     NewDaemon(w, h),
 		SysRes:     NewSysRes(w, h),
 		QuickStats: NewQuickStats(w, h),
+		Help:       styledhelp.NewStyledHelp([]key.Binding{}, w),
 	}
 }
 
@@ -64,9 +67,10 @@ func (s *Home) View() string {
 	stats := s.QuickStats.View()
 	logs := s.Logs.View()
 
-	view := lipgloss.JoinVertical(lipgloss.Left, logo,
+	view := lipgloss.JoinVertical(lipgloss.Center, logo,
 		lipgloss.JoinHorizontal(lipgloss.Center, sysres, stats),
-		lipgloss.JoinHorizontal(lipgloss.Left, daemon, logs),
+		lipgloss.JoinHorizontal(lipgloss.Center, daemon, logs),
+		s.Help.View(),
 	)
 
 	return view

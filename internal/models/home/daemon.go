@@ -30,8 +30,10 @@ func (s Daemon) Update(msg tea.Msg) (Daemon, tea.Cmd) {
 func (s Daemon) View() string {
 	return styles.SubpageStyle().PaddingTop(1).PaddingLeft(4).Render(lipgloss.JoinVertical(lipgloss.Center,
 		styles.TitleStyle().Render("Daemon Status"),
-		lipgloss.Place(s.Width/4, s.Height/3-4,
-			lipgloss.Left, lipgloss.Center, s.FormattedView())))
+		lipgloss.NewStyle().Width((s.Width-14)/4).
+			Height(s.Height/3-4).
+			Align(lipgloss.Left, lipgloss.Center).
+			Render(s.FormattedView())))
 }
 
 func (s Daemon) FormattedView() string {
