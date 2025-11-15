@@ -33,9 +33,9 @@ func NewNetworks(w int, h int) *Networks {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewNetworkList(w-4, h-3-strings.Count(styles.NetworksText, "\n")),
+		List:       NewNetworkList(w-2, h-3-strings.Count(styles.NetworksText, "\n")),
 		Keymap:     keymap.NewNetMap(),
-		Help:       styledhelp.NewStyledHelp(keymap.NewNetMap().Bindings(), w),
+		Help:       styledhelp.NewStyledHelp(keymap.NewNetMap().Bindings(), w-2),
 	}
 }
 

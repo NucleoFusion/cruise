@@ -33,9 +33,9 @@ func NewVolumes(w int, h int) *Volumes {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewVolumeList(w-4, h-3-strings.Count(styles.VolumesText, "\n")),
+		List:       NewVolumeList(w-2, h-3-strings.Count(styles.VolumesText, "\n")),
 		Keymap:     keymap.NewVolMap(),
-		Help:       styledhelp.NewStyledHelp(keymap.NewVolMap().Bindings(), w),
+		Help:       styledhelp.NewStyledHelp(keymap.NewVolMap().Bindings(), w-2),
 	}
 }
 

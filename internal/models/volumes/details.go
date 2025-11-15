@@ -66,7 +66,7 @@ func NewDetail(w int, h int, vol volume.Volume) *VolumeDetail {
 	uvp.SetContent(getUsageView(v, (w-2)/3-5))
 
 	// Options VP
-	ovp := viewport.New((w-2)/3, h/2)
+	ovp := viewport.New((w-2)/3, h-h/2)
 	ovp.Style = styles.PageStyle().Padding(1, 2)
 	ovp.SetContent(getOptionsView(v, opts, (w-2)/3-5))
 

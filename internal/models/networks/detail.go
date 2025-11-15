@@ -48,15 +48,15 @@ func NewDetail(w int, h int, ntw network.Summary) *NetworkDetail {
 	// Label VP
 	lvp := viewport.New((w-2)/3, h*2/5)
 	lvp.Style = styles.PageStyle().Padding(1, 2)
-	lvp.SetContent(getLabelView(ntw, labels, w/3-5))
+	lvp.SetContent(getLabelView(ntw, labels, (w-2)/3-5))
 
 	// Dash VP
-	dvp := viewport.New((w-2)/3, h*3/5)
+	dvp := viewport.New((w-2)/3, h-h*2/5)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
-	dvp.SetContent(getDashboardView(ntw, w/3-5))
+	dvp.SetContent(getDashboardView(ntw, (w-2)/3-5))
 
 	// Cont VP
-	cvp := viewport.New((w-2)-(w-2)/3, h/2)
+	cvp := viewport.New((w-2)-(w-2)/3, h-h/2)
 	cvp.Style = styles.PageStyle().Padding(1, 2)
 	cvp.SetContent(getContainerView(ntw, containers, (w-2)-(w-2)/3-5))
 
