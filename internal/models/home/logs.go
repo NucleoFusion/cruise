@@ -23,12 +23,12 @@ type Logs struct {
 }
 
 func NewLogs(w int, h int) *Logs {
-	eventChan, errChan := docker.RecentEventStream(h/3 - 6)
+	eventChan, errChan := docker.RecentEventStream(h - 6)
 	return &Logs{
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		Length:    h/3 - 6,
+		Length:    h - 6,
 		EventChan: eventChan,
 		ErrChan:   errChan,
 	}
@@ -64,8 +64,9 @@ func (s *Logs) Update(msg tea.Msg) (*Logs, tea.Cmd) {
 func (s Logs) View() string {
 	return styles.SubpageStyle().PaddingTop(1).PaddingLeft(4).Render(lipgloss.JoinVertical(lipgloss.Center,
 		styles.TitleStyle().Render("Event Logs"),
-		lipgloss.NewStyle().Width((s.Width-14-(s.Width-14)/4)).
-			Height(s.Height/3-2).
+		lipgloss.NewStyle().
+			Width(s.Width-6).   //-6 from padding(4) and border(2)
+			Height(s.Height-4). //-4 from title(1) border(2) and padding(1)
 			Align(lipgloss.Left, lipgloss.Center).
 			Render(s.FormattedView())))
 }

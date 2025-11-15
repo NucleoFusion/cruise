@@ -43,29 +43,29 @@ func NewDetail(w int, h int, cnt container.Summary) *ContainerDetail {
 	insp, _ := docker.InspectContainer(cnt.ID)
 
 	// Dash VP
-	dvp := viewport.New(w-2-(w-2)*3/4, h/2)
+	dvp := viewport.New(w-(w-2)*3/4, h/2)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
-	dvp.SetContent(getDashboardView(cnt, insp, w-2-(w-2)*3/4))
+	dvp.SetContent(getDashboardView(cnt, insp, w-2-(w-2)*3/4-4))
 
 	// Resource VP
 	rvp := viewport.New((w-2)/4, h/2)
 	rvp.Style = styles.PageStyle().Padding(1, 2)
-	rvp.SetContent(getResourceView(insp, container.StatsResponse{}, (w-2)/4-5))
+	rvp.SetContent(getResourceView(insp, container.StatsResponse{}, (w-2)/4-4))
 
 	// Network VP
 	nvp := viewport.New((w-2)/4, h/2)
 	nvp.Style = styles.PageStyle().Padding(1, 2)
-	nvp.SetContent(getNetworksView(insp, (w-2)/4-5))
+	nvp.SetContent(getNetworksView(insp, (w-2)/4-4))
 
 	// Volumes VP
 	vvp := viewport.New((w-2)/4, h/2)
 	vvp.Style = styles.PageStyle().Padding(1, 2)
-	vvp.SetContent(getVolumeView(insp, (w-2)/4-5))
+	vvp.SetContent(getVolumeView(insp, (w-2)/4-4))
 
 	// Logs VP
 	lvp := viewport.New(w-2, h-h/2)
 	lvp.Style = styles.PageStyle().Padding(1, 2)
-	lvp.SetContent(getLogsView(make([]string, 0), w-2-5, h-h/2))
+	lvp.SetContent(getLogsView(make([]string, 0), w-4, h-h/2-2))
 
 	return &ContainerDetail{
 		Width:      w,
@@ -163,13 +163,13 @@ func getDashboardView(cnt container.Summary, insp container.InspectResponse, w i
 	}
 	created := time.Unix(cnt.Created, 0)
 	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s \n\n%s %s \n\n%s %s\n\n%s %s\n\n%s %s",
-		styles.DetailKeyStyle().Render(" ID: "), styles.TextStyle().Render(utils.Shorten(cnt.ID, w-10)),
-		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(name, w-10)),
-		styles.DetailKeyStyle().Render(" Command: "), styles.TextStyle().Render(utils.Shorten(cnt.Command, w-10)),
+		styles.DetailKeyStyle().Render(" ID: "), styles.TextStyle().Render(utils.Shorten(cnt.ID, w-5)),
+		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(name, w-5)),
+		styles.DetailKeyStyle().Render(" Command: "), styles.TextStyle().Render(utils.Shorten(cnt.Command, w-5)),
 		styles.DetailKeyStyle().Render(" Image: "), styles.TextStyle().Render(cnt.Image),
-		styles.DetailKeyStyle().Render(" Status: "), styles.TextStyle().Render(utils.Shorten(cnt.Status, w-10)),
-		styles.DetailKeyStyle().Render(" Restart Policy: "), styles.TextStyle().Render(utils.Shorten(string(insp.HostConfig.RestartPolicy.Name), w-10)),
-		styles.DetailKeyStyle().Render(" Uptime: "), styles.TextStyle().Render(utils.Shorten(utils.FormatDuration(time.Since(created)), w-10)))
+		styles.DetailKeyStyle().Render(" Status: "), styles.TextStyle().Render(utils.Shorten(cnt.Status, w-5)),
+		styles.DetailKeyStyle().Render(" Restart Policy: "), styles.TextStyle().Render(utils.Shorten(string(insp.HostConfig.RestartPolicy.Name), w-5)),
+		styles.DetailKeyStyle().Render(" Uptime: "), styles.TextStyle().Render(utils.Shorten(utils.FormatDuration(time.Since(created)), w-5)))
 
 	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Container Details ")), "\n\n", text)
 }
@@ -187,10 +187,10 @@ func getResourceView(cnt container.InspectResponse, stats container.StatsRespons
 	rx, wx := docker.GetBlkio(stats, cnt.Platform)
 
 	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s \n\n%s %s ",
-		styles.DetailKeyStyle().Render(" CPU: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dms", stats.CPUStats.CPUUsage.TotalUsage/1000000), w/4-10)),
-		styles.DetailKeyStyle().Render(" Memory: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dMb", stats.MemoryStats.Usage/(1024*1024)), w/4-10)),
-		styles.DetailKeyStyle().Render(" Processes: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", ps), w/4-10)),
-		styles.DetailKeyStyle().Render(" Blkio: "), styles.TextStyle().Render(fmt.Sprintf("%dRx / %dWx", rx, wx)))
+		styles.DetailKeyStyle().Render(" CPU: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dms", stats.CPUStats.CPUUsage.TotalUsage/500000), w-5)),
+		styles.DetailKeyStyle().Render(" Memory: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dMb", stats.MemoryStats.Usage/(524*524)), w-5)),
+		styles.DetailKeyStyle().Render(" Processes: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", ps), w-5)),
+		styles.DetailKeyStyle().Render(" Blkio: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dRx / %dWx", rx, wx), w-5)))
 
 	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Resource ")), "\n\n", text)
 }
@@ -210,7 +210,7 @@ func getNetworksView(insp container.InspectResponse, w int) string {
 		nets += fmt.Sprintf("\n%s ~ %s", k, v.IPAddress)
 	}
 	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s ",
-		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(insp.HostConfig.NetworkMode.NetworkName(), w/4-10)),
+		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(insp.HostConfig.NetworkMode.NetworkName(), w-5)),
 		styles.DetailKeyStyle().Render(" Networks: "), styles.TextStyle().Render(nets),
 		styles.DetailKeyStyle().Render(" Ports:- "), styles.TextStyle().Render(ports))
 
@@ -222,10 +222,10 @@ func getVolumeView(cnt container.InspectResponse, w int) string {
 		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Volume ")), "\n\n", "No Mounts Found")
 	}
 	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s \n\n%s %s \n\n%s %s ",
-		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Name, w-10)),
-		styles.DetailKeyStyle().Render(" Dest: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Destination, w-10)),
-		styles.DetailKeyStyle().Render(" Source: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Source, w-10)),
-		styles.DetailKeyStyle().Render(" Type: "), styles.TextStyle().Render(utils.Shorten(string(cnt.Mounts[0].Type), w-10)),
+		styles.DetailKeyStyle().Render(" Name: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Name, w-5)),
+		styles.DetailKeyStyle().Render(" Dest: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Destination, w-5)),
+		styles.DetailKeyStyle().Render(" Source: "), styles.TextStyle().Render(utils.Shorten(cnt.Mounts[0].Source, w-5)),
+		styles.DetailKeyStyle().Render(" Type: "), styles.TextStyle().Render(utils.Shorten(string(cnt.Mounts[0].Type), w-5)),
 		styles.DetailKeyStyle().Render(" Mode: "), styles.TextStyle().Render(cnt.Mounts[0].Mode))
 
 	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Volume ")), "\n\n", text)
@@ -248,8 +248,8 @@ func (s *ContainerDetail) UpdateVP() {
 	if s.IsLoading {
 		return
 	}
-	s.ResourceVp.SetContent(getResourceView(s.Insp, s.Stats, s.Width))
-	s.LogsVp.SetContent(getLogsView(s.LogItems, s.Width, s.LogsVp.Height))
+	s.ResourceVp.SetContent(getResourceView(s.Insp, s.Stats, (s.Width-2)/4-4))
+	s.LogsVp.SetContent(getLogsView(s.LogItems, s.Width-4, s.LogsVp.Height))
 }
 
 func (s *ContainerDetail) StartLogStream() {
@@ -259,7 +259,7 @@ func (s *ContainerDetail) StartLogStream() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	lines := make(chan string, 100)
+	lines := make(chan string, 50)
 
 	s.LogStreamer = &LogStreamer{
 		ctx:    ctx,
