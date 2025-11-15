@@ -30,3 +30,7 @@ func SelectedStyle() lipgloss.Style {
 func DetailKeyStyle() lipgloss.Style {
 	return lipgloss.NewStyle().Foreground(colors.Load().HelpKeyText).Background(colors.Load().HelpKeyBg)
 }
+
+func SceneStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Foreground(colors.Load().Text).Padding(0, 1)
+}

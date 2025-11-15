@@ -195,11 +195,12 @@ func (s *Containers) View() string {
 	}
 
 	if s.ShowDetail {
-		return s.Details.View()
+		return styles.SceneStyle().Render(s.Details.View())
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.ContainersText), s.GetListText(), s.Help.View())
+	return styles.SceneStyle().Render(
+		lipgloss.JoinVertical(lipgloss.Center,
+			styles.TextStyle().Render(styles.ContainersText), s.GetListText(), s.Help.View()))
 }
 
 func (s *Containers) GetListText() string {
@@ -208,7 +209,7 @@ func (s *Containers) GetListText() string {
 			lipgloss.Center, lipgloss.Top, "Loading...")
 	}
 
-	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
+	return lipgloss.NewStyle().Render(s.List.View())
 }
 
 func (s *Containers) Refresh() tea.Cmd {

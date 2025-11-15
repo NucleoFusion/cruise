@@ -65,7 +65,7 @@ func (s Logs) View() string {
 	return styles.SubpageStyle().PaddingTop(1).PaddingLeft(4).Render(lipgloss.JoinVertical(lipgloss.Center,
 		styles.TitleStyle().Render("Event Logs"),
 		lipgloss.NewStyle().Width((s.Width-14-(s.Width-14)/4)).
-			Height(s.Height/3-4).
+			Height(s.Height/3-2).
 			Align(lipgloss.Left, lipgloss.Center).
 			Render(s.FormattedView())))
 }

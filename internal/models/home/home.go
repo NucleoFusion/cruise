@@ -73,7 +73,7 @@ func (s *Home) View() string {
 		s.Help.View(),
 	)
 
-	return view
+	return styles.SceneStyle().Render(view)
 }
 
 func (s *Home) Refresh() tea.Cmd {
