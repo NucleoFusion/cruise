@@ -187,8 +187,8 @@ func getResourceView(cnt container.InspectResponse, stats container.StatsRespons
 	rx, wx := docker.GetBlkio(stats, cnt.Platform)
 
 	text := fmt.Sprintf("%s %s \n\n%s %s \n\n%s %s \n\n%s %s ",
-		styles.DetailKeyStyle().Render(" CPU: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dms", stats.CPUStats.CPUUsage.TotalUsage/500000), w-5)),
-		styles.DetailKeyStyle().Render(" Memory: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dMb", stats.MemoryStats.Usage/(524*524)), w-5)),
+		styles.DetailKeyStyle().Render(" CPU: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dms", stats.CPUStats.CPUUsage.TotalUsage/1000000), w-5)),
+		styles.DetailKeyStyle().Render(" Memory: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dMb", stats.MemoryStats.Usage/(1024*1024)), w-5)),
 		styles.DetailKeyStyle().Render(" Processes: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%d", ps), w-5)),
 		styles.DetailKeyStyle().Render(" Blkio: "), styles.TextStyle().Render(utils.Shorten(fmt.Sprintf("%dRx / %dWx", rx, wx), w-5)))
 
