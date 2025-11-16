@@ -42,7 +42,7 @@ func NewContainers(w int, h int) *Containers {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewContainerList(w-2, h-3-strings.Count(styles.ContainersText, "\n")), //h-3 to account for styled help
+		List:      NewContainerList(w-2, h-5-strings.Count(styles.ContainersText, "\n")), //h-5 to account for styled help and title padding
 		Keymap:    keymap.NewContainersMap(),
 		Help:      styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w-2),
 		Vp:        vp,
@@ -200,7 +200,7 @@ func (s *Containers) View() string {
 
 	return styles.SceneStyle().Render(
 		lipgloss.JoinVertical(lipgloss.Center,
-			styles.TextStyle().Render(styles.ContainersText), s.GetListText(), s.Help.View()))
+			styles.TextStyle().Padding(1, 0).Render(styles.ContainersText), s.GetListText(), s.Help.View()))
 }
 
 func (s *Containers) GetListText() string {

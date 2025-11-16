@@ -38,7 +38,7 @@ func NewImages(w int, h int) *Images {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewImageList(w-2, h-3-strings.Count(styles.ImagesText, "\n")),
+		List:      NewImageList(w-2, h-5-strings.Count(styles.ImagesText, "\n")), //h-5 to account for styled help and title padding
 		Keymap:    keymap.NewImagesMap(),
 		Help:      styledhelp.NewStyledHelp(keymap.NewImagesMap().Bindings(), w-2),
 		Vp:        vp,
@@ -157,7 +157,7 @@ func (s *Images) View() string {
 
 	return styles.SceneStyle().Render(
 		lipgloss.JoinVertical(lipgloss.Center,
-			styles.TextStyle().Render(styles.ImagesText), s.GetListText(), s.Help.View()))
+			styles.TextStyle().Padding(1, 0).Render(styles.ImagesText), s.GetListText(), s.Help.View()))
 }
 
 func (s *Images) GetListText() string {
@@ -166,7 +166,7 @@ func (s *Images) GetListText() string {
 			lipgloss.Center, lipgloss.Top, "Loading...")
 	}
 
-	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
+	return lipgloss.NewStyle().Render(s.List.View())
 }
 
 func (s *Images) UpdateImages() tea.Cmd {

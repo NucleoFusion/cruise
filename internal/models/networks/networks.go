@@ -33,7 +33,7 @@ func NewNetworks(w int, h int) *Networks {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewNetworkList(w-2, h-3-strings.Count(styles.NetworksText, "\n")),
+		List:       NewNetworkList(w-2, h-5-strings.Count(styles.NetworksText, "\n")), //h-5 to account for styled help and title padding
 		Keymap:     keymap.NewNetMap(),
 		Help:       styledhelp.NewStyledHelp(keymap.NewNetMap().Bindings(), w-2),
 	}
@@ -105,7 +105,7 @@ func (s *Networks) View() string {
 
 	return styles.SceneStyle().Render(
 		lipgloss.JoinVertical(lipgloss.Center,
-			styles.TextStyle().Render(styles.NetworksText), s.GetListText(), s.Help.View()))
+			styles.TextStyle().Padding(1, 0).Render(styles.NetworksText), s.GetListText(), s.Help.View()))
 }
 
 func (s *Networks) GetListText() string {
@@ -114,7 +114,7 @@ func (s *Networks) GetListText() string {
 			lipgloss.Center, lipgloss.Top, "Loading...")
 	}
 
-	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
+	return lipgloss.NewStyle().Render(s.List.View())
 }
 
 func (s *Networks) Refresh() tea.Cmd {

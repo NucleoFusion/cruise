@@ -33,7 +33,7 @@ func NewVolumes(w int, h int) *Volumes {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewVolumeList(w-2, h-3-strings.Count(styles.VolumesText, "\n")),
+		List:       NewVolumeList(w-2, h-5-strings.Count(styles.VolumesText, "\n")), //h-5 to account for styled help and title padding
 		Keymap:     keymap.NewVolMap(),
 		Help:       styledhelp.NewStyledHelp(keymap.NewVolMap().Bindings(), w-2),
 	}
@@ -100,7 +100,7 @@ func (s *Volumes) View() string {
 
 	return styles.SceneStyle().Render(
 		lipgloss.JoinVertical(lipgloss.Center,
-			styles.TextStyle().Render(styles.VolumesText), s.GetListText(), s.Help.View()))
+			styles.TextStyle().Padding(1, 0).Render(styles.VolumesText), s.GetListText(), s.Help.View()))
 }
 
 func (s *Volumes) GetListText() string {
@@ -109,7 +109,7 @@ func (s *Volumes) GetListText() string {
 			lipgloss.Center, lipgloss.Center, styles.TextStyle().Render("Loading..."))
 	}
 
-	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
+	return lipgloss.NewStyle().Render(s.List.View())
 }
 
 func (s *Volumes) Refresh() tea.Cmd {
