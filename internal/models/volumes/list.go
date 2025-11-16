@@ -31,7 +31,7 @@ type VolumeList struct {
 
 func NewVolumeList(w int, h int) *VolumeList {
 	ti := textinput.New()
-	ti.Width = w - 9
+	ti.Width = w - 12
 	ti.Prompt = " Search: "
 	ti.Placeholder = "Press '/' to search..."
 
@@ -39,7 +39,7 @@ func NewVolumeList(w int, h int) *VolumeList {
 	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().PlaceholderText)
 	ti.TextStyle = styles.TextStyle()
 
-	vp := viewport.New(w+3, h+1)
+	vp := viewport.New(w, h-3)
 	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 
@@ -110,7 +110,7 @@ func (s *VolumeList) Update(msg tea.Msg) (*VolumeList, tea.Cmd) {
 
 func (s *VolumeList) View() string {
 	if len(s.Items) == 0 {
-		return lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, "No Volumes Found!")
+		return lipgloss.Place(s.Width-2, s.Height, lipgloss.Center, lipgloss.Center, "No Volumes Found!")
 	}
 
 	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder)
@@ -123,14 +123,14 @@ func (s *VolumeList) View() string {
 }
 
 func (s *VolumeList) UpdateList() {
-	text := lipgloss.NewStyle().Bold(true).Render(docker.VolumesHeaders(s.Width)+"\n") + "\n"
+	text := lipgloss.NewStyle().Bold(true).Render(docker.VolumesHeaders(s.Width-2)+"\n") + "\n"
 
 	for k, v := range s.FilteredItems {
 		if v == nil {
 			continue
 		}
 
-		line := docker.VolumesFormattedSummary(*v, s.Width)
+		line := docker.VolumesFormattedSummary(*v, s.Width-2)
 
 		if k == s.SelectedIndex {
 			line = styles.SelectedStyle().Render(line)
@@ -149,7 +149,7 @@ func (s *VolumeList) Filter(val string) {
 	originals := make([]*volume.Volume, len(s.Items))
 
 	for i, v := range s.Items {
-		str := docker.VolumesFormattedSummary(*v, s.Width)
+		str := docker.VolumesFormattedSummary(*v, s.Width-2)
 		formatted[i] = str
 		originals[i] = v
 	}

@@ -42,9 +42,9 @@ func NewContainers(w int, h int) *Containers {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewContainerList(w-4, h-3-strings.Count(styles.ContainersText, "\n")),
+		List:      NewContainerList(w-2, h-5-strings.Count(styles.ContainersText, "\n")), //h-5 to account for styled help and title padding
 		Keymap:    keymap.NewContainersMap(),
-		Help:      styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w),
+		Help:      styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w-2),
 		Vp:        vp,
 	}
 }
@@ -195,11 +195,12 @@ func (s *Containers) View() string {
 	}
 
 	if s.ShowDetail {
-		return s.Details.View()
+		return styles.SceneStyle().Render(s.Details.View())
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.ContainersText), s.GetListText(), s.Help.View())
+	return styles.SceneStyle().Render(
+		lipgloss.JoinVertical(lipgloss.Center,
+			styles.TextStyle().Padding(1, 0).Render(styles.ContainersText), s.GetListText(), s.Help.View()))
 }
 
 func (s *Containers) GetListText() string {
@@ -208,7 +209,7 @@ func (s *Containers) GetListText() string {
 			lipgloss.Center, lipgloss.Top, "Loading...")
 	}
 
-	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
+	return lipgloss.NewStyle().Render(s.List.View())
 }
 
 func (s *Containers) Refresh() tea.Cmd {

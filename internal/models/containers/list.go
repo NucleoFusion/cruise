@@ -37,7 +37,7 @@ type ContainerList struct {
 
 func NewContainerList(w int, h int) *ContainerList {
 	ti := textinput.New()
-	ti.Width = w - 10
+	ti.Width = w - 12
 	ti.Prompt = " Search: "
 	ti.Placeholder = "Press '/' to search..."
 
@@ -45,7 +45,7 @@ func NewContainerList(w int, h int) *ContainerList {
 	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().PlaceholderText)
 	ti.TextStyle = styles.TextStyle()
 
-	vp := viewport.New(w+2, h-4)
+	vp := viewport.New(w, h-3) //h-3 to account for searchbar
 	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 
@@ -123,11 +123,11 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 
 func (s *ContainerList) View() string {
 	if s.Err != nil {
-		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height-2, lipgloss.Center, lipgloss.Center, "Error: "+s.Err.Error()))
+		return styles.PageStyle().Render(lipgloss.Place(s.Width-2, s.Height, lipgloss.Center, lipgloss.Center, "Error: "+s.Err.Error()))
 	}
 
 	if len(s.Items) == 0 {
-		return styles.PageStyle().Render(lipgloss.Place(s.Width, s.Height-2, lipgloss.Center, lipgloss.Center, "No Containers Found!"))
+		return styles.PageStyle().Render(lipgloss.Place(s.Width-2, s.Height, lipgloss.Center, lipgloss.Center, "No Containers Found!"))
 	}
 
 	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder)
@@ -140,7 +140,7 @@ func (s *ContainerList) View() string {
 }
 
 func (s *ContainerList) UpdateList() {
-	w := (s.Width)/9 - 1
+	w := (s.Width-2)/9 - 1
 
 	text := lipgloss.NewStyle().Bold(true).Render(docker.ContainerHeaders(w)+"\n") + "\n"
 
@@ -160,7 +160,7 @@ func (s *ContainerList) UpdateList() {
 }
 
 func (s *ContainerList) Filter(val string) {
-	w := (s.Width)/9 - 1
+	w := (s.Width-2)/9 - 1
 
 	formatted := make([]string, len(s.Items))
 	originals := make([]container.Summary, len(s.Items))

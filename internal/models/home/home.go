@@ -24,11 +24,11 @@ func NewHome(w int, h int) *Home {
 	return &Home{
 		Width:      w,
 		Height:     h,
-		Logs:       NewLogs(w, h),
-		Daemon:     NewDaemon(w, h),
-		SysRes:     NewSysRes(w, h),
-		QuickStats: NewQuickStats(w, h),
-		Help:       styledhelp.NewStyledHelp([]key.Binding{}, w),
+		Logs:       NewLogs((w-2)-(w-2)/4, (h-14)-(h-14)/2), //h-15 to account for styled help and title, w-2 for scene padding
+		Daemon:     NewDaemon((w-2)/4, (h-14)-(h-14)/2),
+		SysRes:     NewSysRes((w-2)-(w-2)/4, (h-14)/2),
+		QuickStats: NewQuickStats((w-2)/4, (h-14)/2),
+		Help:       styledhelp.NewStyledHelp([]key.Binding{}, w-2),
 	}
 }
 
@@ -60,7 +60,7 @@ func (s *Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *Home) View() string {
-	logo := lipgloss.Place(s.Width-2, s.Height/3-2, // Accounting for the border
+	logo := lipgloss.Place(s.Width-2, 11, //use fixed height for title
 		lipgloss.Center, lipgloss.Center, styles.TextStyle().Render(styles.LogoText))
 	sysres := s.SysRes.View()
 	daemon := s.Daemon.View()
@@ -72,8 +72,7 @@ func (s *Home) View() string {
 		lipgloss.JoinHorizontal(lipgloss.Center, daemon, logs),
 		s.Help.View(),
 	)
-
-	return view
+	return styles.SceneStyle().Render(view)
 }
 
 func (s *Home) Refresh() tea.Cmd {

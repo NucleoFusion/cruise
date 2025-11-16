@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NucleoFusion/cruise/internal/colors"
 	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
@@ -29,16 +30,17 @@ type Images struct {
 }
 
 func NewImages(w int, h int) *Images {
-	vp := viewport.New(w*2/3, h/2-2)
-	vp.Style = styles.PageStyle().Padding(1, 2)
+	vp := viewport.New(w/3, h/2)
+	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
+		Padding(1).Foreground(colors.Load().Text)
 
 	return &Images{
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewImageList(w-4, h-8-strings.Count(styles.ImagesText, "\n")),
+		List:      NewImageList(w-2, h-5-strings.Count(styles.ImagesText, "\n")), //h-5 to account for styled help and title padding
 		Keymap:    keymap.NewImagesMap(),
-		Help:      styledhelp.NewStyledHelp(keymap.NewImagesMap().Bindings(), w),
+		Help:      styledhelp.NewStyledHelp(keymap.NewImagesMap().Bindings(), w-2),
 		Vp:        vp,
 		ShowVp:    false,
 	}
@@ -153,8 +155,9 @@ func (s *Images) View() string {
 		return lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, s.Vp.View())
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.ImagesText), s.GetListText(), s.Help.View())
+	return styles.SceneStyle().Render(
+		lipgloss.JoinVertical(lipgloss.Center,
+			styles.TextStyle().Padding(1, 0).Render(styles.ImagesText), s.GetListText(), s.Help.View()))
 }
 
 func (s *Images) GetListText() string {
@@ -163,7 +166,7 @@ func (s *Images) GetListText() string {
 			lipgloss.Center, lipgloss.Top, "Loading...")
 	}
 
-	return lipgloss.NewStyle().PaddingLeft(1).Render(s.List.View())
+	return lipgloss.NewStyle().Render(s.List.View())
 }
 
 func (s *Images) UpdateImages() tea.Cmd {

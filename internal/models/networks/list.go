@@ -30,7 +30,7 @@ type NetworkList struct {
 
 func NewNetworkList(w int, h int) *NetworkList {
 	ti := textinput.New()
-	ti.Width = w - 9
+	ti.Width = w - 12
 	ti.Prompt = " Search: "
 	ti.Placeholder = "Press '/' to search..."
 
@@ -38,7 +38,7 @@ func NewNetworkList(w int, h int) *NetworkList {
 	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().PlaceholderText)
 	ti.TextStyle = styles.TextStyle()
 
-	vp := viewport.New(w+3, h+1)
+	vp := viewport.New(w, h-3)
 	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 
@@ -115,7 +115,7 @@ func (s *NetworkList) Update(msg tea.Msg) (*NetworkList, tea.Cmd) {
 
 func (s *NetworkList) View() string {
 	if len(s.Items) == 0 {
-		return lipgloss.Place(s.Width, s.Height, lipgloss.Center, lipgloss.Center, "No Containers Found!")
+		return lipgloss.Place(s.Width-2, s.Height, lipgloss.Center, lipgloss.Center, "No Containers Found!")
 	}
 
 	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder)
@@ -128,10 +128,10 @@ func (s *NetworkList) View() string {
 }
 
 func (s *NetworkList) UpdateList() {
-	text := lipgloss.NewStyle().Bold(true).Render(docker.NetworksHeaders(s.Width)+"\n") + "\n"
+	text := lipgloss.NewStyle().Bold(true).Render(docker.NetworksHeaders(s.Width-2)+"\n") + "\n"
 
 	for k, v := range s.FilteredItems {
-		line := docker.NetworksFormattedSummary(v, s.Width)
+		line := docker.NetworksFormattedSummary(v, s.Width-2)
 
 		if k == s.SelectedIndex {
 			line = lipgloss.NewStyle().Background(colors.Load().MenuSelectedBg).Foreground(colors.Load().MenuSelectedText).Render(line)
@@ -150,7 +150,7 @@ func (s *NetworkList) Filter(val string) {
 	originals := make([]network.Summary, len(s.Items))
 
 	for i, v := range s.Items {
-		str := docker.NetworksFormattedSummary(v, s.Width)
+		str := docker.NetworksFormattedSummary(v, s.Width-2)
 		formatted[i] = str
 		originals[i] = v
 	}

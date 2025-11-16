@@ -44,12 +44,12 @@ type Monitoring struct {
 }
 
 func NewMonitoring(w int, h int) *Monitoring {
-	vp := viewport.New(w, h-7-strings.Count(styles.MonitoringText, "\n"))
+	vp := viewport.New(w-2, h-8-strings.Count(styles.MonitoringText, "\n"))
 	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 
 	ti := textinput.New()
-	ti.Width = w - 12
+	ti.Width = w - 14
 	ti.Prompt = " Search: "
 	ti.Placeholder = "Press '/' to search..."
 
@@ -62,11 +62,11 @@ func NewMonitoring(w int, h int) *Monitoring {
 	return &Monitoring{
 		Width:     w,
 		Height:    h,
-		Help:      styledhelp.NewStyledHelp(keymap.NewMonitorMap().Bindings(), w),
+		Help:      styledhelp.NewStyledHelp(keymap.NewMonitorMap().Bindings(), w-2),
 		Keymap:    keymap.NewMonitorMap(),
 		Vp:        vp,
 		Ti:        ti,
-		Length:    h - 5 - strings.Count(styles.MonitoringText, "\n"),
+		Length:    h - 6 - strings.Count(styles.MonitoringText, "\n"), // -6 for styled help and ti
 		EventChan: eventChan,
 		ErrChan:   errChan,
 	}
@@ -141,8 +141,11 @@ func (s *Monitoring) View() string {
 		s.Vp.SetContent(s.FormattedView())
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Center,
-		styles.TextStyle().Render(styles.MonitoringText), styles.PageStyle().Render(s.Ti.View()), s.Vp.View(), s.Help.View())
+	return styles.SceneStyle().Render(
+		lipgloss.JoinVertical(lipgloss.Center,
+			styles.TextStyle().Padding(1, 0).Render(styles.MonitoringText),
+			styles.PageStyle().Render(s.Ti.View()),
+			s.Vp.View(), s.Help.View()))
 }
 
 func (s *Monitoring) FormattedView() string {
