@@ -88,11 +88,10 @@ func (s *Nav) Update(msg tea.Msg) (*Nav, tea.Cmd) {
 	return s, nil
 }
 
-// TODO: uild View
 func (s *Nav) View() string {
 	h := s.Height - strings.Count(styles.NavText, "\n")
 	return lipgloss.JoinVertical(lipgloss.Center,
-		lipgloss.Place(s.Width, strings.Count(styles.NavText, "\n"), lipgloss.Center, lipgloss.Center, styles.TextStyle().Render(styles.NavText)),
+		styles.TextStyle().Render(styles.NavText),
 		s.GetPages(s.Width, h, "System"),
 		s.GetPages(s.Width, h, "Artifacts"),
 		s.GetPages(s.Width, h, "Ops"),

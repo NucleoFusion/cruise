@@ -46,29 +46,29 @@ func NewDetail(w int, h int, ntw network.Summary) *NetworkDetail {
 	}
 
 	// Label VP
-	lvp := viewport.New((w-2)/3, h*2/5)
+	lvp := viewport.New((w-2)/3, h/5*2)
 	lvp.Style = styles.PageStyle().Padding(1, 2)
-	lvp.SetContent(getLabelView(ntw, labels, (w-2)/3-5))
+	lvp.SetContent(getLabelView(ntw, labels, (w-2)/3-4))
 
 	// Dash VP
-	dvp := viewport.New((w-2)/3, h-h*2/5)
+	dvp := viewport.New((w-2)/3, h-h/5*2)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
-	dvp.SetContent(getDashboardView(ntw, (w-2)/3-5))
+	dvp.SetContent(getDashboardView(ntw, (w-2)/3-4))
 
 	// Cont VP
 	cvp := viewport.New((w-2)-(w-2)/3, h-h/2)
 	cvp.Style = styles.PageStyle().Padding(1, 2)
-	cvp.SetContent(getContainerView(ntw, containers, (w-2)-(w-2)/3-5))
+	cvp.SetContent(getContainerView(ntw, containers, (w-2)-(w-2)/3-4))
 
 	// IPAM VP
 	ivp := viewport.New((w-2)/3, h/2)
 	ivp.Style = styles.PageStyle().Padding(1, 2)
-	ivp.SetContent(getIPAMView(ntw, ipamOpts, (w-2)/3-5))
+	ivp.SetContent(getIPAMView(ntw, ipamOpts, (w-2)/3-4))
 
 	// Options VP
-	ovp := viewport.New((w-2)-(w-2)*2/3, h/2)
+	ovp := viewport.New((w-2)-(w-2)/3*2, h/2)
 	ovp.Style = styles.PageStyle().Padding(1, 2)
-	ovp.SetContent(getOptionsView(ntw, opts, (w-2)-(w-2)*2/3-5))
+	ovp.SetContent(getOptionsView(ntw, opts, (w-2)-(w-2)*2/3-4))
 
 	return &NetworkDetail{
 		Width:    w,

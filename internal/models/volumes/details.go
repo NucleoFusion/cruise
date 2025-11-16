@@ -48,27 +48,27 @@ func NewDetail(w int, h int, vol volume.Volume) *VolumeDetail {
 	// Label VP
 	lvp := viewport.New((w-2)/3, h-h*3/5)
 	lvp.Style = styles.PageStyle().Padding(1, 2)
-	lvp.SetContent(getLabelView(v, labels, (w-2)/3-5))
+	lvp.SetContent(getLabelView(v, labels, (w-2)/3-4))
 
 	// Dash VP
 	dvp := viewport.New((w-2)/3, h*3/5)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
-	dvp.SetContent(getDashboardView(v, (w-2)/3-5))
+	dvp.SetContent(getDashboardView(v, (w-2)/3-4))
 
 	// Status VP
 	svp := viewport.New(w-2-(w-2)*2/3, h)
 	svp.Style = styles.PageStyle().Padding(1, 2)
-	svp.SetContent(getStatusView(v, status, w-2-(w-2)*2/3-5))
+	svp.SetContent(getStatusView(v, status, w-2-(w-2)*2/3-4))
 
 	// Usage VP
 	uvp := viewport.New((w-2)/3, h/2)
 	uvp.Style = styles.PageStyle().Padding(1, 2)
-	uvp.SetContent(getUsageView(v, (w-2)/3-5))
+	uvp.SetContent(getUsageView(v, (w-2)/3-4))
 
 	// Options VP
 	ovp := viewport.New((w-2)/3, h-h/2)
 	ovp.Style = styles.PageStyle().Padding(1, 2)
-	ovp.SetContent(getOptionsView(v, opts, (w-2)/3-5))
+	ovp.SetContent(getOptionsView(v, opts, (w-2)/3-4))
 
 	return &VolumeDetail{
 		Width:    w,
@@ -136,7 +136,7 @@ func getStatusView(vol volume.Volume, opts []string, w int) string {
 	text := ""
 
 	if len(opts) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Status ")), "\n\n", "No Status' Found")
+		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Status ")), "\n\n", "No Status Found")
 	}
 
 	for _, v := range opts {

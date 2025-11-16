@@ -43,7 +43,7 @@ func NewDetail(w int, h int, cnt container.Summary) *ContainerDetail {
 	insp, _ := docker.InspectContainer(cnt.ID)
 
 	// Dash VP
-	dvp := viewport.New(w-2-(w-2)*3/4, h/2)
+	dvp := viewport.New(w-2-(w-2)/4*3, h/2)
 	dvp.Style = styles.PageStyle().Padding(1, 2)
 	dvp.SetContent(getDashboardView(cnt, insp, w-2-(w-2)*3/4-4))
 
