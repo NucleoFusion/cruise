@@ -4,7 +4,7 @@ pageClass: home-page
 
 hero:
   name: Cruise 
-  text: A Docker TUI Client 
+  text: A Container Management TUI 
   actions:
     - theme: brand 
       text: Getting Started 
@@ -14,8 +14,8 @@ hero:
       link: /docs/config/
 
 features:
-  - title: Comprehensive Docker Management
-    details: Manage containers, images, volumes, and networks from a single TUI, covering the full lifecycle of Docker artifacts.
+  - title: Comprehensive Container Management
+    details: Manage containers, images, volumes, and networks from a single TUI, covering the full lifecycle of artifacts.
   - title: Real-Time Monitoring & Logs 
     details: Get instant visibility into container health, system metrics, and live log streams, all in one dashboard.
   - title: Intuitive & Customizable UI 
