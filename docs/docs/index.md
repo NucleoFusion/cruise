@@ -1,12 +1,12 @@
 # Getting Started
 
-Welcome to Cruise, your powerful and user-friendly terminal interface for managing Docker. 
+Welcome to Cruise, your powerful and user-friendly terminal interface for managing containers. 
 
 This Getting Started guide will help you quickly install Cruise, set it up, and launch the intuitive TUI so you can start managing your 
-Docker containers, images, networks, and volumes with ease and efficiency. 
+containers, images, networks, and volumes with ease and efficiency. 
 
 Whether you’re a developer, DevOps engineer, or system administrator, Cruise is designed to seamlessly integrate into your terminal-centric workflow and simplify 
-your Docker experience.
+your experience.
 
 <details>
   <summary>Screenshots</summary>
@@ -28,7 +28,7 @@ your Docker experience.
 ## Prerequisites
 
 - **Go** 
-- **Docker**
+- **Docker (other runtime)**
 - **Trivy/Grype** (optional)
 
 ## Installation
