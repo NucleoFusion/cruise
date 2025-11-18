@@ -36,6 +36,10 @@ Thank you for considering a contribution! We welcome bug reports, feature reques
 - Link relevant issues in the PR.
 - Respond to reviewer comments.
 
+## Code of Conduct
+All contributors must follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+
 ## Help & Feedback
 
 Questions? Use GitHub Discussions or open an issue with the “question” label.
