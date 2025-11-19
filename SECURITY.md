@@ -4,7 +4,7 @@ Thank you for helping keep Cruise secure!
 
 ## Reporting Vulnerabilities
 
-If you discover a security issue, please report it by emailing [maintainer email or security contact] or by opening a private GitHub Security Advisory. When reporting, please include:
+If you discover a security issue, please report it by contacting the mentors or by opening a private GitHub Security Advisory. When reporting, please include:
 
 - A description of the vulnerability
 - Steps to reproduce (if possible)
