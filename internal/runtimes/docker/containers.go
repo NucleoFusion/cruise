@@ -15,7 +15,6 @@ import (
 )
 
 type Details struct {
-	IsLoading   bool
 	CPU         float64
 	Mem         float64
 	Size        float64
