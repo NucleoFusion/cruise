@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/NucleoFusion/cruise/internal/docker"
+	"github.com/NucleoFusion/cruise/internal/runtimes/docker"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/viewport"

@@ -3,7 +3,7 @@ package home
 import (
 	"fmt"
 
-	"github.com/NucleoFusion/cruise/internal/docker"
+	"github.com/NucleoFusion/cruise/internal/runtimes/docker"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

@@ -8,10 +8,10 @@ import (
 
 	"github.com/NucleoFusion/cruise/internal/colors"
 	"github.com/NucleoFusion/cruise/internal/config"
-	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
+	"github.com/NucleoFusion/cruise/internal/runtimes/docker"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/key"
@@ -42,7 +42,7 @@ func NewContainers(w int, h int) *Containers {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewContainerList(w-2, h-5-strings.Count(styles.ContainersText, "\n")), //h-5 to account for styled help and title padding
+		List:      NewContainerList(w-2, h-5-strings.Count(styles.ContainersText, "\n")), // h-5 to account for styled help and title padding
 		Keymap:    keymap.NewContainersMap(),
 		Help:      styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w-2),
 		Vp:        vp,
