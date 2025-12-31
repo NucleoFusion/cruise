@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/colors"
-	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
+	"github.com/NucleoFusion/cruise/internal/runtimes/docker"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/key"

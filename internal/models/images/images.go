@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/NucleoFusion/cruise/internal/colors"
-	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
+	"github.com/NucleoFusion/cruise/internal/runtimes/docker"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/key"
@@ -38,7 +38,7 @@ func NewImages(w int, h int) *Images {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewImageList(w-2, h-5-strings.Count(styles.ImagesText, "\n")), //h-5 to account for styled help and title padding
+		List:      NewImageList(w-2, h-5-strings.Count(styles.ImagesText, "\n")), // h-5 to account for styled help and title padding
 		Keymap:    keymap.NewImagesMap(),
 		Help:      styledhelp.NewStyledHelp(keymap.NewImagesMap().Bindings(), w-2),
 		Vp:        vp,

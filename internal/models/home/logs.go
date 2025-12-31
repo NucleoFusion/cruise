@@ -3,8 +3,8 @@ package home
 import (
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/messages"
+	"github.com/NucleoFusion/cruise/internal/runtimes/docker"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	tea "github.com/charmbracelet/bubbletea"

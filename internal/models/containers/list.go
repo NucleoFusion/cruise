@@ -7,8 +7,8 @@ import (
 
 	"github.com/NucleoFusion/cruise/internal/colors"
 	"github.com/NucleoFusion/cruise/internal/config"
-	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/messages"
+	"github.com/NucleoFusion/cruise/internal/runtimes/docker"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -45,7 +45,7 @@ func NewContainerList(w int, h int) *ContainerList {
 	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().PlaceholderText)
 	ti.TextStyle = styles.TextStyle()
 
-	vp := viewport.New(w, h-3) //h-3 to account for searchbar
+	vp := viewport.New(w, h-3) // h-3 to account for searchbar
 	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 

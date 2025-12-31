@@ -6,8 +6,8 @@ import (
 
 	"github.com/NucleoFusion/cruise/internal/colors"
 	"github.com/NucleoFusion/cruise/internal/config"
-	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/messages"
+	"github.com/NucleoFusion/cruise/internal/runtimes/docker"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/textinput"

@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/docker"
 	"github.com/NucleoFusion/cruise/internal/keymap"
 	"github.com/NucleoFusion/cruise/internal/messages"
 	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
+	"github.com/NucleoFusion/cruise/internal/runtimes/docker"
 	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/key"
@@ -33,7 +33,7 @@ func NewNetworks(w int, h int) *Networks {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewNetworkList(w-2, h-5-strings.Count(styles.NetworksText, "\n")), //h-5 to account for styled help and title padding
+		List:       NewNetworkList(w-2, h-5-strings.Count(styles.NetworksText, "\n")), // h-5 to account for styled help and title padding
 		Keymap:     keymap.NewNetMap(),
 		Help:       styledhelp.NewStyledHelp(keymap.NewNetMap().Bindings(), w-2),
 	}
