@@ -54,7 +54,7 @@ type Network struct {
 	Scope         string
 	Driver        string
 	IPv4          bool
-	NumContainers int64
+	NumContainers int
 }
 
 type Volume struct {
