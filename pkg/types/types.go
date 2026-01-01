@@ -1,8 +1,6 @@
 package types
 
 import (
-	"time"
-
 	"github.com/NucleoFusion/cruise/internal/enums"
 )
 
@@ -23,7 +21,7 @@ type Container struct {
 	ID      string
 	Name    string
 	Image   string
-	Created time.Time
+	Created int64
 	Ports   []ContainerPort
 	State   ContainerState
 	Mounts  []ContainerMount
