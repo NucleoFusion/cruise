@@ -9,8 +9,13 @@ import (
 type Runtime interface {
 	Name() string // Container Runtime name
 
-	Containers(ctx context.Context) []types.Container
-	Images(ctx context.Context) []types.Image
-	Networks(ctx context.Context) []types.Network
-	Volumes(ctx context.Context) []types.Volume
+	Containers(ctx context.Context) (*[]types.Container, error)
+	Images(ctx context.Context) (*[]types.Image, error)
+	Networks(ctx context.Context) (*[]types.Network, error)
+	Volumes(ctx context.Context) (*[]types.Volume, error)
+
+	// TODO: Add all relevant function definitions
+
+	// Container Specific
+	ContainerDetails(ctx context.Context, id string) (*types.Container, error) // TODO: Type creation
 }
