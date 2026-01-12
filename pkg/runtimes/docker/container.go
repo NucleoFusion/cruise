@@ -113,3 +113,29 @@ func (s *DockerRuntime) RestartContainer(ctx context.Context, id string) error {
 func (s *DockerRuntime) ExecContainer(ctx context.Context, id string) *exec.Cmd {
 	return exec.Command(config.Cfg.Global.Term, "-e", fmt.Sprintf("docker exec -it %s %s", id, "sh"))
 }
+
+func (s *DockerRuntime) PortsMap(ctx context.Context, id string) (map[string][]string, error) {
+	conts, err := s.Containers(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res := map[string][]string{}
+	for _, cnt := range *conts {
+		inp, err := s.Client.ContainerInspect(context.Background(), cnt.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		for port, bindings := range inp.NetworkSettings.Ports {
+			arr := []string{}
+			for _, b := range bindings {
+				arr = append(arr, fmt.Sprintf("%s:%s", b.HostIP, b.HostPort))
+			}
+
+			res[port.Port()] = arr
+		}
+	}
+
+	return res, nil
+}

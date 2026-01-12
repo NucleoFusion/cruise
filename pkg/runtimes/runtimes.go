@@ -25,7 +25,6 @@ type Runtime interface {
 	RestartContainer(ctx context.Context, id string) error
 	RemoveContainer(ctx context.Context, id string) error
 	ExecContainer(ctx context.Context, id string) *exec.Cmd
-	// TODO: In containers these are left:-
-	// 1. Port map maker (probably define a concrete type)
-	// 2. Details Object (concrete type as well, or maybe a custom one for each????? concrete maybe)
+	PortsMap(ctx context.Context, id string) map[string][]string
+	ContainerDetails(ctx context.Context, id string) []types.StatCard
 }
