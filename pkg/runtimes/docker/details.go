@@ -98,3 +98,26 @@ func (s *Networks) Stats(ctx context.Context, cli *client.Client) (*map[string]s
 		"Networks": strings.Join(nets, "\n"),
 	}, nil
 }
+
+type Volumes struct {
+	ID string
+}
+
+func (s *Volumes) Title() string { return "Volumes" }
+
+func (s *Volumes) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
+	res, err := cli.ContainerInspect(ctx, s.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	vols := []string{}
+	for _, v := range res.Mounts {
+		vols = append(vols, v.Name)
+	}
+
+	return &map[string]string{
+		"MountLabel": res.MountLabel,
+		"Mounts":     strings.Join(vols, "\n"),
+	}, nil
+}
