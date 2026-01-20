@@ -17,7 +17,7 @@ type Runtime interface {
 
 	// TODO: Add all relevant function definitions
 
-	// Container Specific
+	// Containers
 	StartContainer(ctx context.Context, id string) error
 	StopContainer(ctx context.Context, id string) error
 	PauseContainer(ctx context.Context, id string) error
@@ -27,4 +27,13 @@ type Runtime interface {
 	ExecContainer(ctx context.Context, id string) *exec.Cmd
 	PortsMap(ctx context.Context, id string) map[string][]string
 	ContainerDetails(ctx context.Context, id string) []types.StatCard
+
+	// Images
+	PruneImages(ctx context.Context) error
+	RemoveImage(ctx context.Context, id string) error
+	PushImage(ctx context.Context, id string) error
+	PullImage(ctx context.Context, id string) error
+	BuildImage(ctx context.Context, id string) error
+	SyncImage(ctx context.Context, id string) error
+	ImageLayers(ctx context.Context, id string) error
 }
