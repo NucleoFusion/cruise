@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/NucleoFusion/cruise/pkg/types"
-	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 )
@@ -28,28 +27,6 @@ func NewDockerClient() *DockerRuntime {
 }
 
 func (s *DockerRuntime) Name() string { return "docker" }
-
-func (s *DockerRuntime) Network(ctx context.Context) (*[]types.Network, error) {
-	dockerNet, err := s.Client.NetworkList(context.Background(), network.ListOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	// Type Assert
-	net := make([]types.Network, 0, len(dockerNet))
-	for _, v := range dockerNet {
-		net = append(net, types.Network{
-			ID:            v.ID,
-			Name:          v.Name,
-			Scope:         v.Scope,
-			Driver:        v.Driver,
-			IPv4:          v.EnableIPv4,
-			NumContainers: len(v.Containers),
-		})
-	}
-
-	return &net, nil
-}
 
 func (s *DockerRuntime) Volume(ctx context.Context) (*[]types.Volume, error) {
 	dockerVol, err := s.Client.VolumeList(context.Background(), volume.ListOptions{})
