@@ -16,6 +16,7 @@ type Runtime interface {
 	Volumes(ctx context.Context) (*[]types.Volume, error)
 
 	// TODO: Add all relevant function definitions
+	// TODO: Stat Metadata
 
 	// Containers
 	StartContainer(ctx context.Context, id string) error
@@ -36,4 +37,9 @@ type Runtime interface {
 	BuildImage(ctx context.Context, id string) error
 	SyncImage(ctx context.Context, id string) error
 	ImageLayers(ctx context.Context, id string) error
+
+	// Networks
+	PruneNetworks(ctx context.Context) error
+	RemoveNetwork(ctx context.Context, id string) error
+	NetworkDetails(ctx context.Context, id string) []types.StatCard
 }
