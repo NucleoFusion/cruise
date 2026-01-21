@@ -44,13 +44,13 @@ func (s *ContainerDetails) Stats(ctx context.Context, cli *client.Client) (*map[
 	}, nil
 }
 
-type Resource struct {
+type ContainerResources struct {
 	ID string
 }
 
-func (s *Resource) Title() string { return "Resource" }
+func (s *ContainerResources) Title() string { return "Resource" }
 
-func (s *Resource) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
+func (s *ContainerResources) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
 	res, err := cli.ContainerStats(ctx, s.ID, false)
 	if err != nil {
 		return nil, err
@@ -75,13 +75,13 @@ func (s *Resource) Stats(ctx context.Context, cli *client.Client) (*map[string]s
 	}, nil
 }
 
-type Networks struct {
+type ContainerNetworks struct {
 	ID string
 }
 
-func (s *Networks) Title() string { return "Networks" }
+func (s *ContainerNetworks) Title() string { return "Networks" }
 
-func (s *Networks) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
+func (s *ContainerNetworks) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
 	res, err := cli.ContainerInspect(ctx, s.ID)
 	if err != nil {
 		return nil, err
@@ -99,13 +99,13 @@ func (s *Networks) Stats(ctx context.Context, cli *client.Client) (*map[string]s
 	}, nil
 }
 
-type Volumes struct {
+type ContainerVolumes struct {
 	ID string
 }
 
-func (s *Volumes) Title() string { return "Volumes" }
+func (s *ContainerVolumes) Title() string { return "Volumes" }
 
-func (s *Volumes) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
+func (s *ContainerVolumes) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
 	res, err := cli.ContainerInspect(ctx, s.ID)
 	if err != nil {
 		return nil, err

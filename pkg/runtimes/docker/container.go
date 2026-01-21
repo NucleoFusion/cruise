@@ -56,6 +56,15 @@ func (s *DockerRuntime) Containers(ctx context.Context) (*[]types.Container, err
 	return &cnt, nil
 }
 
+func (s *DockerRuntime) ContainerDetails(ctx context.Context, id string) []types.StatCard {
+	return []types.StatCard{
+		&ContainerDetails{ID: id},
+		&ContainerResources{ID: id},
+		&ContainerNetworks{ID: id},
+		&ContainerVolumes{ID: id},
+	}
+}
+
 func (s *DockerRuntime) StartContainer(ctx context.Context, id string) error {
 	err := s.Client.ContainerStart(ctx, id, container.StartOptions{})
 	if err != nil {
