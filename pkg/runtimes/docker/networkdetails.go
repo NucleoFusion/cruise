@@ -5,11 +5,21 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/NucleoFusion/cruise/pkg/types"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 )
 
 // TODO: THe other Network Details?
+
+func (s *DockerRuntime) NetworkDetails(ctx context.Context, id string) []types.StatCard {
+	return []types.StatCard{
+		&NetworkDetails{ID: id},
+		&NetworkLabels{ID: id},
+		&NetworkOptions{ID: id},
+		&NetworkIPAM{ID: id},
+	}
+}
 
 type NetworkDetails struct{ ID string }
 
