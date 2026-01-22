@@ -42,4 +42,9 @@ type Runtime interface {
 	PruneNetworks(ctx context.Context) error
 	RemoveNetwork(ctx context.Context, id string) error
 	NetworkDetails(ctx context.Context, id string) []types.StatCard
+
+	// Volumes
+	PruneVolumes(ctx context.Context) error
+	RemoveVolume(ctx context.Context, id string) error
+	VolumeDetails(ctx context.Context, id string) []types.StatCard
 }
