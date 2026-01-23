@@ -1,6 +1,11 @@
 package dockerruntime
 
-import "github.com/docker/docker/api/types/container"
+import (
+	"fmt"
+
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/events"
+)
 
 func GetBlkio(stats container.StatsResponse, platform string) (uint64, uint64) {
 	switch platform {
@@ -19,4 +24,21 @@ func GetBlkio(stats container.StatsResponse, platform string) (uint64, uint64) {
 		return read, write
 	}
 	return 0, 0
+}
+
+func FormatEvent(e events.Message) string {
+	switch e.Action {
+	case "start", "die", "stop":
+		return fmt.Sprintf(
+			"container %s %s",
+			e.Actor.Attributes["name"],
+			e.Action,
+		)
+	default:
+		return fmt.Sprintf(
+			"%s %s",
+			e.Type,
+			e.Action,
+		)
+	}
 }
