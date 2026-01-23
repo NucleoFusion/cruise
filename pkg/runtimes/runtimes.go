@@ -16,7 +16,6 @@ type Runtime interface {
 	Volumes(ctx context.Context) (*[]types.Volume, error)
 
 	// TODO: Add all relevant function definitions
-	// TODO: Stat Metadata
 
 	// Containers
 	StartContainer(ctx context.Context, id string) error
@@ -42,8 +41,13 @@ type Runtime interface {
 	PruneNetworks(ctx context.Context) error
 	RemoveNetwork(ctx context.Context, id string) error
 	NetworkDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta)
+
 	// Volumes
 	PruneVolumes(ctx context.Context) error
 	RemoveVolume(ctx context.Context, id string) error
 	VolumeDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta)
+
+	// Events/Logs
+	ContainerLogs(ctx context.Context, id string) (*types.Monitor, error)
+	RuntimeLogs(ctx context.Context, id string) (*types.Monitor, error)
 }
