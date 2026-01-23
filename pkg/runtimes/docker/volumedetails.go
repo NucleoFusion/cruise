@@ -9,12 +9,24 @@ import (
 
 // TODO: New Volume Details format
 
-func (s *DockerRuntime) VolumeDetails(ctx context.Context, id string) []types.StatCard {
+func (s *DockerRuntime) VolumeDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta) {
 	return []types.StatCard{
-		&VolumeDetails{ID: id},
-		&VolumeLabels{ID: id},
-		&VolumeOptions{ID: id},
-	}
+			&VolumeDetails{ID: id},
+			&VolumeLabels{ID: id},
+			&VolumeOptions{ID: id},
+		}, &types.StatMeta{
+			TotalRows:    1,
+			TotalColumns: 3,
+			SpanMap: &map[string]struct {
+				Rows    int
+				Columns int
+				Index   int
+			}{
+				"Volume Details": {Rows: 1, Columns: 1, Index: 0},
+				"Labels":         {Rows: 1, Columns: 1, Index: 1},
+				"Options":        {Rows: 1, Columns: 1, Index: 2},
+			},
+		}
 }
 
 type VolumeDetails struct{ ID string }
