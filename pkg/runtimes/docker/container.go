@@ -56,13 +56,26 @@ func (s *DockerRuntime) Containers(ctx context.Context) (*[]types.Container, err
 	return &cnt, nil
 }
 
-func (s *DockerRuntime) ContainerDetails(ctx context.Context, id string) []types.StatCard {
+func (s *DockerRuntime) ContainerDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta) {
 	return []types.StatCard{
-		&ContainerDetails{ID: id},
-		&ContainerResources{ID: id},
-		&ContainerNetworks{ID: id},
-		&ContainerVolumes{ID: id},
-	}
+			&ContainerDetails{ID: id},
+			&ContainerResources{ID: id},
+			&ContainerNetworks{ID: id},
+			&ContainerVolumes{ID: id},
+		}, &types.StatMeta{
+			TotalRows:    4,
+			TotalColumns: 1,
+			SpanMap: &map[string]struct {
+				Rows    int
+				Columns int
+				Index   int
+			}{
+				"Details":  {Rows: 1, Columns: 1, Index: 0},
+				"Resource": {Rows: 1, Columns: 1, Index: 1},
+				"Networks": {Rows: 1, Columns: 1, Index: 2},
+				"Volume":   {Rows: 1, Columns: 1, Index: 3},
+			},
+		}
 }
 
 func (s *DockerRuntime) StartContainer(ctx context.Context, id string) error {

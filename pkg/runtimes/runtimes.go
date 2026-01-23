@@ -27,7 +27,7 @@ type Runtime interface {
 	RemoveContainer(ctx context.Context, id string) error
 	ExecContainer(ctx context.Context, id string) *exec.Cmd
 	PortsMap(ctx context.Context, id string) map[string][]string
-	ContainerDetails(ctx context.Context, id string) []types.StatCard
+	ContainerDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta)
 
 	// Images
 	PruneImages(ctx context.Context) error
@@ -41,10 +41,9 @@ type Runtime interface {
 	// Networks
 	PruneNetworks(ctx context.Context) error
 	RemoveNetwork(ctx context.Context, id string) error
-	NetworkDetails(ctx context.Context, id string) []types.StatCard
-
+	NetworkDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta)
 	// Volumes
 	PruneVolumes(ctx context.Context) error
 	RemoveVolume(ctx context.Context, id string) error
-	VolumeDetails(ctx context.Context, id string) []types.StatCard
+	VolumeDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta)
 }
