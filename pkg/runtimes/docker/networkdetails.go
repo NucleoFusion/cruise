@@ -12,13 +12,26 @@ import (
 
 // TODO: THe other Network Details?
 
-func (s *DockerRuntime) NetworkDetails(ctx context.Context, id string) []types.StatCard {
+func (s *DockerRuntime) NetworkDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta) {
 	return []types.StatCard{
-		&NetworkDetails{ID: id},
-		&NetworkLabels{ID: id},
-		&NetworkOptions{ID: id},
-		&NetworkIPAM{ID: id},
-	}
+			&NetworkDetails{ID: id},
+			&NetworkLabels{ID: id},
+			&NetworkOptions{ID: id},
+			&NetworkIPAM{ID: id},
+		}, &types.StatMeta{
+			TotalRows:    2,
+			TotalColumns: 3,
+			SpanMap: &map[string]struct {
+				Rows    int
+				Columns int
+				Index   int
+			}{
+				"Network Details": {Rows: 1, Columns: 1, Index: 0},
+				"Labels":          {Rows: 2, Columns: 1, Index: 1},
+				"Options":         {Rows: 2, Columns: 1, Index: 2},
+				"IPAM":            {Rows: 1, Columns: 1, Index: 3},
+			},
+		}
 }
 
 type NetworkDetails struct{ ID string }
