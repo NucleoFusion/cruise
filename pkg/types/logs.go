@@ -1,10 +1,13 @@
 package types
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type Monitor struct {
-	Incoming <-chan Log
-	Ctx      chan<- struct{} // Anything
+	Incoming chan Log
+	Ctx      context.Context
 }
 
 type Log struct {
