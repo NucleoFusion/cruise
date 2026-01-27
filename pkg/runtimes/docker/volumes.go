@@ -3,12 +3,12 @@ package dockerruntime
 import (
 	"context"
 
-	"github.com/NucleoFusion/cruise/pkg/types"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/volume"
 )
 
-func (s *DockerRuntime) Volume(ctx context.Context) (*[]types.Volume, error) {
+func (s *DockerRuntime) Volumes(ctx context.Context) (*[]types.Volume, error) {
 	dockerVol, err := s.Client.VolumeList(context.Background(), volume.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -19,6 +19,7 @@ func (s *DockerRuntime) Volume(ctx context.Context) (*[]types.Volume, error) {
 	for _, v := range dockerVol.Volumes {
 		vol = append(vol, types.Volume{
 			Name:       v.Name,
+			Runtime:    "docker",
 			Scope:      v.Scope,
 			Driver:     v.Driver,
 			Mountpoint: v.Mountpoint,
@@ -34,6 +35,6 @@ func (s *DockerRuntime) PruneVolumes(ctx context.Context) error {
 	return err
 }
 
-func (s *DockerRuntime) RemoveVolumes(ctx context.Context, id string) error {
+func (s *DockerRuntime) RemoveVolume(ctx context.Context, id string) error {
 	return s.Client.VolumeRemove(context.Background(), id, false)
 }

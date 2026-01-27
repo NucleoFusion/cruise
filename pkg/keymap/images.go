@@ -6,8 +6,8 @@ package keymap
 import (
 	"reflect"
 
-	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/cruise-org/cruise/pkg/config"
 )
 
 type ImagesMap struct {

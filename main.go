@@ -3,7 +3,7 @@
 
 package main
 
-import "github.com/NucleoFusion/cruise/cmd"
+import "github.com/cruise-org/cruise/cmd"
 
 func main() {
 	cmd.Execute()

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/NucleoFusion/cruise/pkg/types"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 )

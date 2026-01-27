@@ -4,13 +4,13 @@
 package home
 
 import (
-	"github.com/NucleoFusion/cruise/internal/keymap"
-	"github.com/NucleoFusion/cruise/internal/messages"
-	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
-	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/internal/messages"
+	styledhelp "github.com/cruise-org/cruise/internal/models/help"
+	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/styles"
 )
 
 type Home struct {

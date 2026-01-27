@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/NucleoFusion/cruise/internal/config"
+	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/spf13/cobra"
 )
 

@@ -6,26 +6,26 @@ package keymap
 import (
 	"reflect"
 
-	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/cruise-org/cruise/pkg/config"
 )
 
-type MonitorMap struct {
-	Search     key.Binding
-	ExitSearch key.Binding
-	Export     key.Binding
+type VulnMap struct {
+	FocusScanners key.Binding
+	FocusList     key.Binding
+	Export        key.Binding
 }
 
-func NewMonitorMap() MonitorMap {
-	m := config.Cfg.Keybinds.Monitoring
-	return MonitorMap{
-		Search: key.NewBinding(
-			key.WithKeys(m.Search),
-			key.WithHelp(m.Search, "search"),
+func NewVulnMap() VulnMap {
+	m := config.Cfg.Keybinds.Vulnerability
+	return VulnMap{
+		FocusScanners: key.NewBinding(
+			key.WithKeys(m.FocusScanners),
+			key.WithHelp(m.FocusScanners, "focus scanners"),
 		),
-		ExitSearch: key.NewBinding(
-			key.WithKeys(m.ExitSearch),
-			key.WithHelp(m.ExitSearch, "exit search"),
+		FocusList: key.NewBinding(
+			key.WithKeys(m.FocusList),
+			key.WithHelp(m.FocusList, "focus list"),
 		),
 		Export: key.NewBinding(
 			key.WithKeys(m.Export),
@@ -34,7 +34,7 @@ func NewMonitorMap() MonitorMap {
 	}
 }
 
-func (m MonitorMap) Bindings() []key.Binding {
+func (m VulnMap) Bindings() []key.Binding {
 	var bindings []key.Binding
 
 	v := reflect.ValueOf(m)
