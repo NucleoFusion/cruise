@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/NucleoFusion/cruise/internal/utils"
+	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 )

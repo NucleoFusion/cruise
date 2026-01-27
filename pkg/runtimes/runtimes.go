@@ -4,7 +4,8 @@ import (
 	"context"
 	"os/exec"
 
-	"github.com/NucleoFusion/cruise/pkg/types"
+	dockerruntime "github.com/cruise-org/cruise/pkg/runtimes/docker"
+	"github.com/cruise-org/cruise/pkg/types"
 )
 
 type Runtime interface {
@@ -15,8 +16,6 @@ type Runtime interface {
 	Networks(ctx context.Context) (*[]types.Network, error)
 	Volumes(ctx context.Context) (*[]types.Volume, error)
 
-	// TODO: Add all relevant function definitions
-
 	// Containers
 	StartContainer(ctx context.Context, id string) error
 	StopContainer(ctx context.Context, id string) error
@@ -25,7 +24,7 @@ type Runtime interface {
 	RestartContainer(ctx context.Context, id string) error
 	RemoveContainer(ctx context.Context, id string) error
 	ExecContainer(ctx context.Context, id string) *exec.Cmd
-	PortsMap(ctx context.Context, id string) map[string][]string
+	PortsMap(ctx context.Context, id string) (map[string][]string, error)
 	ContainerDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta)
 
 	// Images
@@ -33,9 +32,7 @@ type Runtime interface {
 	RemoveImage(ctx context.Context, id string) error
 	PushImage(ctx context.Context, id string) error
 	PullImage(ctx context.Context, id string) error
-	BuildImage(ctx context.Context, id string) error
-	SyncImage(ctx context.Context, id string) error
-	ImageLayers(ctx context.Context, id string) error
+	ImageLayers(ctx context.Context, id string) (string, error)
 
 	// Networks
 	PruneNetworks(ctx context.Context) error
@@ -49,5 +46,11 @@ type Runtime interface {
 
 	// Events/Logs
 	ContainerLogs(ctx context.Context, id string) (*types.Monitor, error)
-	RuntimeLogs(ctx context.Context, id string) (*types.Monitor, error)
+	RuntimeLogs(ctx context.Context) (*types.Monitor, error)
+}
+
+var runtimeMap = map[string]func() Runtime{
+	"docker": func() Runtime {
+		return dockerruntime.NewDockerClient()
+	},
 }

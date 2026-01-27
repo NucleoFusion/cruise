@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/NucleoFusion/cruise/internal/enums"
+	"github.com/cruise-org/cruise/pkg/enums"
 )
 
 type ContainerState = string
@@ -19,6 +19,7 @@ const (
 // TODO: Runtime name
 type Container struct {
 	ID      string
+	Runtime string
 	Name    string
 	Image   string
 	Created int64
@@ -42,6 +43,7 @@ type ContainerPort struct {
 
 type Image struct {
 	ID            string
+	Runtime       string
 	Tags          []string
 	Size          int64
 	CreatedAt     int64
@@ -50,6 +52,7 @@ type Image struct {
 
 type Network struct {
 	ID            string
+	Runtime       string
 	Name          string
 	Scope         string
 	Driver        string
@@ -59,6 +62,7 @@ type Network struct {
 
 type Volume struct {
 	Name       string
+	Runtime    string
 	Scope      string
 	Driver     string
 	Mountpoint string
@@ -67,6 +71,7 @@ type Volume struct {
 
 type Vulnerability struct {
 	VulnID     string
+	Runtime    string
 	Pkg        string // PkgName
 	Severity   enums.Severity
 	Title      string

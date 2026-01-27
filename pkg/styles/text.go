@@ -1,8 +1,8 @@
 package styles
 
 import (
-	"github.com/NucleoFusion/cruise/internal/colors"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/pkg/colors"
 )
 
 var LogoText = `

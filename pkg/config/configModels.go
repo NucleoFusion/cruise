@@ -7,6 +7,7 @@ type Config struct {
 }
 
 type Global struct {
-	ExportDir string `mapstructure:"export_dir" toml:"export_dir"`
-	Term      string `mapstructure:"term" toml:"term"` // TODO
+	ExportDir string   `mapstructure:"export_dir" toml:"export_dir"`
+	Term      string   `mapstructure:"term" toml:"term"`
+	Runtimes  []string `mapstructure:"runtimes" toml:"runtimes"`
 }

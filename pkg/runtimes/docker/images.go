@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/NucleoFusion/cruise/pkg/types"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
 )
@@ -20,6 +20,7 @@ func (s *DockerRuntime) Images(ctx context.Context) (*[]types.Image, error) {
 	for _, v := range dockerImg {
 		img = append(img, types.Image{
 			ID:            v.ID,
+			Runtime:       "docker",
 			Tags:          v.RepoTags,
 			Size:          v.Size,
 			CreatedAt:     v.Created,

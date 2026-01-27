@@ -1,4 +1,4 @@
-module github.com/NucleoFusion/cruise
+module github.com/cruise-org/cruise
 
 go 1.24.3
 

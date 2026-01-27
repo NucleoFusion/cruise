@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/config"
-	"github.com/NucleoFusion/cruise/internal/utils"
+	"github.com/cruise-org/cruise/internal/utils"
+	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 )

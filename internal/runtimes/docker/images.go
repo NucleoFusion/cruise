@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/NucleoFusion/cruise/internal/utils"
+	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
 )

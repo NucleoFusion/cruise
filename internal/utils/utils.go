@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/messages"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/cruise-org/cruise/internal/messages"
 	"github.com/docker/docker/api/types/container"
 )
 

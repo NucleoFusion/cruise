@@ -5,9 +5,9 @@ import (
 	"io"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/data"
-	"github.com/NucleoFusion/cruise/internal/enums"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/cruise-org/cruise/internal/data"
+	"github.com/cruise-org/cruise/pkg/enums"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/image"

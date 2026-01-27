@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/NucleoFusion/cruise/pkg/types"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 )
@@ -13,6 +13,7 @@ func (s *DockerRuntime) ContainerLogs(ctx context.Context, id string) (*types.Mo
 	logCh := make(chan types.Log)
 
 	monitor := &types.Monitor{
+		Runtime:  "docker",
 		Ctx:      ctx,
 		Incoming: logCh,
 	}
@@ -61,6 +62,7 @@ func (s *DockerRuntime) RuntimeLogs(ctx context.Context) (*types.Monitor, error)
 	logCh := make(chan types.Log)
 
 	monitor := &types.Monitor{
+		Runtime:  "docker",
 		Ctx:      ctx,
 		Incoming: logCh,
 	}

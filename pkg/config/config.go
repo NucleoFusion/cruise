@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/NucleoFusion/cruise/internal/utils"
+	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/spf13/viper"
 )
 

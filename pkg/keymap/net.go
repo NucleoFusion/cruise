@@ -3,20 +3,20 @@ package keymap
 import (
 	"reflect"
 
-	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/cruise-org/cruise/pkg/config"
 )
 
-type VolMap struct {
+type NetMap struct {
 	Remove      key.Binding
 	Prune       key.Binding
 	ShowDetails key.Binding
 	ExitDetails key.Binding
 }
 
-func NewVolMap() VolMap {
-	m := config.Cfg.Keybinds.Volumes
-	return VolMap{
+func NewNetMap() NetMap {
+	m := config.Cfg.Keybinds.Network
+	return NetMap{
 		Remove: key.NewBinding(
 			key.WithKeys(m.Remove),
 			key.WithHelp(m.Remove, "remove"),
@@ -36,7 +36,7 @@ func NewVolMap() VolMap {
 	}
 }
 
-func (m VolMap) Bindings() []key.Binding {
+func (m NetMap) Bindings() []key.Binding {
 	var bindings []key.Binding
 
 	v := reflect.ValueOf(m)

@@ -1,9 +1,9 @@
 package fzf
 
 import (
-	"github.com/NucleoFusion/cruise/internal/colors"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/pkg/colors"
 )
 
 func TextStyle() lipgloss.Style {
