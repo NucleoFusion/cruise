@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/NucleoFusion/cruise/internal/config"
-	"github.com/NucleoFusion/cruise/pkg/types"
+	"github.com/cruise-org/cruise/pkg/config"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/container"
 )
 
@@ -43,6 +43,7 @@ func (s *DockerRuntime) Containers(ctx context.Context) (*[]types.Container, err
 
 		cnt = append(cnt, types.Container{
 			Name:    v.Names[0],
+			Runtime: "docker",
 			ID:      v.ID,
 			Image:   v.Image,
 			Created: v.Created,

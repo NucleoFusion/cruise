@@ -1,8 +1,8 @@
 package colors
 
 import (
-	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/pkg/config"
 )
 
 type ColorPalette struct {

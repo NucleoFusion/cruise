@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/data"
-	"github.com/NucleoFusion/cruise/internal/messages"
-	"github.com/NucleoFusion/cruise/internal/styles"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/internal/data"
+	"github.com/cruise-org/cruise/internal/messages"
+	"github.com/cruise-org/cruise/pkg/styles"
 )
 
 type SysRes struct {

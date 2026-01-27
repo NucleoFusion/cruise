@@ -3,7 +3,7 @@ package dockerruntime
 import (
 	"context"
 
-	"github.com/NucleoFusion/cruise/pkg/types"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/client"
 )
 

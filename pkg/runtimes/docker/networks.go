@@ -3,12 +3,12 @@ package dockerruntime
 import (
 	"context"
 
-	"github.com/NucleoFusion/cruise/pkg/types"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 )
 
-func (s *DockerRuntime) Network(ctx context.Context) (*[]types.Network, error) {
+func (s *DockerRuntime) Networks(ctx context.Context) (*[]types.Network, error) {
 	dockerNet, err := s.Client.NetworkList(context.Background(), network.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -19,6 +19,7 @@ func (s *DockerRuntime) Network(ctx context.Context) (*[]types.Network, error) {
 	for _, v := range dockerNet {
 		net = append(net, types.Network{
 			ID:            v.ID,
+			Runtime:       "docker",
 			Name:          v.Name,
 			Scope:         v.Scope,
 			Driver:        v.Driver,

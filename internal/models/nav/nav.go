@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/NucleoFusion/cruise/internal/enums"
-	"github.com/NucleoFusion/cruise/internal/keymap"
-	"github.com/NucleoFusion/cruise/internal/messages"
-	"github.com/NucleoFusion/cruise/internal/styles"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/internal/messages"
+	"github.com/cruise-org/cruise/pkg/enums"
+	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/styles"
 )
 
 type Nav struct {

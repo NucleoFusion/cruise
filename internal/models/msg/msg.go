@@ -3,10 +3,10 @@ package msgpopup
 import (
 	"fmt"
 
-	"github.com/NucleoFusion/cruise/internal/colors"
-	"github.com/NucleoFusion/cruise/internal/utils"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/internal/utils"
+	"github.com/cruise-org/cruise/pkg/colors"
 )
 
 type MsgPopup struct {

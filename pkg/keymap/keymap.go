@@ -3,8 +3,8 @@ package keymap
 import (
 	"fmt"
 
-	"github.com/NucleoFusion/cruise/internal/config"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/cruise-org/cruise/pkg/config"
 )
 
 type DynamicMap struct {

@@ -6,6 +6,7 @@ import (
 )
 
 type Monitor struct {
+	Runtime  string
 	Incoming chan Log
 	Ctx      context.Context
 }

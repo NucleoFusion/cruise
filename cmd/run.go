@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/NucleoFusion/cruise/internal/models/root"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/cruise-org/cruise/internal/models/root"
 	"github.com/spf13/cobra"
 )
 
