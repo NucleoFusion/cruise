@@ -8,6 +8,8 @@ import (
 	"github.com/cruise-org/cruise/pkg/types"
 )
 
+// Runtime is the interface/format a runtime instantiation must follow.
+// These functions need to be created and mapped appropriately.
 type Runtime interface {
 	Name() string // Container Runtime name
 
