@@ -1,3 +1,4 @@
+// Package dockerruntime is the implementation of the Runtime interface for Docker
 package dockerruntime
 
 import (
