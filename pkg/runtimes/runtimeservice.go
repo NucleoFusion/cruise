@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os/exec"
+	"sync"
 
 	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/cruise-org/cruise/pkg/types"
@@ -153,4 +154,101 @@ func (s *RuntimeService) ImageLayers(ctx context.Context, runtime string, id str
 
 func (s *RuntimeService) PushImage(ctx context.Context, runtime string, id string) error {
 	return s.Runtimes[runtime].PushImage(ctx, id)
+}
+
+func (s *RuntimeService) PruneNetworks(ctx context.Context, runtime string) error {
+	var errs []error
+	for _, v := range s.Runtimes {
+		err := v.PruneNetworks(ctx)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	return errors.Join(errs...)
+}
+
+func (s *RuntimeService) RemoveNetwork(ctx context.Context, runtime string, id string) error {
+	return s.Runtimes[runtime].RemoveNetwork(ctx, id)
+}
+
+func (s *RuntimeService) NetworkDetails(ctx context.Context, runtime string, id string) ([]types.StatCard, *types.StatMeta) {
+	return s.Runtimes[runtime].NetworkDetails(ctx, id)
+}
+
+func (s *RuntimeService) PruneVolumes(ctx context.Context, runtime string) error {
+	var errs []error
+	for _, v := range s.Runtimes {
+		err := v.PruneVolumes(ctx)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	return errors.Join(errs...)
+}
+
+func (s *RuntimeService) RemoveVolume(ctx context.Context, runtime string, id string) error {
+	return s.Runtimes[runtime].RemoveVolume(ctx, id)
+}
+
+func (s *RuntimeService) VolumeDetails(ctx context.Context, runtime string, id string) ([]types.StatCard, *types.StatMeta) {
+	return s.Runtimes[runtime].VolumeDetails(ctx, id)
+}
+
+// 	// Events/Logs
+// 	ContainerLogs(ctx context.Context, id string) (*types.Monitor, error)
+// 	RuntimeLogs(ctx context.Context) (*types.Monitor, error)
+
+func (s *RuntimeService) ContainerLogs(ctx context.Context, runtime string, id string) (*types.Monitor, error) {
+	return s.Runtimes[runtime].ContainerLogs(ctx, id)
+}
+
+func (s *RuntimeService) RuntimeLogs(ctx context.Context, runtime string, id string) (*types.Monitor, error) {
+	ch := make(chan types.Log)
+	errs := make([]error, 0)
+	var wg sync.WaitGroup
+
+	for _, v := range s.Runtimes {
+		m, err := v.RuntimeLogs(ctx)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+
+		wg.Add(1)
+		go func(m *types.Monitor) {
+			defer wg.Done()
+
+			for {
+				select {
+				case <-ctx.Done():
+					return
+
+				case log, ok := <-m.Incoming:
+					if !ok {
+						return
+					}
+
+					// forward into aggregated channel
+					select {
+					case ch <- log:
+					case <-ctx.Done():
+						return
+					}
+				}
+			}
+		}(m)
+	}
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	return &types.Monitor{
+		Runtime:  "root",
+		Incoming: ch,
+		Ctx:      ctx,
+	}, errors.Join(errs...)
 }
