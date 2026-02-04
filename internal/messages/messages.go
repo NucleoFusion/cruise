@@ -11,6 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/cruise-org/cruise/internal/data"
 	"github.com/cruise-org/cruise/pkg/enums"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/image"
@@ -83,7 +84,7 @@ type (
 	ContainerDetailsTick struct{}
 
 	ContainerReadyMsg struct {
-		Items []container.Summary
+		Items *[]types.Container
 		Err   error
 	}
 
