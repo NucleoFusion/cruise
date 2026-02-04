@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/cruise-org/cruise/pkg/config"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/spf13/cobra"
 )
 
@@ -19,6 +20,11 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	if err := config.SetCfg(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	if err := runtimes.InitializeService(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

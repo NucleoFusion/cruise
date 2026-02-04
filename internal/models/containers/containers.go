@@ -174,7 +174,7 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			})
 		case key.Matches(msg, s.Keymap.ShowDetails):
 			s.ShowDetail = true
-			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
+			// s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
 			return s, s.Details.Init()
 		case key.Matches(msg, s.Keymap.ExitDetails):
 			if s.ShowDetail {
@@ -210,14 +210,4 @@ func (s *Containers) GetListText() string {
 	}
 
 	return lipgloss.NewStyle().Render(s.List.View())
-}
-
-func (s *Containers) Refresh() tea.Cmd {
-	return tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
-		items, err := docker.GetContainers()
-		return messages.ContainerReadyMsg{
-			Items: items,
-			Err:   err,
-		}
-	})
 }

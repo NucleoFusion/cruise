@@ -51,8 +51,8 @@ type Runtime interface {
 	RuntimeLogs(ctx context.Context) (*types.Monitor, error)
 }
 
-var runtimeMap = map[string]func() Runtime{
-	"docker": func() Runtime {
+var runtimeMap = map[string]func() (Runtime, error){
+	"docker": func() (Runtime, error) {
 		return dockerruntime.NewDockerClient()
 	},
 }

@@ -10,18 +10,42 @@ import (
 	"github.com/cruise-org/cruise/pkg/types"
 )
 
+var RuntimeSrv *RuntimeService
+
+func InitializeService() error {
+	rts, err := NewRuntimeService()
+	if err != nil {
+		return err
+	}
+
+	RuntimeSrv = rts
+
+	return nil
+}
+
 // RuntimeService is an aggregating service for multiple runtimes
 type RuntimeService struct {
 	Runtimes map[string]Runtime
 }
 
-func NewRuntimeService() {
+func NewRuntimeService() (*RuntimeService, error) {
 	runtimeNames := config.Cfg.Global.Runtimes
+	errs := make([]error, 0)
 
 	runtimes := map[string]Runtime{}
 	for _, v := range runtimeNames {
-		runtimes[v] = runtimeMap[v]()
+		rt, err := runtimeMap[v]()
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+
+		runtimes[v] = rt
 	}
+
+	return &RuntimeService{
+		Runtimes: runtimes,
+	}, errors.Join(errs...)
 }
 
 func (s *RuntimeService) Containers(ctx context.Context) (*[]types.Container, error) {
@@ -195,10 +219,6 @@ func (s *RuntimeService) RemoveVolume(ctx context.Context, runtime string, id st
 func (s *RuntimeService) VolumeDetails(ctx context.Context, runtime string, id string) ([]types.StatCard, *types.StatMeta) {
 	return s.Runtimes[runtime].VolumeDetails(ctx, id)
 }
-
-// 	// Events/Logs
-// 	ContainerLogs(ctx context.Context, id string) (*types.Monitor, error)
-// 	RuntimeLogs(ctx context.Context) (*types.Monitor, error)
 
 func (s *RuntimeService) ContainerLogs(ctx context.Context, runtime string, id string) (*types.Monitor, error) {
 	return s.Runtimes[runtime].ContainerLogs(ctx, id)
