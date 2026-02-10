@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/cruise-org/cruise/pkg/types"
@@ -137,7 +138,7 @@ func (s *DockerRuntime) ExecContainer(ctx context.Context, id string) *exec.Cmd 
 	return exec.Command(config.Cfg.Global.Term, "-e", fmt.Sprintf("docker exec -it %s %s", id, "sh"))
 }
 
-func (s *DockerRuntime) PortsMap(ctx context.Context, id string) (map[string][]string, error) {
+func (s *DockerRuntime) PortsMap(ctx context.Context, id string) ([]string, error) {
 	conts, err := s.Containers(ctx)
 	if err != nil {
 		return nil, err
@@ -160,5 +161,12 @@ func (s *DockerRuntime) PortsMap(ctx context.Context, id string) (map[string][]s
 		}
 	}
 
-	return res, nil
+	ports := make([]string, 0)
+	for k, v := range res {
+		ports = append(ports, fmt.Sprintf("%s -> %s", k,
+			strings.Join(v, ","),
+		))
+	}
+
+	return ports, nil
 }

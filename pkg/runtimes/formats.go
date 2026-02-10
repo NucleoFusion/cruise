@@ -9,18 +9,6 @@ import (
 	"github.com/cruise-org/cruise/pkg/types"
 )
 
-// type Container struct {
-// 	ID      string
-// 	Runtime string
-// 	Name    string
-// 	Image   string
-// 	Created int64
-// 	Ports   []ContainerPort
-// 	State   ContainerState
-// 	Mounts  []ContainerMount
-// 	Labels  map[string]string
-// }
-
 func ContainerFormatted(item types.Container, width int) string {
 	format := strings.Repeat(fmt.Sprintf("%%-%ds ", width), 9)
 
