@@ -144,7 +144,7 @@ func (s *RuntimeService) ExecContainer(ctx context.Context, runtime string, id s
 	return s.Runtimes[runtime].ExecContainer(ctx, id)
 }
 
-func (s *RuntimeService) PortsMap(ctx context.Context, runtime string, id string) (map[string][]string, error) {
+func (s *RuntimeService) PortsMap(ctx context.Context, runtime string, id string) ([]string, error) {
 	return s.Runtimes[runtime].PortsMap(ctx, id)
 }
 
