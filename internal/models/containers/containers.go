@@ -1,8 +1,8 @@
 package containers
 
 import (
+	"context"
 	"fmt"
-	"os/exec"
 	"strings"
 	"time"
 
@@ -12,11 +12,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
 	styledhelp "github.com/cruise-org/cruise/internal/models/help"
-	"github.com/cruise-org/cruise/internal/runtimes/docker"
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
 )
 
@@ -82,8 +82,8 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return s, utils.ReturnError("Containers Page", "Error Getting Ports", msg.Err)
 		}
 
-		s.Vp.SetContent(strings.Join(msg.Arr, "\n"))
-		if len(msg.Arr) == 0 {
+		s.Vp.SetContent(strings.Join(msg.Ports, "\n"))
+		if len(msg.Ports) == 0 {
 			s.Vp.SetContent("No Port Mappings found")
 		}
 
@@ -106,7 +106,8 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keymap.QuickQuitKey()):
 			return s, tea.Quit
 		case key.Matches(msg, s.Keymap.Start):
-			err := docker.StartContainer(s.List.GetCurrentItem().ID)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.StartContainer(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Containers Page", "Error Starting Contianer", err)
 			}
@@ -114,15 +115,18 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Sprintf("Successfully Started Container w/ ID %s", s.List.GetCurrentItem().ID))
 
 		case key.Matches(msg, s.Keymap.Pause):
-			err := docker.PauseContainer(s.List.GetCurrentItem().ID)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.PauseContainer(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Containers Page", "Error Pausing Contianer", err)
 			}
+
 			return s, utils.ReturnMsg("Container Page", "Pausing Container",
 				fmt.Sprintf("Successfully Pausing Container w/ ID %s", s.List.GetCurrentItem().ID))
 
 		case key.Matches(msg, s.Keymap.Unpause):
-			err := docker.UnpauseContainer(s.List.GetCurrentItem().ID)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.UnpauseContainer(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Containers Page", "Error Unpausing Contianer", err)
 			}
@@ -130,7 +134,8 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Sprintf("Successfully Unpausing Container w/ ID %s", s.List.GetCurrentItem().ID))
 
 		case key.Matches(msg, s.Keymap.Remove):
-			err := docker.RemoveContainer(s.List.GetCurrentItem().ID)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.RemoveContainer(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Containers Page", "Error Removing Contianer", err)
 			}
@@ -138,7 +143,8 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Sprintf("Successfully Removing Container w/ ID %s", s.List.GetCurrentItem().ID))
 
 		case key.Matches(msg, s.Keymap.Restart):
-			err := docker.RestartContainer(s.List.GetCurrentItem().ID)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.RestartContainer(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Containers Page", "Error Restarting Contianer", err)
 			}
@@ -146,7 +152,8 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Sprintf("Successfully Restarting Container w/ ID %s", s.List.GetCurrentItem().ID))
 
 		case key.Matches(msg, s.Keymap.Stop):
-			err := docker.StopContainer(s.List.GetCurrentItem().ID)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.StopContainer(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Containers Page", "Error Stopping Contianer", err)
 			}
@@ -155,7 +162,8 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Sprintf("Successfully Stopped Container w/ ID %s", s.List.GetCurrentItem().ID))
 
 		case key.Matches(msg, s.Keymap.Exec):
-			cmd := exec.Command(config.Cfg.Global.Term, "-e", fmt.Sprintf("docker exec -it %s %s", s.List.GetCurrentItem().ID, "sh"))
+			curr := s.List.GetCurrentItem()
+			cmd := runtimes.RuntimeSrv.ExecContainer(context.Background(), curr.Runtime, curr.ID)
 			cmd.Stdin = nil
 			cmd.Stdout = nil
 			cmd.Stderr = nil
@@ -168,10 +176,14 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.PortMap):
 			s.ShowPortmap = true
 			s.Vp.SetContent("Loading...")
+
 			return s, tea.Tick(0, func(_ time.Time) tea.Msg {
-				arr, err := docker.GetPorts()
-				return messages.PortMapMsg{Arr: arr, Err: err}
+				curr := s.List.GetCurrentItem()
+				ports, err := runtimes.RuntimeSrv.PortsMap(context.Background(), curr.Runtime, curr.ID)
+				return messages.PortMapMsg{Ports: ports, Err: err}
 			})
+
+		// TODO: Details
 		case key.Matches(msg, s.Keymap.ShowDetails):
 			s.ShowDetail = true
 			// s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())

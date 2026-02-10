@@ -26,7 +26,7 @@ type Runtime interface {
 	RestartContainer(ctx context.Context, id string) error
 	RemoveContainer(ctx context.Context, id string) error
 	ExecContainer(ctx context.Context, id string) *exec.Cmd
-	PortsMap(ctx context.Context, id string) (map[string][]string, error)
+	PortsMap(ctx context.Context, id string) ([]string, error)
 	ContainerDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta)
 
 	// Images

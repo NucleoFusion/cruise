@@ -33,8 +33,8 @@ type (
 	CloseDetails struct{}
 
 	PortMapMsg struct {
-		Arr []string
-		Err error
+		Ports []string
+		Err   error
 	}
 
 	ErrorMsg struct {
@@ -86,7 +86,7 @@ type (
 	}
 
 	ImagesReadyMsg struct {
-		Map map[string]image.Summary
+		Map map[string]types.Image
 	}
 
 	UpdateImagesMsg struct {

@@ -1,6 +1,7 @@
 package images
 
 import (
+	"context"
 	"sort"
 	"time"
 
@@ -13,15 +14,16 @@ import (
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/config"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
-	"github.com/docker/docker/api/types/image"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 type ImageList struct {
 	Width         int
 	Height        int
-	ImageMap      map[string]image.Summary
+	ImageMap      map[string]types.Image
 	Items         []string
 	FilteredItems []string
 	SelectedIndex int
@@ -49,16 +51,16 @@ func NewImageList(w int, h int) *ImageList {
 		Ti:            ti,
 		SelectedIndex: 0,
 		Vp:            vp,
-		ImageMap:      make(map[string]image.Summary),
+		ImageMap:      make(map[string]types.Image),
 	}
 }
 
 func (s *ImageList) Init() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		images, err := docker.GetImages()
+		images, err := runtimes.RuntimeSrv.Images(context.Background())
 
-		m := make(map[string]image.Summary)
-		for _, v := range images {
+		m := make(map[string]types.Image)
+		for _, v := range *images {
 			m[v.ID] = v
 		}
 
@@ -175,7 +177,7 @@ func (s *ImageList) Filter(val string) {
 	w := (s.Width-2)/9 - 1
 
 	formatted := make([]string, len(s.Items))
-	originals := make([]image.Summary, len(s.Items))
+	originals := make([]types.Image, len(s.Items))
 
 	for i, v := range s.Items {
 		str := docker.ImagesFormattedSummary(s.ImageMap[v], w)
@@ -198,6 +200,6 @@ func (s *ImageList) Filter(val string) {
 	}
 }
 
-func (s *ImageList) GetCurrentItem() image.Summary {
+func (s *ImageList) GetCurrentItem() types.Image {
 	return s.ImageMap[s.FilteredItems[s.SelectedIndex]]
 }
