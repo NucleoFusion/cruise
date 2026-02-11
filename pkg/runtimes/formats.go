@@ -9,6 +9,42 @@ import (
 	"github.com/cruise-org/cruise/pkg/types"
 )
 
+func ImageFormatted(image types.Image, width int) string {
+	name := "<none>:<none>"
+	if len(image.Tags) > 0 {
+		name = image.Tags[0]
+	}
+
+	id := utils.Shorten(strings.TrimPrefix(image.ID, "sha256:"), 20)
+	size := utils.FormatSize(image.Size)
+	created := utils.CreatedAgo(image.CreatedAt)
+	containers := fmt.Sprintf("%d", image.NumContainers)
+
+	format := strings.Repeat(fmt.Sprintf("%%-%ds ", width), 5)
+
+	return fmt.Sprintf(
+		format,
+		id,
+		utils.Shorten(name, width),
+		size,
+		created,
+		containers,
+	)
+}
+
+func ImageHeaders(width int) string {
+	format := strings.Repeat(fmt.Sprintf("%%-%ds ", width), 5)
+
+	return fmt.Sprintf(
+		format,
+		"ID",
+		"RepoTags",
+		"Size",
+		"Created",
+		"Containers",
+	)
+}
+
 func ContainerFormatted(item types.Container, width int) string {
 	format := strings.Repeat(fmt.Sprintf("%%-%ds ", width), 9)
 
@@ -23,6 +59,23 @@ func ContainerFormatted(item types.Container, width int) string {
 		utils.Shorten(item.State, width),
 		utils.Shorten(FormatMounts(item.Mounts), width),
 		utils.Shorten(FormatLabels(item.Labels), width),
+	)
+}
+
+func ContainerHeaders(width int) string {
+	format := strings.Repeat(fmt.Sprintf("%%-%ds ", width), 9)
+
+	return fmt.Sprintf(
+		format,
+		"ID",
+		"Name",
+		"Image",
+		"Created",
+		"Ports",
+		"State",
+		"Status",
+		"Mounts",
+		"Size",
 	)
 }
 
