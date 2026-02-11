@@ -10,7 +10,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
-	"github.com/cruise-org/cruise/internal/runtimes/docker"
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/config"
@@ -89,8 +88,8 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 		return s, nil
 
 	case messages.UpdateImagesMsg:
-		items := make([]string, 0, len(msg.Items))
-		for _, v := range msg.Items {
+		items := make([]string, 0, len(*msg.Items))
+		for _, v := range *msg.Items {
 			s.ImageMap[v.ID] = v
 			items = append(items, v.ID)
 		}
@@ -156,10 +155,10 @@ func (s *ImageList) View() string {
 func (s *ImageList) UpdateList() {
 	w := (s.Width-2)/9 - 1
 
-	text := lipgloss.NewStyle().Bold(true).Render(docker.ImagesHeaders(w)+"\n") + "\n"
+	text := lipgloss.NewStyle().Bold(true).Render(runtimes.ImageHeaders(w)+"\n") + "\n"
 
 	for k, v := range s.FilteredItems {
-		line := docker.ImagesFormattedSummary(s.ImageMap[v], w)
+		line := runtimes.ImageFormatted(s.ImageMap[v], w)
 
 		if k == s.SelectedIndex {
 			line = lipgloss.NewStyle().Background(colors.Load().MenuSelectedBg).Foreground(colors.Load().MenuSelectedText).Render(line)
@@ -180,7 +179,7 @@ func (s *ImageList) Filter(val string) {
 	originals := make([]types.Image, len(s.Items))
 
 	for i, v := range s.Items {
-		str := docker.ImagesFormattedSummary(s.ImageMap[v], w)
+		str := runtimes.ImageFormatted(s.ImageMap[v], w)
 		formatted[i] = str
 		originals[i] = s.ImageMap[v]
 	}

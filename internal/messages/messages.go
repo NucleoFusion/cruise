@@ -11,7 +11,6 @@ import (
 	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 )
@@ -90,7 +89,7 @@ type (
 	}
 
 	UpdateImagesMsg struct {
-		Items []image.Summary
+		Items *[]types.Image
 	}
 
 	NetworksReadyMsg struct {

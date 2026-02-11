@@ -10,7 +10,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
-	"github.com/cruise-org/cruise/internal/runtimes/docker"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/cruise-org/cruise/pkg/runtimes"
@@ -143,7 +142,7 @@ func (s *ContainerList) View() string {
 func (s *ContainerList) UpdateList() {
 	w := (s.Width-2)/9 - 1
 
-	text := lipgloss.NewStyle().Bold(true).Render(docker.ContainerHeaders(w)+"\n") + "\n"
+	text := lipgloss.NewStyle().Bold(true).Render(runtimes.ContainerHeaders(w)+"\n") + "\n"
 
 	for k, v := range *s.FilteredItems {
 		line := runtimes.ContainerFormatted(v, w)
