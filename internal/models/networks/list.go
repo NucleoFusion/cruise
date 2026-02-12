@@ -1,6 +1,7 @@
 package networks
 
 import (
+	"context"
 	"sort"
 	"time"
 
@@ -9,20 +10,20 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
-	"github.com/cruise-org/cruise/internal/runtimes/docker"
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/config"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
-	"github.com/docker/docker/api/types/network"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 type NetworkList struct {
 	Width         int
 	Height        int
-	Items         []network.Summary
-	FilteredItems []network.Summary
+	Items         []types.Network
+	FilteredItems []types.Network
 	SelectedIndex int
 	Ti            textinput.Model
 	Vp            viewport.Model
@@ -53,25 +54,25 @@ func NewNetworkList(w int, h int) *NetworkList {
 
 func (s *NetworkList) Init() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		images, err := docker.GetNetworks()
+		nets, err := runtimes.RuntimeSrv.Networks(context.Background())
 		if err != nil {
 			return utils.ReturnError("Networks Page", "Error Querying Networks", err)
 		}
-		return messages.NetworksReadyMsg{Items: images}
+		return messages.NetworksReadyMsg{Items: nets}
 	})
 }
 
 func (s *NetworkList) Update(msg tea.Msg) (*NetworkList, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.NetworksReadyMsg:
-		s.Items = msg.Items
-		s.FilteredItems = msg.Items
+		s.Items = *msg.Items
+		s.FilteredItems = *msg.Items
 		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
-			images, err := docker.GetNetworks()
+			nets, err := runtimes.RuntimeSrv.Networks(context.Background())
 			if err != nil {
 				return utils.ReturnError("Networks Page", "Error Querying Networks", err)
 			}
-			return messages.NetworksReadyMsg{Items: images}
+			return messages.NetworksReadyMsg{Items: nets}
 		})
 
 	case tea.KeyMsg:
@@ -128,10 +129,10 @@ func (s *NetworkList) View() string {
 }
 
 func (s *NetworkList) UpdateList() {
-	text := lipgloss.NewStyle().Bold(true).Render(docker.NetworksHeaders(s.Width-2)+"\n") + "\n"
+	text := lipgloss.NewStyle().Bold(true).Render(runtimes.NetworkHeaders(s.Width-2)+"\n") + "\n"
 
 	for k, v := range s.FilteredItems {
-		line := docker.NetworksFormattedSummary(v, s.Width-2)
+		line := runtimes.NetworkFormatted(v, s.Width-2)
 
 		if k == s.SelectedIndex {
 			line = lipgloss.NewStyle().Background(colors.Load().MenuSelectedBg).Foreground(colors.Load().MenuSelectedText).Render(line)
@@ -147,10 +148,10 @@ func (s *NetworkList) UpdateList() {
 
 func (s *NetworkList) Filter(val string) {
 	formatted := make([]string, len(s.Items))
-	originals := make([]network.Summary, len(s.Items))
+	originals := make([]types.Network, len(s.Items))
 
 	for i, v := range s.Items {
-		str := docker.NetworksFormattedSummary(v, s.Width-2)
+		str := runtimes.NetworkFormatted(v, s.Width-2)
 		formatted[i] = str
 		originals[i] = v
 	}
@@ -158,7 +159,7 @@ func (s *NetworkList) Filter(val string) {
 	ranked := fuzzy.RankFindFold(val, formatted)
 	sort.Sort(ranked)
 
-	result := make([]network.Summary, len(ranked))
+	result := make([]types.Network, len(ranked))
 	for i, r := range ranked {
 		result[i] = originals[r.OriginalIndex]
 	}
@@ -170,6 +171,6 @@ func (s *NetworkList) Filter(val string) {
 	}
 }
 
-func (s *NetworkList) GetCurrentItem() network.Summary {
+func (s *NetworkList) GetCurrentItem() types.Network {
 	return s.FilteredItems[s.SelectedIndex]
 }

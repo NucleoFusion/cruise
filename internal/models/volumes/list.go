@@ -1,6 +1,7 @@
 package volumes
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
@@ -10,20 +11,20 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
-	"github.com/cruise-org/cruise/internal/runtimes/docker"
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/config"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
-	"github.com/docker/docker/api/types/volume"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 type VolumeList struct {
 	Width         int
 	Height        int
-	Items         []*volume.Volume
-	FilteredItems []*volume.Volume
+	Items         []types.Volume
+	FilteredItems []types.Volume
 	SelectedIndex int
 	Ti            textinput.Model
 	Vp            viewport.Model
@@ -54,20 +55,20 @@ func NewVolumeList(w int, h int) *VolumeList {
 
 func (s *VolumeList) Init() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		vols, err := docker.GetVolumes()
+		vols, err := runtimes.RuntimeSrv.Volumes(context.Background())
 		if err != nil {
 			fmt.Println(err)
 			return utils.ReturnError("Volumes Page", "Error Querying Volumes", err)
 		}
-		return messages.VolumesReadyMsg{Items: vols.Volumes}
+		return messages.VolumesReadyMsg{Items: vols}
 	})
 }
 
 func (s *VolumeList) Update(msg tea.Msg) (*VolumeList, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.VolumesReadyMsg:
-		s.Items = msg.Items
-		s.FilteredItems = msg.Items
+		s.Items = *msg.Items
+		s.FilteredItems = *msg.Items
 		return s, nil
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
@@ -123,14 +124,10 @@ func (s *VolumeList) View() string {
 }
 
 func (s *VolumeList) UpdateList() {
-	text := lipgloss.NewStyle().Bold(true).Render(docker.VolumesHeaders(s.Width-2)+"\n") + "\n"
+	text := lipgloss.NewStyle().Bold(true).Render(runtimes.VolumeHeaders(s.Width-2)+"\n") + "\n"
 
 	for k, v := range s.FilteredItems {
-		if v == nil {
-			continue
-		}
-
-		line := docker.VolumesFormattedSummary(*v, s.Width-2)
+		line := runtimes.VolumeFormatted(v, s.Width-2)
 
 		if k == s.SelectedIndex {
 			line = styles.SelectedStyle().Render(line)
@@ -146,10 +143,10 @@ func (s *VolumeList) UpdateList() {
 
 func (s *VolumeList) Filter(val string) {
 	formatted := make([]string, len(s.Items))
-	originals := make([]*volume.Volume, len(s.Items))
+	originals := make([]types.Volume, len(s.Items))
 
 	for i, v := range s.Items {
-		str := docker.VolumesFormattedSummary(*v, s.Width-2)
+		str := runtimes.VolumeFormatted(v, s.Width-2)
 		formatted[i] = str
 		originals[i] = v
 	}
@@ -157,7 +154,7 @@ func (s *VolumeList) Filter(val string) {
 	ranked := fuzzy.RankFindFold(val, formatted)
 	sort.Sort(ranked)
 
-	result := make([]*volume.Volume, len(ranked))
+	result := make([]types.Volume, len(ranked))
 	for i, r := range ranked {
 		result[i] = originals[r.OriginalIndex]
 	}
@@ -169,6 +166,6 @@ func (s *VolumeList) Filter(val string) {
 	}
 }
 
-func (s *VolumeList) GetCurrentItem() volume.Volume {
-	return *s.FilteredItems[s.SelectedIndex]
+func (s *VolumeList) GetCurrentItem() types.Volume {
+	return s.FilteredItems[s.SelectedIndex]
 }
