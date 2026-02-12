@@ -1,6 +1,7 @@
 package volumes
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -10,9 +11,9 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
 	styledhelp "github.com/cruise-org/cruise/internal/models/help"
-	"github.com/cruise-org/cruise/internal/runtimes/docker"
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
 )
 
@@ -63,14 +64,16 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keymap.QuickQuitKey()):
 			return s, tea.Quit
 		case key.Matches(msg, s.Keymap.Remove):
-			err := docker.RemoveVolumes(s.List.GetCurrentItem().Name)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.RemoveVolume(context.Background(), curr.Runtime, curr.Name)
 			if err != nil {
 				return s, utils.ReturnError("Volumes Page", "Error Removing Volume", err)
 			}
 			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Volumes Page", "Removed Volume",
 				fmt.Sprintf("Successfully Removed Volume %s", s.List.GetCurrentItem().Name)))
 		case key.Matches(msg, s.Keymap.Prune):
-			err := docker.PruneVolumes()
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.PruneVolumes(context.Background(), curr.Runtime)
 			if err != nil {
 				return s, utils.ReturnError("Volumes Page", "Error Pruning Volumes", err)
 			}
@@ -83,7 +86,7 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case key.Matches(msg, s.Keymap.ShowDetails):
 			s.ShowDetail = true
-			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
+			// s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
 			return s, nil
 		}
 	}
@@ -114,11 +117,11 @@ func (s *Volumes) GetListText() string {
 
 func (s *Volumes) Refresh() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		vols, err := docker.GetVolumes()
+		vols, err := runtimes.RuntimeSrv.Volumes(context.Background())
 		if err != nil {
 			fmt.Println(err)
 			return utils.ReturnError("Volumes Page", "Error Querying Volumes", err)
 		}
-		return messages.VolumesReadyMsg{Items: vols.Volumes}
+		return messages.VolumesReadyMsg{Items: vols}
 	})
 }

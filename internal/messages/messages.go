@@ -11,8 +11,6 @@ import (
 	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/api/types/volume"
 )
 
 type DashboardTick time.Time
@@ -93,11 +91,11 @@ type (
 	}
 
 	NetworksReadyMsg struct {
-		Items []network.Summary
+		Items *[]types.Network
 	}
 
 	VolumesReadyMsg struct {
-		Items []*volume.Volume
+		Items *[]types.Volume
 	}
 
 	UpdateNetworksMsg struct{}

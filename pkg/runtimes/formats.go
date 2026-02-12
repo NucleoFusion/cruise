@@ -9,6 +9,52 @@ import (
 	"github.com/cruise-org/cruise/pkg/types"
 )
 
+func VolumeFormatted(vol types.Volume, width int) string {
+	w := width / 11
+	return fmt.Sprintf("%-*s %-*s %-*s %-*s %-*s",
+		3*w, utils.Shorten(vol.Name, 2*w),
+		1*w, utils.Shorten(vol.Scope, 2*w),
+		1*w, utils.Shorten(vol.Driver, 2*w),
+		3*w, utils.Shorten(vol.Mountpoint, 2*w),
+		3*w, utils.Shorten(vol.CreatedAt, 2*w))
+}
+
+func VolumeHeaders(width int) string {
+	w := width / 11
+	return fmt.Sprintf("%-*s %-*s %-*s %-*s %-*s",
+		3*w, "Name",
+		1*w, "Scope",
+		1*w, "Driver",
+		3*w, "Mount Point",
+		3*w, "Created")
+}
+
+func NetworkFormatted(ntwrk types.Network, width int) string {
+	w := width / 14
+	ipv := "✘"
+	if ntwrk.IPv4 {
+		ipv = "✔"
+	}
+	return fmt.Sprintf("%-*s %-*s %-*s %-*s %-*s %-*s",
+		3*w, utils.Shorten(ntwrk.ID, 2*w),
+		3*w, utils.Shorten(ntwrk.Name, 3*w),
+		2*w, utils.Shorten(ntwrk.Scope, 2*w),
+		2*w, utils.Shorten(ntwrk.Driver, 2*w),
+		2*w, ipv,
+		2*w, fmt.Sprintf("%d", ntwrk.NumContainers))
+}
+
+func NetworkHeaders(width int) string {
+	w := width / 14
+	return fmt.Sprintf("%-*s %-*s %-*s %-*s %-*s %-*s",
+		3*w, "ID",
+		3*w, "Name",
+		2*w, "Scope",
+		2*w, "Driver",
+		2*w, "IPv4",
+		2*w, "Container Count")
+}
+
 func ImageFormatted(image types.Image, width int) string {
 	name := "<none>:<none>"
 	if len(image.Tags) > 0 {
