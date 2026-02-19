@@ -30,26 +30,28 @@ func NewSysRes(w int, h int) *SysRes {
 	}
 }
 
+var refresh = func(t time.Time) tea.Msg {
+	cpuChan := make(chan *data.CPUInfo, 1)
+	memChan := make(chan *data.MemInfo, 1)
+	diskChan := make(chan *data.DiskInfo, 1)
+	go func() {
+		cpuChan <- data.GetCPUInfo()
+	}()
+	go func() {
+		memChan <- data.GetMemInfo()
+	}()
+	go func() {
+		diskChan <- data.GetDiskInfo()
+	}()
+	return messages.SysResReadyMsg{
+		CPU:  <-cpuChan,
+		Mem:  <-memChan,
+		Disk: <-diskChan,
+	}
+}
+
 func (s *SysRes) Init() tea.Cmd {
-	return tea.Tick(0, func(t time.Time) tea.Msg {
-		cpuChan := make(chan *data.CPUInfo, 1)
-		memChan := make(chan *data.MemInfo, 1)
-		diskChan := make(chan *data.DiskInfo, 1)
-		go func() {
-			cpuChan <- data.GetCPUInfo()
-		}()
-		go func() {
-			memChan <- data.GetMemInfo()
-		}()
-		go func() {
-			diskChan <- data.GetDiskInfo()
-		}()
-		return messages.SysResReadyMsg{
-			CPU:  <-cpuChan,
-			Mem:  <-memChan,
-			Disk: <-diskChan,
-		}
-	})
+	return tea.Tick(0, refresh)
 }
 
 func (s *SysRes) Update(msg tea.Msg) (*SysRes, tea.Cmd) {
@@ -59,7 +61,7 @@ func (s *SysRes) Update(msg tea.Msg) (*SysRes, tea.Cmd) {
 		s.CPU = msg.CPU
 		s.Mem = msg.Mem
 		s.Disk = msg.Disk
-		return s, nil
+		return s, tea.Tick(200, refresh)
 	}
 	return s, nil
 }
