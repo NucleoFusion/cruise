@@ -1,17 +1,24 @@
 package home
 
 import (
+	"context"
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/cruise-org/cruise/internal/runtimes/docker"
+	"github.com/cruise-org/cruise/internal/messages"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
+	"github.com/cruise-org/cruise/pkg/types"
 )
 
 type QuickStats struct {
-	Width  int
-	Height int
+	Width      int
+	Height     int
+	Containers *[]types.Container
+	Images     *[]types.Image
+	Networks   *[]types.Network
+	Volumes    *[]types.Volume
 }
 
 func NewQuickStats(w int, h int) *QuickStats {
@@ -21,9 +28,61 @@ func NewQuickStats(w int, h int) *QuickStats {
 	}
 }
 
-func (s QuickStats) Init() tea.Cmd { return nil }
+func getCmds() []tea.Cmd {
+	return []tea.Cmd{
+		// Containers
+		func() tea.Msg {
+			cnts, err := runtimes.RuntimeSrv.Containers(context.Background())
+			if err != nil {
+				return messages.ErrorMsg{Msg: err.Error()}
+			}
+			return messages.HomeStatContainer{Containers: cnts}
+		},
 
-func (s QuickStats) Update(msg tea.Msg) (QuickStats, tea.Cmd) {
+		// Images
+		func() tea.Msg {
+			cnts, err := runtimes.RuntimeSrv.Images(context.Background())
+			if err != nil {
+				return messages.ErrorMsg{Msg: err.Error()}
+			}
+			return messages.HomeStatImage{Images: cnts}
+		},
+
+		// Networks
+		func() tea.Msg {
+			cnts, err := runtimes.RuntimeSrv.Networks(context.Background())
+			if err != nil {
+				return messages.ErrorMsg{Msg: err.Error()}
+			}
+			return messages.HomeStatNetwork{Networks: cnts}
+		},
+
+		// Volumes
+		func() tea.Msg {
+			cnts, err := runtimes.RuntimeSrv.Volumes(context.Background())
+			if err != nil {
+				return messages.ErrorMsg{Msg: err.Error()}
+			}
+			return messages.HomeStatVolume{Volumes: cnts}
+		},
+	}
+}
+
+func (s *QuickStats) Init() tea.Cmd {
+	return tea.Batch(getCmds()...)
+}
+
+func (s *QuickStats) Update(msg tea.Msg) (*QuickStats, tea.Cmd) {
+	switch msg := msg.(type) {
+	case messages.HomeStatContainer:
+		s.Containers = msg.Containers
+	case messages.HomeStatImage:
+		s.Images = msg.Images
+	case messages.HomeStatNetwork:
+		s.Networks = msg.Networks
+	case messages.HomeStatVolume:
+		s.Volumes = msg.Volumes
+	}
 	return s, nil
 }
 
@@ -38,18 +97,37 @@ func (s QuickStats) View() string {
 }
 
 func (s QuickStats) GetFormattedView() string {
-	vols := docker.GetNumVolumes()
-	cntnr := docker.GetNumContainers()
-	imgs := docker.GetNumImages()
-	ntwrks, _ := docker.GetNumNetworks()
+	if s.Containers == nil && s.Images == nil && s.Volumes == nil && s.Networks == nil {
+		return "Loading"
+	}
+
+	cnts := "..."
+	if s.Containers != nil {
+		cnts = fmt.Sprintf("%d", len(*s.Containers))
+	}
+
+	imgs := "..."
+	if s.Images != nil {
+		imgs = fmt.Sprintf("%d", len(*s.Images))
+	}
+
+	nets := "..."
+	if s.Networks != nil {
+		nets = fmt.Sprintf("%d", len(*s.Networks))
+	}
+
+	vols := "..."
+	if s.Volumes != nil {
+		vols = fmt.Sprintf("%d", len(*s.Volumes))
+	}
 
 	return fmt.Sprintf(`
-Containers: %d
+	Containers: %s
 
-Images:     %d
+	Images:     %s
 
-Volumes:    %d
+	Volumes:    %s
 
-Networks:   %d
-		`, cntnr, imgs, vols, ntwrks)
+	Networks:   %s
+			`, cnts, imgs, vols, nets)
 }
