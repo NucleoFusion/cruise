@@ -25,6 +25,11 @@ func TickDashboard() tea.Cmd {
 }
 
 type (
+	HomeStatContainer struct{ Containers *[]types.Container }
+	HomeStatImage     struct{ Images *[]types.Image }
+	HomeStatNetwork   struct{ Networks *[]types.Network }
+	HomeStatVolume    struct{ Volumes *[]types.Volume }
+
 	ChangePg struct {
 		Pg     enums.PageType
 		Exited bool
