@@ -16,6 +16,7 @@ import (
 	"github.com/docker/docker/api/types/events"
 )
 
+// TODO: Remove?
 type DashboardTick time.Time
 
 func TickDashboard() tea.Cmd {
@@ -29,6 +30,9 @@ type (
 	HomeStatImage     struct{ Images *[]types.Image }
 	HomeStatNetwork   struct{ Networks *[]types.Network }
 	HomeStatVolume    struct{ Volumes *[]types.Volume }
+
+	HomeLogsTick    struct{}
+	HomeLogsMonitor struct{ Monitor *types.Monitor }
 
 	ChangePg struct {
 		Pg     enums.PageType
