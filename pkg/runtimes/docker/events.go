@@ -82,7 +82,6 @@ func (s *DockerRuntime) RuntimeLogs(ctx context.Context) (*types.Monitor, error)
 				if !ok {
 					return
 				}
-
 				logCh <- types.Log{
 					Timestamp: time.Unix(msg.Time, 0),
 					Message:   FormatEvent(msg),

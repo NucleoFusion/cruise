@@ -1,62 +1,86 @@
 package home
 
 import (
+	"context"
+	"log"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
-	"github.com/cruise-org/cruise/internal/runtimes/docker"
-	"github.com/cruise-org/cruise/internal/utils"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
-	"github.com/docker/docker/api/types/events"
+	"github.com/cruise-org/cruise/pkg/types"
 )
 
+var tickCmd = func() tea.Cmd {
+	return tea.Tick(time.Second*3, func(_ time.Time) tea.Msg {
+		return messages.HomeLogsTick{}
+	})
+}
+
 type Logs struct {
-	Width     int
-	Height    int
-	Events    []*events.Message
-	EventChan <-chan *events.Message
-	ErrChan   <-chan error
-	IsLoading bool
-	Length    int
+	Width        int
+	Height       int
+	Events       []types.Log
+	EventMonitor *types.Monitor
+	IsLoading    bool
+	Length       int
 }
 
 func NewLogs(w int, h int) *Logs {
-	eventChan, errChan := docker.RecentEventStream(h - 6)
 	return &Logs{
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
 		Length:    h - 6,
-		EventChan: eventChan,
-		ErrChan:   errChan,
+		Events:    make([]types.Log, 0),
 	}
 }
 
 func (s *Logs) Init() tea.Cmd {
-	return tea.Batch(s.Sub())
-}
-
-func (s *Logs) Sub() tea.Cmd {
-	return tea.Every(2*time.Second, func(_ time.Time) tea.Msg {
-		return s.PollEvents()()
-	})
+	return tea.Batch(tickCmd(),
+		func() tea.Msg {
+			m, err := runtimes.RuntimeSrv.RuntimeLogs(context.Background())
+			if err != nil {
+				return messages.ErrorMsg{Msg: err.Error()}
+			}
+			return messages.HomeLogsMonitor{Monitor: m}
+		})
 }
 
 func (s *Logs) Update(msg tea.Msg) (*Logs, tea.Cmd) {
 	switch msg := msg.(type) {
-	case messages.NewEvents:
-		s.Events = append(s.Events, msg.Events...)
+	case messages.HomeLogsMonitor:
+		s.EventMonitor = msg.Monitor
+		s.IsLoading = false
+		return s, nil
 
-		if len(s.Events) > s.Length {
-			s.Events = s.Events[len(s.Events)-s.Length:]
-		}
+	case messages.HomeLogsTick:
+		log.Println("[Home UI] Home Logs Ticked")
 		if s.IsLoading {
-			s.IsLoading = false
+			return s, tickCmd()
 		}
 
-		return s, s.Sub()
+		buf := make([]types.Log, 0)
+		for {
+			select {
+			case v := <-s.EventMonitor.Incoming:
+				buf = append(buf, v)
+			default:
+				goto done
+			}
+		}
+
+	done:
+		for _, v := range buf {
+			s.Events = append(s.Events, v)
+			if len(s.Events) == s.Height-5 {
+				s.Events = s.Events[1:]
+			}
+		}
+
+		return s, tickCmd()
 	}
 	return s, nil
 }
@@ -65,6 +89,7 @@ func (s Logs) View() string {
 	return styles.SubpageStyle().PaddingTop(1).PaddingLeft(4).Render(lipgloss.JoinVertical(lipgloss.Center,
 		styles.TitleStyle().Render("Event Logs"),
 		lipgloss.NewStyle().
+			PaddingTop(1).
 			Width(s.Width-6).   //-6 from padding(4) and border(2)
 			Height(s.Height-4). //-4 from title(1) border(2) and padding(1)
 			Align(lipgloss.Left, lipgloss.Center).
@@ -83,34 +108,8 @@ func (s *Logs) FormattedView() string {
 	text := ""
 	events := s.Events
 	for _, msg := range events {
-		text += docker.FormatDockerEvent(*msg) + "\n"
+		text += runtimes.FormatLog(msg) + "\n"
 	}
 
 	return text
-}
-
-func (s *Logs) PollEvents() tea.Cmd {
-	return func() tea.Msg {
-		evs := make([]*events.Message, 0, s.Length)
-
-		select {
-		case err := <-s.ErrChan:
-			return utils.ReturnError("Home Page", "Error in Logs", err)
-		default:
-			for i := 0; i < s.Length; i++ {
-				select {
-				case ev := <-s.EventChan:
-					evs = append(evs, ev)
-				default:
-					return messages.NewEvents{
-						Events: evs,
-					}
-				}
-			}
-
-			return messages.NewEvents{
-				Events: evs,
-			}
-		}
-	}
 }
