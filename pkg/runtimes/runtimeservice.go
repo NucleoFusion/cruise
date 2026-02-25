@@ -3,6 +3,7 @@ package runtimes
 import (
 	"context"
 	"errors"
+	"log"
 	"os/exec"
 	"sync"
 
@@ -224,8 +225,8 @@ func (s *RuntimeService) ContainerLogs(ctx context.Context, runtime string, id s
 	return s.Runtimes[runtime].ContainerLogs(ctx, id)
 }
 
-func (s *RuntimeService) RuntimeLogs(ctx context.Context, runtime string, id string) (*types.Monitor, error) {
-	ch := make(chan types.Log)
+func (s *RuntimeService) RuntimeLogs(ctx context.Context) (*types.Monitor, error) {
+	ch := make(chan types.Log, 100)
 	errs := make([]error, 0)
 	var wg sync.WaitGroup
 
@@ -245,14 +246,15 @@ func (s *RuntimeService) RuntimeLogs(ctx context.Context, runtime string, id str
 				case <-ctx.Done():
 					return
 
-				case log, ok := <-m.Incoming:
+				case rsLog, ok := <-m.Incoming:
 					if !ok {
 						return
 					}
 
 					// forward into aggregated channel
 					select {
-					case ch <- log:
+					case ch <- rsLog:
+						log.Println("[RuntimeService] Log Sent via Service" + rsLog.Message)
 					case <-ctx.Done():
 						return
 					}

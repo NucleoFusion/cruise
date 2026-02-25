@@ -10,17 +10,15 @@ import (
 	"github.com/cruise-org/cruise/pkg/styles"
 )
 
-// TO ADD
-// - System Resources
-// - Runtime Overview (Total Cont (Stopped, Restarting, healthy etc), Images ...)
 // - Container Events (Coded / Nice)
-//
+// Enabled Runtimes (Coded / Nice)
 
 type Home struct {
 	Width  int
 	Height int
 	SysRes *SysRes
 	Stats  *QuickStats
+	Logs   *Logs
 	Help   styledhelp.StyledHelp
 }
 
@@ -30,12 +28,13 @@ func NewHome(w int, h int) *Home {
 		Height: h,
 		SysRes: NewSysRes(2*w/3, (h-11)/2-2),
 		Stats:  NewQuickStats(w/3, (h-11)/2-2),
+		Logs:   NewLogs(2*w/3, (h-11)/2),
 		Help:   styledhelp.NewStyledHelp([]key.Binding{}, w-2),
 	}
 }
 
 func (s *Home) Init() tea.Cmd {
-	return tea.Batch(s.SysRes.Init(), s.Stats.Init())
+	return tea.Batch(s.SysRes.Init(), s.Stats.Init(), s.Logs.Init())
 }
 
 func (s *Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -60,6 +59,14 @@ func (s *Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		st, cmd := s.Stats.Update(msg)
 		s.Stats = st
 		return s, cmd
+	case messages.HomeLogsMonitor:
+		st, cmd := s.Logs.Update(msg)
+		s.Logs = st
+		return s, cmd
+	case messages.HomeLogsTick:
+		st, cmd := s.Logs.Update(msg)
+		s.Logs = st
+		return s, cmd
 
 	case tea.KeyMsg:
 		switch {
@@ -76,6 +83,7 @@ func (s *Home) View() string {
 
 	view := lipgloss.JoinVertical(lipgloss.Center, logo,
 		lipgloss.JoinHorizontal(lipgloss.Center, s.SysRes.View(), s.Stats.View()),
+		s.Logs.View(),
 		s.Help.View(),
 	)
 	return styles.SceneStyle().Render(view)

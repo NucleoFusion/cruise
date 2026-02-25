@@ -118,14 +118,6 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		s.Overlay = overlay.New(s.MsgPopup, curr, overlay.Right, overlay.Top, 2, 2)
 		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg { return messages.CloseMsgPopup{} })
-	case messages.ContainerReadyMsg:
-		cnt, cmd := s.Containers.Update(msg)
-		s.Containers = cnt.(*containers.Containers)
-		return s, cmd
-	case messages.ImagesReadyMsg:
-		img, cmd := s.Images.Update(msg)
-		s.Images = img.(*images.Images)
-		return s, cmd
 	case messages.ChangePg:
 		s.CurrentPage = msg.Pg
 		s.IsChangingPage = false

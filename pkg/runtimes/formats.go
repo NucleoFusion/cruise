@@ -9,6 +9,12 @@ import (
 	"github.com/cruise-org/cruise/pkg/types"
 )
 
+func FormatLog(msg types.Log) string {
+	eventTime := msg.Timestamp.Format("15:04:05") // only HH:MM:SS
+
+	return fmt.Sprintf("[%s] %s", eventTime, msg.Message)
+}
+
 func VolumeFormatted(vol types.Volume, width int) string {
 	w := width / 11
 	return fmt.Sprintf("%-*s %-*s %-*s %-*s %-*s",
