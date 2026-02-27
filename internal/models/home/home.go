@@ -10,9 +10,6 @@ import (
 	"github.com/cruise-org/cruise/pkg/styles"
 )
 
-// - Container Events (Coded / Nice)
-// Enabled Runtimes (Coded / Nice)
-
 type Home struct {
 	Width  int
 	Height int
