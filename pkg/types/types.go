@@ -1,9 +1,5 @@
 package types
 
-import (
-	"github.com/cruise-org/cruise/pkg/enums"
-)
-
 type ContainerState = string
 
 const (
@@ -16,7 +12,6 @@ const (
 	StateDead       ContainerState = "dead"       // StateDead indicates that the container failed to be deleted. Containers in this state are attempted to be cleaned up when the daemon restarts.
 )
 
-// TODO: Runtime name
 type Container struct {
 	ID      string
 	Runtime string
@@ -67,14 +62,4 @@ type Volume struct {
 	Driver     string
 	Mountpoint string
 	CreatedAt  string
-}
-
-type Vulnerability struct {
-	VulnID     string
-	Runtime    string
-	Pkg        string // PkgName
-	Severity   enums.Severity
-	Title      string
-	Published  string
-	PrimaryURL string
 }

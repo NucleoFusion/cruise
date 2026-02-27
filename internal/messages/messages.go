@@ -3,24 +3,13 @@ package messages
 import (
 	"encoding/json"
 	"io"
-	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/cruise-org/cruise/internal/data"
 	"github.com/cruise-org/cruise/pkg/enums"
 	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 )
-
-// TODO: Remove?
-type DashboardTick time.Time
-
-func TickDashboard() tea.Cmd {
-	return tea.Tick(5*time.Second, func(t time.Time) tea.Msg {
-		return DashboardTick(t)
-	})
-}
 
 type (
 	HomeStatContainer struct{ Containers *[]types.Container }
@@ -64,8 +53,7 @@ type (
 	}
 
 	ScanResponse struct {
-		Arr []any
-		Err error
+		Arr *[]types.Vulnerability
 	}
 
 	ScannerListMsg struct {
