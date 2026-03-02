@@ -10,66 +10,106 @@ import (
 // TODO: New Volume Details format
 
 func (s *DockerRuntime) VolumeDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta) {
-	return []types.StatCard{
-			&VolumeDetails{ID: id},
-			&VolumeLabels{ID: id},
-			&VolumeOptions{ID: id},
-		}, &types.StatMeta{
-			TotalRows:    1,
-			TotalColumns: 3,
-			SpanMap: &map[string]struct {
-				Rows    int
-				Columns int
-				Index   int
-			}{
-				"Volume Details": {Rows: 1, Columns: 1, Index: 0},
-				"Labels":         {Rows: 1, Columns: 1, Index: 1},
-				"Options":        {Rows: 1, Columns: 1, Index: 2},
-			},
-		}
-}
-
-type VolumeDetails struct{ ID string }
-
-func (s *VolumeDetails) Title() string { return "Volume Details" }
-
-func (s *VolumeDetails) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
-	res, err := cli.VolumeInspect(ctx, s.ID)
-	if err != nil {
-		return nil, err
+	stats := []types.StatCard{
+		NewVolumeDetails(ctx, id, s.Client),
+		NewVolumeLabelDetails(ctx, id, s.Client),
+		NewVolumeOptionsDetails(ctx, id, s.Client),
 	}
 
-	return &map[string]string{
+	return stats, &types.StatMeta{
+		TotalRows:    1,
+		TotalColumns: 3,
+		SpanMap: &map[string]struct {
+			Rows    int
+			Columns int
+			Index   int
+		}{
+			"Volume Details": {Rows: 1, Columns: 1, Index: 0},
+			"Labels":         {Rows: 1, Columns: 1, Index: 1},
+			"Options":        {Rows: 1, Columns: 1, Index: 2},
+		},
+	}
+}
+
+type VolumeDetails struct {
+	ID   string
+	data *map[string]string
+	err  error
+}
+
+func NewVolumeDetails(ctx context.Context, id string, cli *client.Client) *VolumeDetails {
+	s := VolumeDetails{ID: id}
+
+	res, err := cli.VolumeInspect(ctx, s.ID)
+	if err != nil {
+		s.err = err
+		return &s
+	}
+
+	s.data = &map[string]string{
 		"Volume":     res.Name,
 		"Mountpoint": res.Mountpoint,
 		"Driver":     res.Driver,
 		"Scope":      res.Scope,
 		"Created":    res.CreatedAt,
-	}, nil
+	}
+
+	return &s
 }
 
-type VolumeLabels struct{ ID string }
+func (s *VolumeDetails) Title() string { return "Volume Details" }
+
+func (s *VolumeDetails) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
+}
+
+type VolumeLabels struct {
+	ID   string
+	data *map[string]string
+	err  error
+}
+
+func NewVolumeLabelDetails(ctx context.Context, id string, cli *client.Client) *VolumeLabels {
+	s := VolumeLabels{ID: id}
+
+	res, err := cli.VolumeInspect(ctx, s.ID)
+	if err != nil {
+		s.err = err
+		return &s
+	}
+
+	s.data = &res.Labels
+	return &s
+}
 
 func (s *VolumeLabels) Title() string { return "Labels" }
 
-func (s *VolumeLabels) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
-	res, err := cli.VolumeInspect(ctx, s.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &res.Labels, nil
+func (s *VolumeLabels) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
 }
 
-type VolumeOptions struct{ ID string }
+type VolumeOptions struct {
+	ID   string
+	data *map[string]string
+	err  error
+}
+
+func NewVolumeOptionsDetails(ctx context.Context, id string, cli *client.Client) *VolumeDetails {
+	s := VolumeDetails{ID: id}
+
+	res, err := cli.VolumeInspect(ctx, s.ID)
+	if err != nil {
+		s.err = err
+		return &s
+	}
+
+	s.data = &res.Options
+
+	return &s
+}
 
 func (s *VolumeOptions) Title() string { return "Options" }
 
-func (s *VolumeOptions) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
-	res, err := cli.VolumeInspect(ctx, s.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &res.Options, nil
+func (s *VolumeOptions) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
 }

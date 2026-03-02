@@ -59,25 +59,27 @@ func (s *DockerRuntime) Containers(ctx context.Context) (*[]types.Container, err
 }
 
 func (s *DockerRuntime) ContainerDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta) {
-	return []types.StatCard{
-			&ContainerDetails{ID: id},
-			&ContainerResources{ID: id},
-			&ContainerNetworks{ID: id},
-			&ContainerVolumes{ID: id},
-		}, &types.StatMeta{
-			TotalRows:    4,
-			TotalColumns: 1,
-			SpanMap: &map[string]struct {
-				Rows    int
-				Columns int
-				Index   int
-			}{
-				"Details":  {Rows: 1, Columns: 1, Index: 0},
-				"Resource": {Rows: 1, Columns: 1, Index: 1},
-				"Networks": {Rows: 1, Columns: 1, Index: 2},
-				"Volume":   {Rows: 1, Columns: 1, Index: 3},
-			},
-		}
+	stats := []types.StatCard{
+		NewContainerDetails(ctx, id, s.Client),
+		NewContainerResourceDetails(ctx, id, s.Client),
+		NewContainerVolumesDetails(ctx, id, s.Client),
+		NewContainerNetworksDetails(ctx, id, s.Client),
+	}
+
+	return stats, &types.StatMeta{
+		TotalRows:    4,
+		TotalColumns: 1,
+		SpanMap: &map[string]struct {
+			Rows    int
+			Columns int
+			Index   int
+		}{
+			"Details":  {Rows: 1, Columns: 1, Index: 0},
+			"Resource": {Rows: 1, Columns: 1, Index: 1},
+			"Networks": {Rows: 1, Columns: 1, Index: 2},
+			"Volume":   {Rows: 1, Columns: 1, Index: 3},
+		},
+	}
 }
 
 func (s *DockerRuntime) StartContainer(ctx context.Context, id string) error {
