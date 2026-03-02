@@ -13,38 +13,44 @@ import (
 // TODO: THe other Network Details?
 
 func (s *DockerRuntime) NetworkDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta) {
-	return []types.StatCard{
-			&NetworkDetails{ID: id},
-			&NetworkLabels{ID: id},
-			&NetworkOptions{ID: id},
-			&NetworkIPAM{ID: id},
-		}, &types.StatMeta{
-			TotalRows:    2,
-			TotalColumns: 3,
-			SpanMap: &map[string]struct {
-				Rows    int
-				Columns int
-				Index   int
-			}{
-				"Network Details": {Rows: 1, Columns: 1, Index: 0},
-				"Labels":          {Rows: 2, Columns: 1, Index: 1},
-				"Options":         {Rows: 2, Columns: 1, Index: 2},
-				"IPAM":            {Rows: 1, Columns: 1, Index: 3},
-			},
-		}
+	stats := []types.StatCard{
+		NewNetworkDetails(ctx, id, s.Client),
+		NewNetworkLabelDetails(ctx, id, s.Client),
+		NewNetworkOptionsDetails(ctx, id, s.Client),
+		NewNetworkIPAMDetails(ctx, id, s.Client),
+	}
+	return stats, &types.StatMeta{
+		TotalRows:    2,
+		TotalColumns: 3,
+		SpanMap: &map[string]struct {
+			Rows    int
+			Columns int
+			Index   int
+		}{
+			"Network Details": {Rows: 1, Columns: 1, Index: 0},
+			"Labels":          {Rows: 2, Columns: 1, Index: 1},
+			"Options":         {Rows: 2, Columns: 1, Index: 2},
+			"IPAM":            {Rows: 1, Columns: 1, Index: 3},
+		},
+	}
 }
 
-type NetworkDetails struct{ ID string }
+type NetworkDetails struct {
+	ID   string
+	data *map[string]string
+	err  error
+}
 
-func (s *NetworkDetails) Title() string { return "Network Details" }
+func NewNetworkDetails(ctx context.Context, id string, cli *client.Client) *NetworkDetails {
+	s := NetworkDetails{ID: id}
 
-func (s *NetworkDetails) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
 	res, err := cli.NetworkInspect(ctx, s.ID, network.InspectOptions{})
 	if err != nil {
-		return nil, err
+		s.err = err
+		return &s
 	}
 
-	return &map[string]string{
+	s.data = &map[string]string{
 		"Network":  res.Name,
 		"ID":       res.ID,
 		"Created":  res.Created.Format(time.DateOnly) + " " + res.Created.Format(time.Kitchen),
@@ -52,43 +58,81 @@ func (s *NetworkDetails) Stats(ctx context.Context, cli *client.Client) (*map[st
 		"Scope":    res.Scope,
 		"Internal": strconv.FormatBool(res.Internal),
 		"Ingress":  strconv.FormatBool(res.Ingress),
-	}, nil
+	}
+
+	return &s
 }
 
-type NetworkLabels struct{ ID string }
+func (s *NetworkDetails) Title() string { return "Network Details" }
+
+func (s *NetworkDetails) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
+}
+
+type NetworkLabels struct {
+	ID   string
+	data *map[string]string
+	err  error
+}
+
+func NewNetworkLabelDetails(ctx context.Context, id string, cli *client.Client) *NetworkLabels {
+	s := NetworkLabels{ID: id}
+
+	res, err := cli.NetworkInspect(ctx, s.ID, network.InspectOptions{})
+	if err != nil {
+		s.err = err
+		return &s
+	}
+
+	s.data = &res.Labels
+
+	return &s
+}
 
 func (s *NetworkLabels) Title() string { return "Labels" }
 
-func (s *NetworkLabels) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
-	res, err := cli.NetworkInspect(ctx, s.ID, network.InspectOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &res.Labels, nil
+func (s *NetworkLabels) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
 }
 
-type NetworkOptions struct{ ID string }
+type NetworkOptions struct {
+	ID   string
+	data *map[string]string
+	err  error
+}
 
+func NewNetworkOptionsDetails(ctx context.Context, id string, cli *client.Client) *NetworkOptions {
+	s := NetworkOptions{ID: id}
+
+	res, err := cli.NetworkInspect(ctx, s.ID, network.InspectOptions{})
+	if err != nil {
+		s.err = err
+		return &s
+	}
+
+	s.data = &res.Options
+
+	return &s
+}
 func (s *NetworkOptions) Title() string { return "Options" }
 
-func (s *NetworkOptions) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
-	res, err := cli.NetworkInspect(ctx, s.ID, network.InspectOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &res.Options, nil
+func (s *NetworkOptions) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
 }
 
-type NetworkIPAM struct{ ID string }
+type NetworkIPAM struct {
+	ID   string
+	data *map[string]string
+	err  error
+}
 
-func (s *NetworkIPAM) Title() string { return "Options" }
+func NewNetworkIPAMDetails(ctx context.Context, id string, cli *client.Client) *NetworkIPAM {
+	s := NetworkIPAM{ID: id}
 
-func (s *NetworkIPAM) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
 	res, err := cli.NetworkInspect(ctx, s.ID, network.InspectOptions{})
 	if err != nil {
-		return nil, err
+		s.err = err
+		return &s
 	}
 
 	stat := map[string]string{
@@ -102,5 +146,12 @@ func (s *NetworkIPAM) Stats(ctx context.Context, cli *client.Client) (*map[strin
 		stat[k] = v
 	}
 
-	return &stat, nil
+	s.data = &stat
+
+	return &s
+}
+func (s *NetworkIPAM) Title() string { return "Options" }
+
+func (s *NetworkIPAM) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
 }

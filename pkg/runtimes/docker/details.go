@@ -14,15 +14,18 @@ import (
 )
 
 type ContainerDetails struct {
-	ID string
+	ID   string
+	data *map[string]string
+	err  error
 }
 
-func (s *ContainerDetails) Title() string { return "Container Details" }
+func NewContainerDetails(ctx context.Context, id string, cli *client.Client) *ContainerDetails {
+	s := ContainerDetails{ID: id}
 
-func (s *ContainerDetails) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
 	insp, err := cli.ContainerInspect(ctx, s.ID)
 	if err != nil {
-		return nil, err
+		s.err = err
+		return &s
 	}
 
 	startedAt, err := time.Parse(time.RFC3339Nano, insp.State.StartedAt)
@@ -32,7 +35,7 @@ func (s *ContainerDetails) Stats(ctx context.Context, cli *client.Client) (*map[
 
 	uptime := time.Since(startedAt).String()
 
-	return &map[string]string{
+	s.data = &map[string]string{
 		"ID":            s.ID,
 		"Name":          insp.Name,
 		"Entrypoint":    strings.Join(insp.Config.Entrypoint, " "),
@@ -41,25 +44,37 @@ func (s *ContainerDetails) Stats(ctx context.Context, cli *client.Client) (*map[
 		"Status":        string(insp.State.Status),
 		"RestartPolicy": string(insp.HostConfig.RestartPolicy.Name),
 		"Uptime":        uptime,
-	}, nil
+	}
+
+	return &s
+}
+
+func (s *ContainerDetails) Title() string { return "Container Details" }
+
+func (s *ContainerDetails) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
 }
 
 type ContainerResources struct {
-	ID string
+	ID   string
+	data *map[string]string
+	err  error
 }
 
-func (s *ContainerResources) Title() string { return "Resource" }
+func NewContainerResourceDetails(ctx context.Context, id string, cli *client.Client) *ContainerResources {
+	s := ContainerResources{ID: id}
 
-func (s *ContainerResources) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
 	res, err := cli.ContainerStats(ctx, s.ID, false)
 	if err != nil {
-		return nil, err
+		s.err = err
+		return &s
 	}
 	defer res.Body.Close()
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		s.err = err
+		return &s
 	}
 
 	var stats container.StatsResponse
@@ -67,24 +82,35 @@ func (s *ContainerResources) Stats(ctx context.Context, cli *client.Client) (*ma
 
 	r, w := GetBlkio(stats, res.OSType)
 
-	return &map[string]string{
+	s.data = &map[string]string{
 		"CPU":       fmt.Sprintf("%d", stats.CPUStats.CPUUsage.TotalUsage),
 		"Memory":    fmt.Sprintf("%d", stats.MemoryStats.Usage),
 		"Processes": fmt.Sprintf("%d", stats.NumProcs),
 		"Blkio":     fmt.Sprintf("%d Rx / %d Wx", r, w),
-	}, nil
+	}
+
+	return &s
+}
+
+func (s *ContainerResources) Title() string { return "Resource" }
+
+func (s *ContainerResources) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
 }
 
 type ContainerNetworks struct {
-	ID string
+	ID   string
+	data *map[string]string
+	err  error
 }
 
-func (s *ContainerNetworks) Title() string { return "Networks" }
+func NewContainerNetworksDetails(ctx context.Context, id string, cli *client.Client) *ContainerNetworks {
+	s := ContainerNetworks{ID: id}
 
-func (s *ContainerNetworks) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
 	res, err := cli.ContainerInspect(ctx, s.ID)
 	if err != nil {
-		return nil, err
+		s.err = err
+		return &s
 	}
 
 	nets := []string{}
@@ -92,23 +118,34 @@ func (s *ContainerNetworks) Stats(ctx context.Context, cli *client.Client) (*map
 		nets = append(nets, k)
 	}
 
-	return &map[string]string{
+	s.data = &map[string]string{
 		"IP":       res.NetworkSettings.IPAddress,
 		"Mac":      res.NetworkSettings.MacAddress,
 		"Networks": strings.Join(nets, "\n"),
-	}, nil
+	}
+
+	return &s
+}
+
+func (s *ContainerNetworks) Title() string { return "Networks" }
+
+func (s *ContainerNetworks) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
 }
 
 type ContainerVolumes struct {
-	ID string
+	ID   string
+	data *map[string]string
+	err  error
 }
 
-func (s *ContainerVolumes) Title() string { return "Volumes" }
+func NewContainerVolumesDetails(ctx context.Context, id string, cli *client.Client) *ContainerVolumes {
+	s := ContainerVolumes{ID: id}
 
-func (s *ContainerVolumes) Stats(ctx context.Context, cli *client.Client) (*map[string]string, error) {
 	res, err := cli.ContainerInspect(ctx, s.ID)
 	if err != nil {
-		return nil, err
+		s.err = err
+		return &s
 	}
 
 	vols := []string{}
@@ -116,8 +153,16 @@ func (s *ContainerVolumes) Stats(ctx context.Context, cli *client.Client) (*map[
 		vols = append(vols, v.Name)
 	}
 
-	return &map[string]string{
+	s.data = &map[string]string{
 		"MountLabel": res.MountLabel,
 		"Mounts":     strings.Join(vols, "\n"),
-	}, nil
+	}
+
+	return &s
+}
+
+func (s *ContainerVolumes) Title() string { return "Volumes" }
+
+func (s *ContainerVolumes) Stats(ctx context.Context) (*map[string]string, error) {
+	return s.data, s.err
 }
