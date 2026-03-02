@@ -20,6 +20,9 @@ type (
 	HomeLogsTick    struct{}
 	HomeLogsMonitor struct{ Monitor *types.Monitor }
 
+	MonitoringTick    struct{}
+	MonitoringMonitor struct{ Monitor *types.Monitor }
+
 	ChangePg struct {
 		Pg     enums.PageType
 		Exited bool

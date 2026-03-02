@@ -2,10 +2,14 @@ package runtimes
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/cruise-org/cruise/internal/utils"
+	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/cruise-org/cruise/pkg/types"
 )
 
@@ -174,4 +178,17 @@ func FormatLabels(m map[string]string) string {
 	}
 
 	return strings.Join(result, ",")
+}
+
+func Export(content []string, page string) error {
+	filename := fmt.Sprintf("%d:%d_%d-%d_%s", time.Now().Hour(), time.Now().Minute(), time.Now().Day(), time.Now().Month(), page)
+
+	f, err := os.Create(filepath.Join(config.Cfg.Global.ExportDir, filename))
+	if err != nil {
+		return err
+	}
+
+	f.WriteString(strings.Join(content, "\n"))
+
+	return nil
 }

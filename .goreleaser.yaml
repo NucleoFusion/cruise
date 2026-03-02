@@ -42,23 +42,23 @@ nfpms:
       - rpm
       - deb
 
-# Homebrew
-homebrew_casks:
-  - name: cruise
-    binary: cruise
-    url:
-      template: "https://github.com/NucleoFusion/cruise/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-      verified: "github.com/NucleoFusion/cruise"
-    homepage: https://nucleofusion.github.io/cruise/
-    description: |-
-      Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
-      User Interface) for interacting with Docker
-    skip_upload: false
-    directory: Casks
-    repository:
-      owner: NucleoFusion
-      name: homebrew-tap
-      branch: main
+# # Homebrew
+# homebrew_casks:
+#   - name: cruise
+#     binary: cruise
+#     url:
+#       template: "https://github.com/NucleoFusion/cruise/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#       verified: "github.com/NucleoFusion/cruise"
+#     homepage: https://nucleofusion.github.io/cruise/
+#     description: |-
+#       Cruise is a powerful, intuitive, and fully-featured TUI (Terminal
+#       User Interface) for interacting with Docker
+#     skip_upload: false
+#     directory: Casks
+#     repository:
+#       owner: NucleoFusion
+#       name: homebrew-tap
+#       branch: main
 
 # AUR
 aurs: 
