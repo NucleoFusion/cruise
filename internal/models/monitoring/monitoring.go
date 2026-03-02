@@ -15,12 +15,12 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
 	styledhelp "github.com/cruise-org/cruise/internal/models/help"
-	"github.com/cruise-org/cruise/internal/runtimes/docker"
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
-	"github.com/docker/docker/api/types/events"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
@@ -31,12 +31,17 @@ type Monitoring struct {
 	Ti        textinput.Model
 	Keymap    keymap.MonitorMap
 	Help      styledhelp.StyledHelp
-	Events    []*events.Message
-	Filtered  []*events.Message
-	EventChan <-chan *events.Message
-	ErrChan   <-chan error
+	Events    []types.Log
+	Filtered  []types.Log
+	Monitor   *types.Monitor
 	IsLoading bool
 	Length    int
+}
+
+var tickCmd = func() tea.Cmd {
+	return tea.Tick(time.Second*3, func(_ time.Time) tea.Msg {
+		return messages.MonitoringTick{}
+	})
 }
 
 func NewMonitoring(w int, h int) *Monitoring {
@@ -53,8 +58,6 @@ func NewMonitoring(w int, h int) *Monitoring {
 	ti.PlaceholderStyle = lipgloss.NewStyle().Foreground(colors.Load().PlaceholderText)
 	ti.TextStyle = styles.TextStyle()
 
-	eventChan, errChan := docker.RecentEventStream(h/3 - 6)
-
 	return &Monitoring{
 		Width:     w,
 		Height:    h,
@@ -62,40 +65,54 @@ func NewMonitoring(w int, h int) *Monitoring {
 		Keymap:    keymap.NewMonitorMap(),
 		Vp:        vp,
 		Ti:        ti,
+		IsLoading: true,
+		Events:    make([]types.Log, 0),
 		Length:    h - 6 - strings.Count(styles.MonitoringText, "\n"), // -6 for styled help and ti
-		EventChan: eventChan,
-		ErrChan:   errChan,
 	}
 }
 
 func (s *Monitoring) Init() tea.Cmd {
-	return tea.Batch(s.Sub())
-}
-
-func (s *Monitoring) Sub() tea.Cmd {
-	return tea.Every(2*time.Second, func(_ time.Time) tea.Msg {
-		return s.PollEvents()()
-	})
+	return tea.Batch(tickCmd(),
+		func() tea.Msg {
+			m, err := runtimes.RuntimeSrv.RuntimeLogs(context.Background())
+			if err != nil {
+				return messages.ErrorMsg{Msg: err.Error()}
+			}
+			return messages.MonitoringMonitor{Monitor: m}
+		})
 }
 
 func (s *Monitoring) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case messages.NewEvents:
-		s.Events = append(s.Events, msg.Events...)
+	case messages.MonitoringMonitor:
+		s.Monitor = msg.Monitor
+		s.IsLoading = false
+		return s, nil
 
-		s.Filtered = s.Events
-
-		if s.Ti.Value() != "" {
-			s.Filter(s.Ti.Value())
-		}
-
+	case messages.MonitoringTick:
 		if s.IsLoading {
-			s.IsLoading = false
+			return s, tickCmd()
 		}
 
-		s.Vp.SetYOffset(len(s.Events))
+		buf := make([]types.Log, 0)
+		for {
+			select {
+			case v := <-s.Monitor.Incoming:
+				buf = append(buf, v)
+			default:
+				goto done
+			}
+		}
 
-		return s, s.Sub()
+	done:
+		for _, v := range buf {
+			s.Events = append(s.Events, v)
+			if len(s.Events) == s.Height-5 {
+				s.Events = s.Events[1:]
+			}
+		}
+
+		return s, tickCmd()
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
 			if key.Matches(msg, s.Keymap.ExitSearch) {
@@ -116,10 +133,10 @@ func (s *Monitoring) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Export):
 			arr := make([]string, 0)
 			for _, v := range s.Events {
-				arr = append(arr, docker.FormatDockerEventVerbose(*v))
+				arr = append(arr, runtimes.FormatLog(v))
 			}
 
-			err := docker.Export(arr, "monitoring")
+			err := runtimes.Export(arr, "monitoring")
 			if err != nil {
 				return s, utils.ReturnError("Monitoring", "Error Exporting", err)
 			}
@@ -131,11 +148,7 @@ func (s *Monitoring) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *Monitoring) View() string {
-	if s.IsLoading {
-		s.Vp.SetContent("Loading...")
-	} else {
-		s.Vp.SetContent(s.FormattedView())
-	}
+	s.Vp.SetContent(s.FormattedView())
 
 	return styles.SceneStyle().Render(
 		lipgloss.JoinVertical(lipgloss.Center,
@@ -154,50 +167,27 @@ func (s *Monitoring) FormattedView() string {
 	}
 
 	text := ""
-	events := s.Filtered
-	for _, msg := range events {
-		text += docker.FormatDockerEventVerbose(*msg) + "\n"
+	for _, msg := range s.GetLogs() {
+		text += runtimes.FormatLog(msg) + "\n"
 	}
 
 	return text
 }
 
-func (s *Monitoring) PollEvents() tea.Cmd {
-	return func() tea.Msg {
-		evs := make([]*events.Message, 0, s.Length)
-
-	drain:
-		for {
-			select {
-			case err := <-s.ErrChan:
-				return utils.ReturnError("Monitoring Page", "Error Querying Events", err)
-			default:
-				for i := 0; i < s.Length; i++ {
-					select {
-					case ev := <-s.EventChan:
-						evs = append(evs, ev)
-					default:
-						return messages.NewEvents{
-							Events: evs,
-						}
-					}
-				}
-				break drain
-			}
-		}
-
-		return messages.NewEvents{
-			Events: evs,
-		}
+func (s *Monitoring) GetLogs() []types.Log {
+	if s.Ti.Value() == "" {
+		return s.Events
+	} else {
+		return s.Filtered
 	}
 }
 
 func (s *Monitoring) Filter(val string) {
 	formatted := make([]string, len(s.Events))
-	originals := make([]*events.Message, len(s.Events))
+	originals := make([]types.Log, len(s.Events))
 
 	for i, v := range s.Events {
-		str := docker.FormatDockerEventVerbose(*v)
+		str := runtimes.FormatLog(v)
 		formatted[i] = str
 		originals[i] = v
 	}
@@ -205,7 +195,7 @@ func (s *Monitoring) Filter(val string) {
 	ranked := fuzzy.RankFindFold(val, formatted)
 	sort.Sort(ranked)
 
-	result := make([]*events.Message, len(ranked))
+	result := make([]types.Log, len(ranked))
 	for i, r := range ranked {
 		result[i] = originals[r.OriginalIndex]
 	}
