@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"io"
 
+	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/cruise-org/cruise/internal/data"
 	"github.com/cruise-org/cruise/pkg/enums"
 	"github.com/cruise-org/cruise/pkg/types"
@@ -25,6 +26,8 @@ type (
 
 	MonitoringTick    struct{}
 	MonitoringMonitor struct{ Monitor *types.Monitor }
+
+	DetailRendererInitialized struct{ VPs *map[int]viewport.Model }
 
 	ChangePg struct {
 		Pg     enums.PageType
