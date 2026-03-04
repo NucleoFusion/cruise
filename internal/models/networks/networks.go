@@ -12,6 +12,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
+	detailrenderer "github.com/cruise-org/cruise/internal/models/detailRenderer"
 	styledhelp "github.com/cruise-org/cruise/internal/models/help"
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/keymap"
@@ -23,7 +24,7 @@ type Networks struct {
 	Width      int
 	Height     int
 	List       *NetworkList
-	Details    *NetworkDetail
+	Details    *detailrenderer.DetailRenderer
 	Keymap     keymap.NetMap
 	Help       styledhelp.StyledHelp
 	IsLoading  bool
@@ -54,6 +55,26 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
+	case messages.DetailRendererInit:
+		if s.Details == nil {
+			return s, nil
+		}
+		dr, cmd := s.Details.Update(msg)
+		if details, ok := dr.(*detailrenderer.DetailRenderer); ok {
+			s.Details = details
+		}
+		return s, cmd
+
+	case messages.DetailRendererContent:
+		if s.Details == nil {
+			return s, nil
+		}
+
+		dr, cmd := s.Details.Update(msg)
+		if details, ok := dr.(*detailrenderer.DetailRenderer); ok {
+			s.Details = details
+		}
+		return s, cmd
 	case messages.UpdateNetworksMsg:
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
@@ -66,19 +87,20 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			var cmd tea.Cmd
 			s.List, cmd = s.List.Update(msg)
 			return s, cmd
+		} else if s.ShowDetail {
+			if key.Matches(msg, s.Keymap.ExitDetails) {
+				s.ShowDetail = false
+			}
+			return s, nil
 		}
 		switch {
 		case key.Matches(msg, keymap.QuickQuitKey()):
 			return s, tea.Quit
 		case key.Matches(msg, s.Keymap.ShowDetails):
+			s.Details = detailrenderer.NewDetailRenderer(s.Width, s.Height, s.detailsStatFunc(), s.detailsRenderFunc())
 			s.ShowDetail = true
-			// s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
-			return s, nil
+			return s, s.Details.Init()
 		case key.Matches(msg, s.Keymap.ExitDetails):
-			if s.ShowDetail {
-				s.ShowDetail = false
-				return s, nil
-			}
 		case key.Matches(msg, s.Keymap.Remove):
 			curr := s.List.GetCurrentItem()
 			err := runtimes.RuntimeSrv.RemoveNetwork(context.Background(), curr.Runtime, curr.ID)
@@ -105,7 +127,7 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (s *Networks) View() string {
 	if s.ShowDetail {
-		return styles.SceneStyle().Render(s.Details.View())
+		return s.Details.View()
 	}
 
 	return styles.SceneStyle().Render(

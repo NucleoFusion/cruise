@@ -3,7 +3,6 @@ package runtimes
 import (
 	"context"
 	"errors"
-	"log"
 	"os/exec"
 	"sync"
 
@@ -254,7 +253,6 @@ func (s *RuntimeService) RuntimeLogs(ctx context.Context) (*types.Monitor, error
 					// forward into aggregated channel
 					select {
 					case ch <- rsLog:
-						log.Println("[RuntimeService] Log Sent via Service" + rsLog.Message)
 					case <-ctx.Done():
 						return
 					}

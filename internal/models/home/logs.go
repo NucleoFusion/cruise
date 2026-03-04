@@ -5,7 +5,6 @@ package home
 
 import (
 	"context"
-	"log"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -60,7 +59,6 @@ func (s *Logs) Update(msg tea.Msg) (*Logs, tea.Cmd) {
 		return s, nil
 
 	case messages.HomeLogsTick:
-		log.Println("[Home UI] Home Logs Ticked")
 		if s.IsLoading {
 			return s, tickCmd()
 		}

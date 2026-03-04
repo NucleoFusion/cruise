@@ -150,7 +150,7 @@ func NewNetworkIPAMDetails(ctx context.Context, id string, cli *client.Client) *
 
 	return &s
 }
-func (s *NetworkIPAM) Title() string { return "Options" }
+func (s *NetworkIPAM) Title() string { return "IPAM" }
 
 func (s *NetworkIPAM) Stats(ctx context.Context) (*map[string]string, error) {
 	return s.data, s.err
