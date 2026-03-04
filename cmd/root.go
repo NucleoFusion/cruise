@@ -30,7 +30,7 @@ func Execute() {
 		os.Exit(1)
 	}
 
-	f, err := tea.LogToFile("debug.log", "docker log coming")
+	f, err := tea.LogToFile("debug.log", "")
 	if err != nil {
 		panic(err)
 	}

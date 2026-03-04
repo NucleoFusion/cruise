@@ -1,6 +1,7 @@
 package root
 
 import (
+	"log"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -63,9 +64,11 @@ func NewRoot() *Root {
 func (s *Root) Init() tea.Cmd { return nil }
 
 func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	log.Printf("[ROOT MSG] %T\n", msg)
 	switch msg := msg.(type) {
 	case messages.CloseError:
 		s.IsShowingError = false
+		s.Overlay = nil
 		return s, nil
 	case messages.ErrorMsg:
 		s.IsShowingError = true
@@ -93,6 +96,7 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg { return messages.CloseError{} })
 	case messages.CloseMsgPopup:
 		s.IsShowingMsg = false
+		s.Overlay = nil
 		return s, nil
 	case messages.MsgPopup:
 		s.IsShowingMsg = true

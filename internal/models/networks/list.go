@@ -67,14 +67,7 @@ func (s *NetworkList) Update(msg tea.Msg) (*NetworkList, tea.Cmd) {
 	case messages.NetworksReadyMsg:
 		s.Items = *msg.Items
 		s.FilteredItems = *msg.Items
-		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
-			nets, err := runtimes.RuntimeSrv.Networks(context.Background())
-			if err != nil {
-				return utils.ReturnError("Networks Page", "Error Querying Networks", err)
-			}
-			return messages.NetworksReadyMsg{Items: nets}
-		})
-
+		return s, nil
 	case tea.KeyMsg:
 		if s.Ti.Focused() {
 			if msg.String() == config.Cfg.Keybinds.Global.UnfocusSearch {

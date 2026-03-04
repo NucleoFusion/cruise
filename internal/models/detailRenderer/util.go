@@ -12,66 +12,68 @@ import (
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/styles"
-	"github.com/cruise-org/cruise/pkg/types"
 )
 
 var (
-	keyStyle = lipgloss.NewStyle().Background(colors.Load().HelpKeyBg).Foreground(colors.Load().HelpKeyText)
-	valStyle = lipgloss.NewStyle().Foreground(colors.Load().HelpDescText)
+	KeyStyle = func() lipgloss.Style {
+		return lipgloss.NewStyle().Background(colors.Load().HelpKeyBg).Foreground(colors.Load().HelpKeyText)
+	}
+	ValStyle = func() lipgloss.Style {
+		return lipgloss.NewStyle().Foreground(colors.Load().HelpDescText)
+	}
 )
+
+func SetVP(w, h int, content []string, title string) viewport.Model {
+	text := lipgloss.JoinVertical(lipgloss.Left,
+		lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(title)),
+		"\n\n",
+		lipgloss.PlaceVertical(h, lipgloss.Top, strings.Join(content, "\n\n")),
+	)
+
+	vp := NewVP(w-1, h)
+	vp.SetContent(text)
+
+	return vp
+}
+
+func FormatLine(key, val string, w int) string {
+	line := fmt.Sprintf("%s %s",
+		KeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(key, w/3-3))),
+		ValStyle().Render(utils.Shorten(val, 2*w/3-3)),
+	)
+
+	return line
+}
 
 func (s *DetailRenderer) initRenderer() tea.Cmd {
 	return func() tea.Msg {
-		vpmap := make(map[int]viewport.Model)
-		wCol, hRow := sizeCalculator(s.Width, s.Height, s.Meta)
+		vpmap := make(map[string]map[string]string)
 
 		for _, v := range *s.Stats {
 			statKey := v.Title()
-			cardMeta := (*s.Meta.SpanMap)[statKey]
 
-			vp := NewVP(cardMeta.Columns*wCol, cardMeta.Rows*hRow)
-			vp.SetContent(statView(wCol*cardMeta.Columns, v))
-
-			vpmap[cardMeta.Index] = vp
+			m, err := v.Stats(context.Background())
+			if err != nil {
+				*m = map[string]string{"Error:": fmt.Sprintf("Error: %v", err)}
+			}
+			vpmap[statKey] = *m
 		}
 
-		return messages.DetailRendererInitialized{VPs: &vpmap}
+		return messages.DetailRendererContent{VPMap: &vpmap}
 	}
 }
 
-func statView(w int, stat types.StatCard) string {
-	var text string
-
-	m, err := stat.Stats(context.Background())
-	if err != nil {
-		text = utils.Shorten("Error: "+err.Error(), w)
-	} else {
-		text = convertMapToString(w, m)
-	}
-
-	return lipgloss.JoinVertical(lipgloss.Left,
-		lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Resource ")), "\n\n", text)
-}
-
-// Calculates the size of viewport from metadata for one row / column
-func sizeCalculator(w, h int, meta *types.StatMeta) (int, int) {
-	return w / meta.TotalColumns, h / meta.TotalRows
-}
-
-func convertMapToString(w int, m *map[string]string) string {
-	arr := make([]string, 0)
-	for k, v := range *m {
-		content := fmt.Sprintf("%s %s", keyStyle.Render(fmt.Sprintf(" %s :", k)), valStyle.Render(v))
-
-		arr = append(arr, utils.Shorten(content, w-2))
-	}
-
-	return strings.Join(arr, "\n")
+func loadingView(w, h int) *viewport.Model {
+	vp := NewVP(w, h)
+	vp.SetContent(lipgloss.Place(w, h, lipgloss.Center, lipgloss.Center, "Loading..."))
+	return &vp
 }
 
 func NewVP(w, h int) viewport.Model {
+	style := styles.PageStyle().Padding(1, 2)
+
 	vp := viewport.New(w, h)
-	vp.Style = styles.PageStyle().Padding(1, 2)
+	vp.Style = style
 
 	return vp
 }
