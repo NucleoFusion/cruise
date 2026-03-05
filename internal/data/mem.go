@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright The cruise-org Authors
+
+
 package data
 
 import "github.com/shirou/gopsutil/v3/mem"

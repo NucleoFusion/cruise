@@ -1,0 +1,8 @@
+
+version: "3"
+
+tasks:
+  vuln-check:
+    desc: Run govulncheck 
+    cmds:
+      - govulncheck ./...
