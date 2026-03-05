@@ -1,0 +1,16 @@
+version: "3"
+
+vars:
+  PKG: ./...
+
+tasks:
+  unit:
+    desc: Run tests
+    cmds:
+      - task: test-build
+      - go test {{.PKG}} -race -cover
+
+  test-build:
+    desc: Testing if codebase builds
+    cmds:
+      - go build ./main.go

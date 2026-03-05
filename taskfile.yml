@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+includes:
+  lint: ./taskfiles/lint.yml
+  test: ./taskfiles/test.yml
+  vuln: ./taskfiles/vuln.yml
+
+tasks:
+  ci:
+    desc: Full CI Pipeline
+    cmds:
+      - task: lint:run
+      - task: test:unit
+      - task: vuln:vuln-check

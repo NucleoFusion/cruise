@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright The cruise-org Authors
+
+
 import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
