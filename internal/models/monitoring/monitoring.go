@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright The cruise-org Authors
 
-
 package monitoring
 
 import (
-	"context"
 	"sort"
 	"strings"
 	"time"
@@ -25,12 +23,6 @@ import (
 	"github.com/docker/docker/api/types/events"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
-
-type LogStreamer struct {
-	ctx    context.Context
-	cancel context.CancelFunc
-	lines  chan string
-}
 
 type Monitoring struct {
 	Width     int

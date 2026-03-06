@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright The cruise-org Authors
 
-
 package docker
 
 import (
@@ -105,7 +104,6 @@ func Export(content []string, page string) error {
 		return err
 	}
 
-	f.WriteString(strings.Join(content, "\n"))
-
-	return nil
+	_, err = f.WriteString(strings.Join(content, "\n"))
+	return err
 }

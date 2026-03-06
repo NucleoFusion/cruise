@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright The cruise-org Authors
 
-
 package home
 
 import (
@@ -28,7 +27,7 @@ func NewHome(w int, h int) *Home {
 	return &Home{
 		Width:      w,
 		Height:     h,
-		Logs:       NewLogs((w-2)-(w-2)/4, (h-14)-(h-14)/2), //h-15 to account for styled help and title, w-2 for scene padding
+		Logs:       NewLogs((w-2)-(w-2)/4, (h-14)-(h-14)/2), // h-15 to account for styled help and title, w-2 for scene padding
 		Daemon:     NewDaemon((w-2)/4, (h-14)-(h-14)/2),
 		SysRes:     NewSysRes((w-2)-(w-2)/4, (h-14)/2),
 		QuickStats: NewQuickStats((w-2)/4, (h-14)/2),
@@ -42,7 +41,6 @@ func (s *Home) Init() tea.Cmd {
 
 func (s *Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-
 	case messages.DashboardTick:
 		cmd := s.Refresh()
 		return s, tea.Batch(cmd, messages.TickDashboard())
@@ -64,7 +62,7 @@ func (s *Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *Home) View() string {
-	logo := lipgloss.Place(s.Width-2, 11, //use fixed height for title
+	logo := lipgloss.Place(s.Width-2, 11, // use fixed height for title
 		lipgloss.Center, lipgloss.Center, styles.TextStyle().Render(styles.LogoText))
 	sysres := s.SysRes.View()
 	daemon := s.Daemon.View()

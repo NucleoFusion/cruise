@@ -1,6 +1,6 @@
 module github.com/NucleoFusion/cruise
 
-go 1.25.4
+go 1.26.0
 
 require (
 	github.com/charmbracelet/bubbles v0.21.0

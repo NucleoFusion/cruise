@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright The cruise-org Authors
 
-
 package docker
 
 import (
@@ -48,7 +47,7 @@ func PullImage(img string) error {
 	return err
 }
 
-// TODO: Requires a seperate popup
+// TODO: Requires a separate popup
 // func BuildImage(img string) error {
 // 	_, err := cli.ImageBuild(context.Background(), img, image.PullOptions{})
 // 	return err

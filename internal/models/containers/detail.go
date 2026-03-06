@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright The cruise-org Authors
 
-
 package containers
 
 import (
@@ -128,7 +127,11 @@ func (s *ContainerDetail) Update(msg tea.Msg) (*ContainerDetail, tea.Cmd) {
 	case messages.ContainerDetailsTick:
 		if !s.IsLoading {
 			var st container.StatsResponse
-			s.Decoder.Decode(&st)
+			err := s.Decoder.Decode(&st)
+			if err != nil {
+				return s, utils.ReturnError("Container Detail", "Error Decoding Response", err)
+			}
+
 			s.Stats = st
 			s.UpdateVP()
 		}
@@ -143,7 +146,11 @@ func (s *ContainerDetail) Update(msg tea.Msg) (*ContainerDetail, tea.Cmd) {
 		s.StartLogStream()
 
 		var st container.StatsResponse
-		s.Decoder.Decode(&st)
+		err := s.Decoder.Decode(&st)
+		if err != nil {
+			return s, utils.ReturnError("Container Detail", "Error Decoding Response", err)
+		}
+
 		s.Stats = st
 
 		s.UpdateVP()
