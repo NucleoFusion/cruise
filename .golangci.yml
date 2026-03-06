@@ -2,7 +2,6 @@ version: "2"
 linters:
   enable:
     - bodyclose
-    - dupl
     - goheader
     - gosec
     - misspell

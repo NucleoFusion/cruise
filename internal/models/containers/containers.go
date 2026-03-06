@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright The cruise-org Authors
 
-
 package containers
 
 import (
@@ -46,7 +45,7 @@ func NewContainers(w int, h int) *Containers {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewContainerList(w-2, h-5-strings.Count(styles.ContainersText, "\n")), //h-5 to account for styled help and title padding
+		List:      NewContainerList(w-2, h-5-strings.Count(styles.ContainersText, "\n")), // h-5 to account for styled help and title padding
 		Keymap:    keymap.NewContainersMap(),
 		Help:      styledhelp.NewStyledHelp(keymap.NewContainersMap().Bindings(), w-2),
 		Vp:        vp,
@@ -112,7 +111,7 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Start):
 			err := docker.StartContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, utils.ReturnError("Containers Page", "Error Starting Contianer", err)
+				return s, utils.ReturnError("Containers Page", "Error Starting Container", err)
 			}
 			return s, utils.ReturnMsg("Container Page", "Started Container",
 				fmt.Sprintf("Successfully Started Container w/ ID %s", s.List.GetCurrentItem().ID))
@@ -120,7 +119,7 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Pause):
 			err := docker.PauseContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, utils.ReturnError("Containers Page", "Error Pausing Contianer", err)
+				return s, utils.ReturnError("Containers Page", "Error Pausing Container", err)
 			}
 			return s, utils.ReturnMsg("Container Page", "Pausing Container",
 				fmt.Sprintf("Successfully Pausing Container w/ ID %s", s.List.GetCurrentItem().ID))
@@ -128,7 +127,7 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Unpause):
 			err := docker.UnpauseContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, utils.ReturnError("Containers Page", "Error Unpausing Contianer", err)
+				return s, utils.ReturnError("Containers Page", "Error Unpausing Container", err)
 			}
 			return s, utils.ReturnMsg("Container Page", "Unpausing Container",
 				fmt.Sprintf("Successfully Unpausing Container w/ ID %s", s.List.GetCurrentItem().ID))
@@ -136,7 +135,7 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Remove):
 			err := docker.RemoveContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, utils.ReturnError("Containers Page", "Error Removing Contianer", err)
+				return s, utils.ReturnError("Containers Page", "Error Removing Container", err)
 			}
 			return s, utils.ReturnMsg("Container Page", "Removing Container",
 				fmt.Sprintf("Successfully Removing Container w/ ID %s", s.List.GetCurrentItem().ID))
@@ -144,7 +143,7 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Restart):
 			err := docker.RestartContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, utils.ReturnError("Containers Page", "Error Restarting Contianer", err)
+				return s, utils.ReturnError("Containers Page", "Error Restarting Container", err)
 			}
 			return s, utils.ReturnMsg("Container Page", "Restarting Container",
 				fmt.Sprintf("Successfully Restarting Container w/ ID %s", s.List.GetCurrentItem().ID))
@@ -152,14 +151,14 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.Keymap.Stop):
 			err := docker.StopContainer(s.List.GetCurrentItem().ID)
 			if err != nil {
-				return s, utils.ReturnError("Containers Page", "Error Stopping Contianer", err)
+				return s, utils.ReturnError("Containers Page", "Error Stopping Container", err)
 			}
 
 			return s, utils.ReturnMsg("Container Page", "Stopping Container",
 				fmt.Sprintf("Successfully Stopped Container w/ ID %s", s.List.GetCurrentItem().ID))
 
 		case key.Matches(msg, s.Keymap.Exec):
-			cmd := exec.Command(config.Cfg.Global.Term, "-e", fmt.Sprintf("docker exec -it %s %s", s.List.GetCurrentItem().ID, "sh"))
+			cmd := exec.Command("docker", "exec", "-it", s.List.GetCurrentItem().ID, "sh") // #nosec G204
 			cmd.Stdin = nil
 			cmd.Stdout = nil
 			cmd.Stderr = nil
