@@ -64,6 +64,24 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			s.Details, cmd = s.Details.Update(msg)
 			return s, cmd
 		}
+
+	case messages.DetailRendererInit:
+		if s.Details == nil {
+			return s, nil
+		}
+
+		var cmd tea.Cmd
+		s.Details, cmd = s.Details.Update(msg)
+		return s, cmd
+	case messages.DetailRendererContent:
+		if s.Details == nil {
+			return s, nil
+		}
+
+		var cmd tea.Cmd
+		s.Details, cmd = s.Details.Update(msg)
+		return s, cmd
+
 	case messages.ContainerDetailsTick:
 		if s.ShowDetail {
 			var cmd tea.Cmd
@@ -189,7 +207,7 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// TODO: Details
 		case key.Matches(msg, s.Keymap.ShowDetails):
 			s.ShowDetail = true
-			// s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
+			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem(), s.detailsStatFunc, s.detailsRenderFunc)
 			return s, s.Details.Init()
 		case key.Matches(msg, s.Keymap.ExitDetails):
 			if s.ShowDetail {

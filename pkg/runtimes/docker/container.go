@@ -74,10 +74,10 @@ func (s *DockerRuntime) ContainerDetails(ctx context.Context, id string) ([]type
 			Columns int
 			Index   int
 		}{
-			"Details":  {Rows: 1, Columns: 1, Index: 0},
-			"Resource": {Rows: 1, Columns: 1, Index: 1},
-			"Networks": {Rows: 1, Columns: 1, Index: 2},
-			"Volume":   {Rows: 1, Columns: 1, Index: 3},
+			"Container Details": {Rows: 1, Columns: 1, Index: 0},
+			"Resources":         {Rows: 1, Columns: 1, Index: 1},
+			"Networks":          {Rows: 1, Columns: 1, Index: 2},
+			"Volumes":           {Rows: 1, Columns: 1, Index: 3},
 		},
 	}
 }

@@ -77,13 +77,7 @@ func (s *ContainerList) Update(msg tea.Msg) (*ContainerList, tea.Cmd) {
 		s.Items = msg.Items
 		s.FilteredItems = msg.Items
 		s.Err = msg.Err
-		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
-			items, err := runtimes.RuntimeSrv.Containers(context.Background())
-			return messages.ContainerReadyMsg{
-				Items: items,
-				Err:   err,
-			}
-		})
+		return s, nil
 
 	case tea.KeyMsg:
 		if s.Ti.Focused() {

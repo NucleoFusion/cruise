@@ -92,7 +92,7 @@ func NewContainerResourceDetails(ctx context.Context, id string, cli *client.Cli
 	return &s
 }
 
-func (s *ContainerResources) Title() string { return "Resource" }
+func (s *ContainerResources) Title() string { return "Resources" }
 
 func (s *ContainerResources) Stats(ctx context.Context) (*map[string]string, error) {
 	return s.data, s.err

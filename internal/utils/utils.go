@@ -104,12 +104,18 @@ func FormatSize(bytes int64) string {
 }
 
 func Shorten(s string, max int) string {
+	if max <= 0 {
+		return ""
+	}
+
 	if len(s) <= max {
 		return s
 	}
+
 	if max <= 3 {
-		return s[:max] // no room for "..."
+		return s[:max]
 	}
+
 	return s[:max-3] + "..."
 }
 

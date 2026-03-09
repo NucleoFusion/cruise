@@ -1,7 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright The cruise-org Authors
-
-package volumes
+package containers
 
 import (
 	"context"
@@ -13,18 +10,17 @@ import (
 	"github.com/cruise-org/cruise/pkg/types"
 )
 
-func (s *Volumes) detailsStatFunc() func() ([]types.StatCard, *types.StatMeta) {
+func (s *Containers) detailsStatFunc() func() ([]types.StatCard, *types.StatMeta) {
 	curr := s.List.GetCurrentItem()
 	return func() (stats []types.StatCard, meta *types.StatMeta) {
-		return runtimes.RuntimeSrv.VolumeDetails(context.Background(), curr.Runtime, curr.Name)
+		return runtimes.RuntimeSrv.ContainerDetails(context.Background(), curr.Runtime, curr.Name)
 	}
 }
 
-func (s *Volumes) detailsRenderFunc() func(map[string]map[string]string) string {
+func (s *Containers) detailsRenderFunc() func(map[string]map[string]string) string {
 	return func(m map[string]map[string]string) string {
 		vpmap := map[string]viewport.Model{}
 		for k, v := range m {
-
 			w, h := s.findSize(k)
 
 			if len(v) == 0 {
@@ -41,21 +37,24 @@ func (s *Volumes) detailsRenderFunc() func(map[string]map[string]string) string 
 		}
 
 		return lipgloss.JoinHorizontal(lipgloss.Center,
-			vpmap["Volume Details"].View(),
-			vpmap["Labels"].View(),
-			vpmap["Options"].View(),
+			vpmap["Container Details"].View(),
+			vpmap["Resources"].View(),
+			vpmap["Networks"].View(),
+			vpmap["Volumes"].View(),
 		)
 	}
 }
 
-func (s *Volumes) findSize(title string) (int, int) {
+func (s *Containers) findSize(title string) (int, int) {
 	switch title {
-	case "Volume Details":
-		return s.Width / 3, s.Height
-	case "Labels":
-		return s.Width / 3, s.Height
-	case "Options":
-		return s.Width / 3, s.Height
+	case "Container Details":
+		return s.Width / 4, s.Height / 2
+	case "Resources":
+		return s.Width / 4, s.Height / 2
+	case "Networks":
+		return s.Width / 4, s.Height / 2
+	case "Volumes":
+		return s.Width / 4, s.Height / 2
 	default:
 		return 0, 0
 	}
