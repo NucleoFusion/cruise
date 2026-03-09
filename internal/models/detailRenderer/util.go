@@ -3,6 +3,7 @@ package detailrenderer
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/viewport"
@@ -25,7 +26,7 @@ var (
 
 func SetVP(w, h int, content []string, title string) viewport.Model {
 	text := lipgloss.JoinVertical(lipgloss.Left,
-		lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(title)),
+		lipgloss.PlaceHorizontal(w-4, lipgloss.Center, styles.TitleStyle().Render(" "+title+" ")),
 		"\n\n",
 		lipgloss.PlaceVertical(h, lipgloss.Top, strings.Join(content, "\n\n")),
 	)
@@ -51,6 +52,7 @@ func (s *DetailRenderer) initRenderer() tea.Cmd {
 
 		for _, v := range *s.Stats {
 			statKey := v.Title()
+			log.Println("[RENDERER INIT] " + statKey)
 
 			m, err := v.Stats(context.Background())
 			if err != nil {

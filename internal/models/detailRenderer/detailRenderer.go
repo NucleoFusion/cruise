@@ -1,6 +1,8 @@
 package detailrenderer
 
 import (
+	"log"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/cruise-org/cruise/internal/messages"
 	"github.com/cruise-org/cruise/pkg/types"
@@ -46,9 +48,12 @@ func (s *DetailRenderer) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.DetailRendererInit:
 		s.Stats = msg.Stats
 		s.Meta = msg.Meta
+		log.Printf("Stats: %v", msg.Stats)
+		log.Printf("MetaMap: %v", msg.Meta.SpanMap)
 		return s, s.initRenderer()
 	case messages.DetailRendererContent:
 		s.VPMap = msg.VPMap
+		log.Printf("VPMap: %v", msg.VPMap)
 		s.IsLoading = false
 		return s, nil
 	}

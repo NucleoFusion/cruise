@@ -7,8 +7,6 @@ import (
 	"github.com/docker/docker/client"
 )
 
-// TODO: New Volume Details format
-
 func (s *DockerRuntime) VolumeDetails(ctx context.Context, id string) ([]types.StatCard, *types.StatMeta) {
 	stats := []types.StatCard{
 		NewVolumeDetails(ctx, id, s.Client),
@@ -94,8 +92,8 @@ type VolumeOptions struct {
 	err  error
 }
 
-func NewVolumeOptionsDetails(ctx context.Context, id string, cli *client.Client) *VolumeDetails {
-	s := VolumeDetails{ID: id}
+func NewVolumeOptionsDetails(ctx context.Context, id string, cli *client.Client) *VolumeOptions {
+	s := VolumeOptions{ID: id}
 
 	res, err := cli.VolumeInspect(ctx, s.ID)
 	if err != nil {
