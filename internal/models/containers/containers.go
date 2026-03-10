@@ -65,13 +65,6 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return s, cmd
 		}
 
-	case messages.ContainerDetailsReady:
-		if s.ShowDetail {
-			var cmd tea.Cmd
-			s.Details, cmd = s.Details.Update(msg)
-			return s, cmd
-		}
-
 	case messages.DetailRendererInit:
 		if s.Details == nil {
 			return s, nil
@@ -95,10 +88,6 @@ func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			s.Details, cmd = s.Details.Update(msg)
 			return s, cmd
 		}
-	case messages.NewContainerDetails:
-		var cmd tea.Cmd
-		s.List, cmd = s.List.Update(msg)
-		return s, cmd
 	case messages.ContainerReadyMsg:
 		s.IsLoading = false
 

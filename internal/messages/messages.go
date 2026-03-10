@@ -4,13 +4,9 @@
 package messages
 
 import (
-	"encoding/json"
-	"io"
-
 	"github.com/cruise-org/cruise/internal/data"
 	"github.com/cruise-org/cruise/pkg/enums"
 	"github.com/cruise-org/cruise/pkg/types"
-	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 )
 
@@ -72,18 +68,6 @@ type (
 
 	ScannerListMsg struct {
 		Found []bool
-	}
-
-	NewContainerDetails struct {
-		Stats   container.StatsResponseReader
-		Decoder *json.Decoder
-		Logs    *io.ReadCloser
-	}
-
-	ContainerDetailsReady struct {
-		Stats   container.StatsResponseReader
-		Decoder *json.Decoder
-		Logs    *io.ReadCloser
 	}
 
 	ContainerDetailsTick struct{}
