@@ -191,3 +191,15 @@
 2026/03/10 10:18:49 [ROOT MSG] messages.ImagesReadyMsg
 2026/03/10 10:18:49 [ROOT MSG] messages.HomeStatImage
 2026/03/10 10:18:49 [ROOT MSG] tea.KeyMsg
+2026/03/10 10:24:49 [ROOT MSG] tea.WindowSizeMsg
+2026/03/10 10:24:49 [ROOT MSG] messages.HomeLogsMonitor
+2026/03/10 10:24:49 [ROOT MSG] messages.VolumesReadyMsg
+2026/03/10 10:24:49 [ROOT MSG] messages.MonitoringMonitor
+2026/03/10 10:24:49 [ROOT MSG] messages.NetworksReadyMsg
+2026/03/10 10:24:49 [ROOT MSG] messages.HomeStatVolume
+2026/03/10 10:24:49 [ROOT MSG] messages.HomeStatNetwork
+2026/03/10 10:24:49 [ROOT MSG] messages.ContainerReadyMsg
+2026/03/10 10:24:49 [ROOT MSG] messages.HomeStatContainer
+2026/03/10 10:24:49 [ROOT MSG] messages.ImagesReadyMsg
+2026/03/10 10:24:49 [ROOT MSG] messages.HomeStatImage
+2026/03/10 10:24:50 [ROOT MSG] tea.KeyMsg
