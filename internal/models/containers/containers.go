@@ -58,6 +58,13 @@ func (s *Containers) Init() tea.Cmd {
 
 func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case messages.ContainerDetailsMonitorReady:
+		if s.ShowDetail {
+			var cmd tea.Cmd
+			s.Details, cmd = s.Details.Update(msg)
+			return s, cmd
+		}
+
 	case messages.ContainerDetailsReady:
 		if s.ShowDetail {
 			var cmd tea.Cmd

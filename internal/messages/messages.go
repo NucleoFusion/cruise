@@ -32,6 +32,8 @@ type (
 	}
 	DetailRendererContent struct{ VPMap *map[string]map[string]string }
 
+	ContainerDetailsMonitorReady struct{ Monitor *types.Monitor }
+
 	ChangePg struct {
 		Pg     enums.PageType
 		Exited bool

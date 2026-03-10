@@ -2,6 +2,7 @@ package containers
 
 import (
 	"context"
+	"sort"
 
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/lipgloss"
@@ -33,6 +34,7 @@ func (s *Containers) detailsRenderFunc() func(map[string]map[string]string) stri
 				arr = append(arr, detailrenderer.FormatLine(key, val, w))
 			}
 
+			sort.Strings(arr)
 			vpmap[k] = detailrenderer.SetVP(w, h, arr, k)
 		}
 
