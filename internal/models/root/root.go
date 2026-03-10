@@ -4,21 +4,22 @@
 package root
 
 import (
+	"log"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/enums"
-	"github.com/NucleoFusion/cruise/internal/messages"
-	"github.com/NucleoFusion/cruise/internal/models/containers"
-	errorpopup "github.com/NucleoFusion/cruise/internal/models/error"
-	"github.com/NucleoFusion/cruise/internal/models/home"
-	"github.com/NucleoFusion/cruise/internal/models/images"
-	"github.com/NucleoFusion/cruise/internal/models/monitoring"
-	msgpopup "github.com/NucleoFusion/cruise/internal/models/msg"
-	"github.com/NucleoFusion/cruise/internal/models/nav"
-	"github.com/NucleoFusion/cruise/internal/models/networks"
-	"github.com/NucleoFusion/cruise/internal/models/volumes"
-	"github.com/NucleoFusion/cruise/internal/models/vulnerability"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/cruise-org/cruise/internal/messages"
+	"github.com/cruise-org/cruise/internal/models/containers"
+	errorpopup "github.com/cruise-org/cruise/internal/models/error"
+	"github.com/cruise-org/cruise/internal/models/home"
+	"github.com/cruise-org/cruise/internal/models/images"
+	"github.com/cruise-org/cruise/internal/models/monitoring"
+	msgpopup "github.com/cruise-org/cruise/internal/models/msg"
+	"github.com/cruise-org/cruise/internal/models/nav"
+	"github.com/cruise-org/cruise/internal/models/networks"
+	"github.com/cruise-org/cruise/internal/models/volumes"
+	"github.com/cruise-org/cruise/internal/models/vulnerability"
+	"github.com/cruise-org/cruise/pkg/enums"
 	overlay "github.com/rmhubbert/bubbletea-overlay"
 )
 
@@ -66,9 +67,11 @@ func NewRoot() *Root {
 func (s *Root) Init() tea.Cmd { return nil }
 
 func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	log.Printf("[ROOT MSG] %T\n", msg)
 	switch msg := msg.(type) {
 	case messages.CloseError:
 		s.IsShowingError = false
+		s.Overlay = nil
 		return s, nil
 	case messages.ErrorMsg:
 		s.IsShowingError = true
@@ -96,6 +99,7 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg { return messages.CloseError{} })
 	case messages.CloseMsgPopup:
 		s.IsShowingMsg = false
+		s.Overlay = nil
 		return s, nil
 	case messages.MsgPopup:
 		s.IsShowingMsg = true
@@ -121,14 +125,6 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		s.Overlay = overlay.New(s.MsgPopup, curr, overlay.Right, overlay.Top, 2, 2)
 		return s, tea.Tick(3*time.Second, func(_ time.Time) tea.Msg { return messages.CloseMsgPopup{} })
-	case messages.ContainerReadyMsg:
-		cnt, cmd := s.Containers.Update(msg)
-		s.Containers = cnt.(*containers.Containers)
-		return s, cmd
-	case messages.ImagesReadyMsg:
-		img, cmd := s.Images.Update(msg)
-		s.Images = img.(*images.Images)
-		return s, cmd
 	case messages.ChangePg:
 		s.CurrentPage = msg.Pg
 		s.IsChangingPage = false

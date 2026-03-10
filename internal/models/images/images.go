@@ -4,21 +4,22 @@
 package images
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/colors"
-	"github.com/NucleoFusion/cruise/internal/docker"
-	"github.com/NucleoFusion/cruise/internal/keymap"
-	"github.com/NucleoFusion/cruise/internal/messages"
-	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
-	"github.com/NucleoFusion/cruise/internal/styles"
-	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/internal/messages"
+	styledhelp "github.com/cruise-org/cruise/internal/models/help"
+	"github.com/cruise-org/cruise/internal/utils"
+	"github.com/cruise-org/cruise/pkg/colors"
+	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/runtimes"
+	"github.com/cruise-org/cruise/pkg/styles"
 )
 
 type Images struct {
@@ -41,7 +42,7 @@ func NewImages(w int, h int) *Images {
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
-		List:      NewImageList(w-2, h-5-strings.Count(styles.ImagesText, "\n")), //h-5 to account for styled help and title padding
+		List:      NewImageList(w-2, h-5-strings.Count(styles.ImagesText, "\n")), // h-5 to account for styled help and title padding
 		Keymap:    keymap.NewImagesMap(),
 		Help:      styledhelp.NewStyledHelp(keymap.NewImagesMap().Bindings(), w-2),
 		Vp:        vp,
@@ -83,22 +84,17 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keymap.QuickQuitKey()):
 			return s, tea.Quit
 		case key.Matches(msg, s.Keymap.Remove):
-			err := docker.RemoveImage(s.List.GetCurrentItem().ID)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.RemoveImage(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Images Page", "Error Removing Image", err)
 			}
+
 			return s, tea.Batch(s.UpdateImages(), utils.ReturnMsg("Images Page", "Removing Image",
 				fmt.Sprintf("Successfully Removed Image w/ ID %s", s.List.GetCurrentItem().ID)))
 		case key.Matches(msg, s.Keymap.Pull):
 			curr := s.List.GetCurrentItem()
-			img := curr.ID // Accurately get the image name
-			if len(curr.RepoTags) > 0 && curr.RepoTags[0] != "<none>:<none>" {
-				img = curr.RepoTags[0]
-			} else if len(curr.RepoDigests) > 0 {
-				img = curr.RepoDigests[0]
-			}
-
-			err := docker.PullImage(img)
+			err := runtimes.RuntimeSrv.PullImage(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Images Page", "Error Pulling Image", err)
 			}
@@ -106,21 +102,15 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fmt.Sprintf("Successfully Pulled Image w/ ID %s", s.List.GetCurrentItem().ID)))
 		case key.Matches(msg, s.Keymap.Push):
 			curr := s.List.GetCurrentItem()
-			img := curr.ID // Accurately get the image name
-			if len(curr.RepoTags) > 0 && curr.RepoTags[0] != "<none>:<none>" {
-				img = curr.RepoTags[0]
-			} else if len(curr.RepoDigests) > 0 {
-				img = curr.RepoDigests[0]
-			}
-
-			err := docker.PushImage(img)
+			err := runtimes.RuntimeSrv.PushImage(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Images Page", "Error Pushing Image", err)
 			}
 			return s, tea.Batch(s.UpdateImages(), utils.ReturnMsg("Images Page", "Pushing Image",
 				fmt.Sprintf("Successfully Pushed Image w/ ID %s", s.List.GetCurrentItem().ID)))
 		case key.Matches(msg, s.Keymap.Prune):
-			err := docker.PruneImages()
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.PruneImages(context.Background(), curr.Runtime)
 			if err != nil {
 				return s, utils.ReturnError("Images Page", "Error Pruning Image", err)
 			}
@@ -129,14 +119,7 @@ func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return s, s.UpdateImages()
 		case key.Matches(msg, s.Keymap.Layers):
 			curr := s.List.GetCurrentItem()
-			img := curr.ID // Accurately get the image name
-			if len(curr.RepoTags) > 0 && curr.RepoTags[0] != "<none>:<none>" {
-				img = curr.RepoTags[0]
-			} else if len(curr.RepoDigests) > 0 {
-				img = curr.RepoDigests[0]
-			}
-
-			text, err := docker.ImageHistory(img)
+			text, err := runtimes.RuntimeSrv.ImageLayers(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Images Page", "Error Querying Image Layers", err)
 			}
@@ -174,10 +157,10 @@ func (s *Images) GetListText() string {
 
 func (s *Images) UpdateImages() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		images, err := docker.GetImages()
+		imgs, err := runtimes.RuntimeSrv.Images(context.Background())
 		if err != nil {
 			return utils.ReturnError("Images Page", "Error Querying Images", err)
 		}
-		return messages.UpdateImagesMsg{Items: images}
+		return messages.UpdateImagesMsg{Items: imgs}
 	})
 }

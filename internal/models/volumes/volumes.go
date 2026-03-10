@@ -4,26 +4,28 @@
 package volumes
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/docker"
-	"github.com/NucleoFusion/cruise/internal/keymap"
-	"github.com/NucleoFusion/cruise/internal/messages"
-	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
-	"github.com/NucleoFusion/cruise/internal/styles"
-	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/internal/messages"
+	detailrenderer "github.com/cruise-org/cruise/internal/models/detailRenderer"
+	styledhelp "github.com/cruise-org/cruise/internal/models/help"
+	"github.com/cruise-org/cruise/internal/utils"
+	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/runtimes"
+	"github.com/cruise-org/cruise/pkg/styles"
 )
 
 type Volumes struct {
 	Width      int
 	Height     int
 	List       *VolumeList
-	Details    *VolumeDetail
+	Details    *detailrenderer.DetailRenderer
 	Keymap     keymap.VolMap
 	Help       styledhelp.StyledHelp
 	IsLoading  bool
@@ -36,7 +38,7 @@ func NewVolumes(w int, h int) *Volumes {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewVolumeList(w-2, h-5-strings.Count(styles.VolumesText, "\n")), //h-5 to account for styled help and title padding
+		List:       NewVolumeList(w-2, h-5-strings.Count(styles.VolumesText, "\n")), // h-5 to account for styled help and title padding
 		Keymap:     keymap.NewVolMap(),
 		Help:       styledhelp.NewStyledHelp(keymap.NewVolMap().Bindings(), w-2),
 	}
@@ -53,6 +55,26 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
+	case messages.DetailRendererInit:
+		if s.Details == nil {
+			return s, nil
+		}
+		dr, cmd := s.Details.Update(msg)
+		if details, ok := dr.(*detailrenderer.DetailRenderer); ok {
+			s.Details = details
+		}
+		return s, cmd
+
+	case messages.DetailRendererContent:
+		if s.Details == nil {
+			return s, nil
+		}
+
+		dr, cmd := s.Details.Update(msg)
+		if details, ok := dr.(*detailrenderer.DetailRenderer); ok {
+			s.Details = details
+		}
+		return s, cmd
 	case messages.CloseDetails:
 		s.ShowDetail = false
 		return s, nil
@@ -61,19 +83,27 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			var cmd tea.Cmd
 			s.List, cmd = s.List.Update(msg)
 			return s, cmd
+		} else if s.ShowDetail {
+			if key.Matches(msg, s.Keymap.ExitDetails) {
+				s.ShowDetail = false
+			}
+			return s, nil
 		}
+
 		switch {
 		case key.Matches(msg, keymap.QuickQuitKey()):
 			return s, tea.Quit
 		case key.Matches(msg, s.Keymap.Remove):
-			err := docker.RemoveVolumes(s.List.GetCurrentItem().Name)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.RemoveVolume(context.Background(), curr.Runtime, curr.Name)
 			if err != nil {
 				return s, utils.ReturnError("Volumes Page", "Error Removing Volume", err)
 			}
 			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Volumes Page", "Removed Volume",
 				fmt.Sprintf("Successfully Removed Volume %s", s.List.GetCurrentItem().Name)))
 		case key.Matches(msg, s.Keymap.Prune):
-			err := docker.PruneVolumes()
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.PruneVolumes(context.Background(), curr.Runtime)
 			if err != nil {
 				return s, utils.ReturnError("Volumes Page", "Error Pruning Volumes", err)
 			}
@@ -85,9 +115,9 @@ func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return s, nil
 			}
 		case key.Matches(msg, s.Keymap.ShowDetails):
+			s.Details = detailrenderer.NewDetailRenderer(s.Width, s.Height, s.detailsStatFunc(), s.detailsRenderFunc())
 			s.ShowDetail = true
-			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
-			return s, nil
+			return s, s.Details.Init()
 		}
 	}
 
@@ -117,11 +147,11 @@ func (s *Volumes) GetListText() string {
 
 func (s *Volumes) Refresh() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		vols, err := docker.GetVolumes()
+		vols, err := runtimes.RuntimeSrv.Volumes(context.Background())
 		if err != nil {
 			fmt.Println(err)
 			return utils.ReturnError("Volumes Page", "Error Querying Volumes", err)
 		}
-		return messages.VolumesReadyMsg{Items: vols.Volumes}
+		return messages.VolumesReadyMsg{Items: vols}
 	})
 }

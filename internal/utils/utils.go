@@ -11,8 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/messages"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/cruise-org/cruise/internal/messages"
+	"github.com/cruise-org/cruise/pkg/enums"
 	"github.com/docker/docker/api/types/container"
 )
 
@@ -103,12 +104,18 @@ func FormatSize(bytes int64) string {
 }
 
 func Shorten(s string, max int) string {
+	if max <= 0 {
+		return ""
+	}
+
 	if len(s) <= max {
 		return s
 	}
+
 	if max <= 3 {
-		return s[:max] // no room for "..."
+		return s[:max]
 	}
+
 	return s[:max-3] + "..."
 }
 
@@ -173,5 +180,35 @@ func GetCfgDir() string {
 	default:
 		cfg, _ := os.UserConfigDir()
 		return cfg
+	}
+}
+
+func GetSeverity(scanner, severity string) enums.Severity {
+	switch severity {
+	case "CRITICAL":
+		return enums.Critical
+	case "HIGH":
+		return enums.High
+	case "MEDIUM":
+		return enums.Medium
+	case "LOW":
+		return enums.Low
+	default:
+		return enums.Unknown
+	}
+}
+
+func SeverityText(sev enums.Severity) string {
+	switch sev {
+	case enums.Critical:
+		return "CRITICAL"
+	case enums.High:
+		return "HIGH"
+	case enums.Medium:
+		return "MEDIUM"
+	case enums.Low:
+		return "LOW"
+	default:
+		return "UKNOWN"
 	}
 }

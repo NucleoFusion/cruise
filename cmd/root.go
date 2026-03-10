@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/NucleoFusion/cruise/internal/config"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/cruise-org/cruise/pkg/config"
+	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +27,17 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+	if err := runtimes.InitializeService(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	f, err := tea.LogToFile("debug.log", "")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

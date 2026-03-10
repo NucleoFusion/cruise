@@ -1,7 +1,6 @@
 # About
 
-Cruise is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for interacting with Docker. Built with Go and Bubbletea. 
-It offers a visually rich, keyboard-first experience for managing containers, images, volumes, networks, logs and more — all from your terminal.
+Cruise is a powerful, intuitive, and fully-featured TUI (Terminal User Interface) for managing containers. Built with Go and Bubbletea, it offers a visually rich, keyboard-first experience for managing containers, images, volumes, networks, logs and more — all from your terminal. 
 
 <details>
   <summary>Screenshots</summary>
@@ -22,12 +21,12 @@ It offers a visually rich, keyboard-first experience for managing containers, im
 
 ## Features
 
-- Manage Lifecycles of Docker Artifacts, currently supports,
+- Manage Lifecycles of Artifacts, currently supports,
   1. Containers
   2. Images
   3. Networks
   4. Volumes
-- Aggregated Detailed statistics of Docker Artifacts
+- Aggregated Detailed statistics of Artifacts
 - Aggregated Monitoring and Logging service
 - Scanning Images for Vulnerabilities
 - ...and more to come
@@ -36,28 +35,27 @@ It offers a visually rich, keyboard-first experience for managing containers, im
 
 #### Planned
 
-- Docker Compose Management
+- Compose/Project Management
 - More Vulnerability Scanners
-- Docker Registry management
+- Registry management
 - Image repository browser
 - Alert integration for Monitoring
+- And plenty more features?
 
-## Why not Docker CLI?
+## Why not CLI?
 
-> Ever found yourself writing commands again and again for stats? or wrote a long command just for a typo to mess it up?
+Ever felt that CLI's for containerization tools are too lengthy or limited? Find yourself executing commands again and again for simple things? Wrote multiline commands just for a typo to ruin it? Well... Fret no more. Cruise - Is a TUI Container Management Client, fitting easily in your terminal-first dev workflow, while making repetitive work easy and interactive.
 
-Cruise solves this problem, now you can interact with docker from your terminal, from common lifecycle management to complex 
-Vulnerability scanning. 
+    How is cruise different from existing solutions?
 
-Cruise seemlessly fits into your terminal-first dev workflow, be that on a remote server or a physical machine. Making working with docker easier
-and more fun.
+Existing applications are limited in what they do, they serve as mostly a monitoring service, not a management service let alone a Client.
 
 ## Why not other TUI Alternatives?
 
 Other TUI Alternatives such as lazydocker or docui (deprecated) are more of a _monitoring_ service than a _management_ application.
 
-Cruise on the other hand, aims to be a Docker TUI Client, allowing management _and_ monitoring of most docker services. With cruise
-you can have the benefits of a TUI app without having to deal with the downsides of the Docker CLI. It blends both of them perfectly
+Cruise on the other hand, aims to be a Container Management TUI, allowing management _and_ monitoring of most services. With cruise
+you can have the benefits of a TUI app without having to deal with the downsides of the CLI. It blends both of them perfectly
 obtaining the best of both worlds.
 
 Oh, and did I mention? Cruise looks a lot better... _and is also configurable_.

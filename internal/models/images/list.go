@@ -4,27 +4,28 @@
 package images
 
 import (
+	"context"
 	"sort"
 	"time"
 
-	"github.com/NucleoFusion/cruise/internal/colors"
-	"github.com/NucleoFusion/cruise/internal/config"
-	"github.com/NucleoFusion/cruise/internal/docker"
-	"github.com/NucleoFusion/cruise/internal/messages"
-	"github.com/NucleoFusion/cruise/internal/styles"
-	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/docker/docker/api/types/image"
+	"github.com/cruise-org/cruise/internal/messages"
+	"github.com/cruise-org/cruise/internal/utils"
+	"github.com/cruise-org/cruise/pkg/colors"
+	"github.com/cruise-org/cruise/pkg/config"
+	"github.com/cruise-org/cruise/pkg/runtimes"
+	"github.com/cruise-org/cruise/pkg/styles"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 type ImageList struct {
 	Width         int
 	Height        int
-	ImageMap      map[string]image.Summary
+	ImageMap      map[string]types.Image
 	Items         []string
 	FilteredItems []string
 	SelectedIndex int
@@ -52,16 +53,16 @@ func NewImageList(w int, h int) *ImageList {
 		Ti:            ti,
 		SelectedIndex: 0,
 		Vp:            vp,
-		ImageMap:      make(map[string]image.Summary),
+		ImageMap:      make(map[string]types.Image),
 	}
 }
 
 func (s *ImageList) Init() tea.Cmd {
 	return tea.Tick(0, func(_ time.Time) tea.Msg {
-		images, err := docker.GetImages()
+		images, err := runtimes.RuntimeSrv.Images(context.Background())
 
-		m := make(map[string]image.Summary)
-		for _, v := range images {
+		m := make(map[string]types.Image)
+		for _, v := range *images {
 			m[v.ID] = v
 		}
 
@@ -90,8 +91,8 @@ func (s *ImageList) Update(msg tea.Msg) (*ImageList, tea.Cmd) {
 		return s, nil
 
 	case messages.UpdateImagesMsg:
-		items := make([]string, 0, len(msg.Items))
-		for _, v := range msg.Items {
+		items := make([]string, 0, len(*msg.Items))
+		for _, v := range *msg.Items {
 			s.ImageMap[v.ID] = v
 			items = append(items, v.ID)
 		}
@@ -157,10 +158,10 @@ func (s *ImageList) View() string {
 func (s *ImageList) UpdateList() {
 	w := (s.Width-2)/9 - 1
 
-	text := lipgloss.NewStyle().Bold(true).Render(docker.ImagesHeaders(w)+"\n") + "\n"
+	text := lipgloss.NewStyle().Bold(true).Render(runtimes.ImageHeaders(w)+"\n") + "\n"
 
 	for k, v := range s.FilteredItems {
-		line := docker.ImagesFormattedSummary(s.ImageMap[v], w)
+		line := runtimes.ImageFormatted(s.ImageMap[v], w)
 
 		if k == s.SelectedIndex {
 			line = lipgloss.NewStyle().Background(colors.Load().MenuSelectedBg).Foreground(colors.Load().MenuSelectedText).Render(line)
@@ -178,10 +179,10 @@ func (s *ImageList) Filter(val string) {
 	w := (s.Width-2)/9 - 1
 
 	formatted := make([]string, len(s.Items))
-	originals := make([]image.Summary, len(s.Items))
+	originals := make([]types.Image, len(s.Items))
 
 	for i, v := range s.Items {
-		str := docker.ImagesFormattedSummary(s.ImageMap[v], w)
+		str := runtimes.ImageFormatted(s.ImageMap[v], w)
 		formatted[i] = str
 		originals[i] = s.ImageMap[v]
 	}
@@ -201,6 +202,6 @@ func (s *ImageList) Filter(val string) {
 	}
 }
 
-func (s *ImageList) GetCurrentItem() image.Summary {
+func (s *ImageList) GetCurrentItem() types.Image {
 	return s.ImageMap[s.FilteredItems[s.SelectedIndex]]
 }

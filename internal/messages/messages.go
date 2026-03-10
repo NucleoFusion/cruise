@@ -4,29 +4,32 @@
 package messages
 
 import (
-	"encoding/json"
-	"io"
-	"time"
-
-	"github.com/NucleoFusion/cruise/internal/data"
-	"github.com/NucleoFusion/cruise/internal/enums"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/docker/docker/api/types/container"
+	"github.com/cruise-org/cruise/internal/data"
+	"github.com/cruise-org/cruise/pkg/enums"
+	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/api/types/volume"
 )
 
-type DashboardTick time.Time
-
-func TickDashboard() tea.Cmd {
-	return tea.Tick(5*time.Second, func(t time.Time) tea.Msg {
-		return DashboardTick(t)
-	})
-}
-
 type (
+	HomeStatContainer struct{ Containers *[]types.Container }
+	HomeStatImage     struct{ Images *[]types.Image }
+	HomeStatNetwork   struct{ Networks *[]types.Network }
+	HomeStatVolume    struct{ Volumes *[]types.Volume }
+
+	HomeLogsTick    struct{}
+	HomeLogsMonitor struct{ Monitor *types.Monitor }
+
+	MonitoringTick    struct{}
+	MonitoringMonitor struct{ Monitor *types.Monitor }
+
+	DetailRendererInit struct {
+		Stats *[]types.StatCard
+		Meta  *types.StatMeta
+	}
+	DetailRendererContent struct{ VPMap *map[string]map[string]string }
+
+	ContainerDetailsMonitorReady struct{ Monitor *types.Monitor }
+
 	ChangePg struct {
 		Pg     enums.PageType
 		Exited bool
@@ -35,8 +38,8 @@ type (
 	CloseDetails struct{}
 
 	PortMapMsg struct {
-		Arr []string
-		Err error
+		Ports []string
+		Err   error
 	}
 
 	ErrorMsg struct {
@@ -60,47 +63,34 @@ type (
 	}
 
 	ScanResponse struct {
-		Arr []any
-		Err error
+		Arr *[]types.Vulnerability
 	}
 
 	ScannerListMsg struct {
 		Found []bool
 	}
 
-	NewContainerDetails struct {
-		Stats   container.StatsResponseReader
-		Decoder *json.Decoder
-		Logs    *io.ReadCloser
-	}
-
-	ContainerDetailsReady struct {
-		Stats   container.StatsResponseReader
-		Decoder *json.Decoder
-		Logs    *io.ReadCloser
-	}
-
 	ContainerDetailsTick struct{}
 
 	ContainerReadyMsg struct {
-		Items []container.Summary
+		Items *[]types.Container
 		Err   error
 	}
 
 	ImagesReadyMsg struct {
-		Map map[string]image.Summary
+		Map map[string]types.Image
 	}
 
 	UpdateImagesMsg struct {
-		Items []image.Summary
+		Items *[]types.Image
 	}
 
 	NetworksReadyMsg struct {
-		Items []network.Summary
+		Items *[]types.Network
 	}
 
 	VolumesReadyMsg struct {
-		Items []*volume.Volume
+		Items *[]types.Volume
 	}
 
 	UpdateNetworksMsg struct{}

@@ -4,26 +4,27 @@
 package networks
 
 import (
+	"context"
 	"fmt"
 	"strings"
-	"time"
 
-	"github.com/NucleoFusion/cruise/internal/docker"
-	"github.com/NucleoFusion/cruise/internal/keymap"
-	"github.com/NucleoFusion/cruise/internal/messages"
-	styledhelp "github.com/NucleoFusion/cruise/internal/models/help"
-	"github.com/NucleoFusion/cruise/internal/styles"
-	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/internal/messages"
+	detailrenderer "github.com/cruise-org/cruise/internal/models/detailRenderer"
+	styledhelp "github.com/cruise-org/cruise/internal/models/help"
+	"github.com/cruise-org/cruise/internal/utils"
+	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/runtimes"
+	"github.com/cruise-org/cruise/pkg/styles"
 )
 
 type Networks struct {
 	Width      int
 	Height     int
 	List       *NetworkList
-	Details    *NetworkDetail
+	Details    *detailrenderer.DetailRenderer
 	Keymap     keymap.NetMap
 	Help       styledhelp.StyledHelp
 	IsLoading  bool
@@ -36,7 +37,7 @@ func NewNetworks(w int, h int) *Networks {
 		Height:     h,
 		IsLoading:  true,
 		ShowDetail: false,
-		List:       NewNetworkList(w-2, h-5-strings.Count(styles.NetworksText, "\n")), //h-5 to account for styled help and title padding
+		List:       NewNetworkList(w-2, h-5-strings.Count(styles.NetworksText, "\n")), // h-5 to account for styled help and title padding
 		Keymap:     keymap.NewNetMap(),
 		Help:       styledhelp.NewStyledHelp(keymap.NewNetMap().Bindings(), w-2),
 	}
@@ -54,6 +55,26 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
 		return s, cmd
+	case messages.DetailRendererInit:
+		if s.Details == nil {
+			return s, nil
+		}
+		dr, cmd := s.Details.Update(msg)
+		if details, ok := dr.(*detailrenderer.DetailRenderer); ok {
+			s.Details = details
+		}
+		return s, cmd
+
+	case messages.DetailRendererContent:
+		if s.Details == nil {
+			return s, nil
+		}
+
+		dr, cmd := s.Details.Update(msg)
+		if details, ok := dr.(*detailrenderer.DetailRenderer); ok {
+			s.Details = details
+		}
+		return s, cmd
 	case messages.UpdateNetworksMsg:
 		var cmd tea.Cmd
 		s.List, cmd = s.List.Update(msg)
@@ -66,32 +87,35 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			var cmd tea.Cmd
 			s.List, cmd = s.List.Update(msg)
 			return s, cmd
+		} else if s.ShowDetail {
+			if key.Matches(msg, s.Keymap.ExitDetails) {
+				s.ShowDetail = false
+			}
+			return s, nil
 		}
 		switch {
 		case key.Matches(msg, keymap.QuickQuitKey()):
 			return s, tea.Quit
 		case key.Matches(msg, s.Keymap.ShowDetails):
+			s.Details = detailrenderer.NewDetailRenderer(s.Width, s.Height, s.detailsStatFunc(), s.detailsRenderFunc())
 			s.ShowDetail = true
-			s.Details = NewDetail(s.Width, s.Height, s.List.GetCurrentItem())
-			return s, nil
+			return s, s.Details.Init()
 		case key.Matches(msg, s.Keymap.ExitDetails):
-			if s.ShowDetail {
-				s.ShowDetail = false
-				return s, nil
-			}
 		case key.Matches(msg, s.Keymap.Remove):
-			err := docker.RemoveNetwork(s.List.GetCurrentItem().ID)
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.RemoveNetwork(context.Background(), curr.Runtime, curr.ID)
 			if err != nil {
 				return s, utils.ReturnError("Networks Page", "Error Removing Network", err)
 			}
-			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Networks Page", "Removed Network",
+			return s, tea.Batch(s.Init(), utils.ReturnMsg("Networks Page", "Removed Network",
 				fmt.Sprintf("Successfully Removed Networks w/ ID %s", s.List.GetCurrentItem().ID)))
 		case key.Matches(msg, s.Keymap.Prune):
-			err := docker.PruneNetworks()
+			curr := s.List.GetCurrentItem()
+			err := runtimes.RuntimeSrv.PruneNetworks(context.Background(), curr.Runtime)
 			if err != nil {
 				return s, utils.ReturnError("Networks Page", "Error Pruning Networks", err)
 			}
-			return s, tea.Batch(s.Refresh(), utils.ReturnMsg("Networks Page", "Pruned Networks",
+			return s, tea.Batch(s.Init(), utils.ReturnMsg("Networks Page", "Pruned Networks",
 				"Successfully Pruned Networks"))
 		}
 	}
@@ -103,7 +127,7 @@ func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (s *Networks) View() string {
 	if s.ShowDetail {
-		return styles.SceneStyle().Render(s.Details.View())
+		return s.Details.View()
 	}
 
 	return styles.SceneStyle().Render(
@@ -118,14 +142,4 @@ func (s *Networks) GetListText() string {
 	}
 
 	return lipgloss.NewStyle().Render(s.List.View())
-}
-
-func (s *Networks) Refresh() tea.Cmd {
-	return tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
-		items, err := docker.GetNetworks()
-		if err != nil {
-			return utils.ReturnError("Networks Page", "Error Querying Networks", err)
-		}
-		return messages.NetworksReadyMsg{Items: items}
-	})
 }

@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright The cruise-org Authors
+
+package styles
+
+import (
+	"github.com/charmbracelet/lipgloss"
+	"github.com/cruise-org/cruise/pkg/colors"
+)
+
+func ErrorStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Background(colors.Load().ErrorBg).Foreground(colors.Load().ErrorText)
+}
+
+func PageStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Foreground(colors.Load().Text).
+		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder)
+}
+
+func SubpageStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Foreground(colors.Load().Text).
+		Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().UnfocusedBorder)
+}
+
+func TitleStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Background(colors.Load().SubtitleBg).Foreground(colors.Load().SubtitleText).Padding(0, 1)
+}
+
+func SelectedStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Background(colors.Load().MenuSelectedBg).Foreground(colors.Load().MenuSelectedText)
+}
+
+func DetailKeyStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Foreground(colors.Load().HelpKeyText).Background(colors.Load().HelpKeyBg)
+}
+
+func SceneStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Foreground(colors.Load().Text).Padding(0, 1)
+}

@@ -4,187 +4,55 @@
 package networks
 
 import (
-	"fmt"
-	"strings"
-	"time"
+	"context"
 
-	"github.com/NucleoFusion/cruise/internal/styles"
-	"github.com/NucleoFusion/cruise/internal/utils"
 	"github.com/charmbracelet/bubbles/viewport"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/docker/docker/api/types/network"
+	detailrenderer "github.com/cruise-org/cruise/internal/models/detailRenderer"
+	"github.com/cruise-org/cruise/pkg/runtimes"
+	"github.com/cruise-org/cruise/pkg/types"
 )
 
-type NetworkDetail struct {
-	Width    int
-	Height   int
-	Network  network.Summary
-	LabelsVp viewport.Model
-	DashVp   viewport.Model
-	ContVp   viewport.Model
-	IPAMVp   viewport.Model
-	OptsVp   viewport.Model
-}
-
-func NewDetail(w int, h int, ntw network.Summary) *NetworkDetail {
-	labels := make([]string, 0, len(ntw.Labels))
-	for k := range ntw.Labels {
-		labels = append(labels, k)
-	}
-
-	containers := make([]string, 0, len(ntw.Containers))
-	for k := range ntw.Containers {
-		containers = append(containers, k)
-	}
-
-	ipamOpts := make([]string, 0, len(ntw.IPAM.Options))
-	for k := range ntw.IPAM.Options {
-		ipamOpts = append(ipamOpts, k)
-	}
-
-	opts := make([]string, 0, len(ntw.Options))
-	for k := range ntw.Options {
-		opts = append(opts, k)
-	}
-
-	// Label VP
-	lvp := viewport.New((w-2)/3, h/5*2)
-	lvp.Style = styles.PageStyle().Padding(1, 2)
-	lvp.SetContent(getLabelView(ntw, labels, (w-2)/3-4))
-
-	// Dash VP
-	dvp := viewport.New((w-2)/3, h-h/5*2)
-	dvp.Style = styles.PageStyle().Padding(1, 2)
-	dvp.SetContent(getDashboardView(ntw, (w-2)/3-4))
-
-	// Cont VP
-	cvp := viewport.New((w-2)-(w-2)/3, h-h/2)
-	cvp.Style = styles.PageStyle().Padding(1, 2)
-	cvp.SetContent(getContainerView(ntw, containers, (w-2)-(w-2)/3-4))
-
-	// IPAM VP
-	ivp := viewport.New((w-2)/3, h/2)
-	ivp.Style = styles.PageStyle().Padding(1, 2)
-	ivp.SetContent(getIPAMView(ntw, ipamOpts, (w-2)/3-4))
-
-	// Options VP
-	ovp := viewport.New((w-2)-(w-2)/3*2, h/2)
-	ovp.Style = styles.PageStyle().Padding(1, 2)
-	ovp.SetContent(getOptionsView(ntw, opts, (w-2)-(w-2)*2/3-4))
-
-	return &NetworkDetail{
-		Width:    w,
-		Height:   h,
-		Network:  ntw,
-		LabelsVp: lvp,
-		DashVp:   dvp,
-		ContVp:   cvp,
-		IPAMVp:   ivp,
-		OptsVp:   ovp,
+func (s *Networks) detailsStatFunc() func() ([]types.StatCard, *types.StatMeta) {
+	curr := s.List.GetCurrentItem()
+	return func() (stats []types.StatCard, meta *types.StatMeta) {
+		return runtimes.RuntimeSrv.NetworkDetails(context.Background(), curr.Runtime, curr.ID)
 	}
 }
 
-func (s *NetworkDetail) Init() tea.Cmd {
-	return nil
-}
+func (s *Networks) detailsRenderFunc() func(map[string]map[string]string) string {
+	return func(m map[string]map[string]string) string {
+		vpmap := map[string]viewport.Model{}
+		for k, v := range m {
+			w, h := s.findSize(k)
 
-func (s *NetworkDetail) Update(msg tea.Msg) (*NetworkDetail, tea.Cmd) {
-	return s, nil
-}
+			arr := make([]string, 0, len(v))
+			for key, val := range v {
+				arr = append(arr, detailrenderer.FormatLine(key, val, w))
+			}
 
-func (s *NetworkDetail) View() string {
-	return lipgloss.JoinHorizontal(lipgloss.Center, lipgloss.JoinVertical(lipgloss.Center, s.DashVp.View(), s.LabelsVp.View()),
-		lipgloss.JoinVertical(lipgloss.Center, s.ContVp.View(),
-			lipgloss.JoinHorizontal(lipgloss.Center, s.OptsVp.View(), s.IPAMVp.View())))
-}
+			vpmap[k] = detailrenderer.SetVP(w, h, arr, k)
+		}
 
-func getDashboardView(ntw network.Summary, w int) string {
-	intrn := "✘"
-	if ntw.Internal {
-		intrn = "✔"
-	}
-	ingr := "✘"
-	if ntw.Ingress {
-		intrn = "✔"
-	}
-	text := fmt.Sprintf("%s   %s \n\n%s        %s \n\n%s   %s \n\n%s    %s \n\n%s     %s \n\n%s  %s \n\n%s   %s",
-		styles.DetailKeyStyle().Render(" Network: "), styles.TextStyle().Render(ntw.Name),
-		styles.DetailKeyStyle().Render(" ID: "), styles.TextStyle().Render(utils.Shorten(ntw.ID, w-10)),
-		styles.DetailKeyStyle().Render(" Created: "), styles.TextStyle().Render(utils.Shorten(ntw.Created.Format(time.DateOnly)+" "+ntw.Created.Format(time.Kitchen), w-15)),
-		styles.DetailKeyStyle().Render(" Driver: "), styles.TextStyle().Render(ntw.Driver),
-		styles.DetailKeyStyle().Render(" Scope: "), styles.TextStyle().Render(ntw.Scope),
-		styles.DetailKeyStyle().Render(" Internal: "), styles.TextStyle().Render(intrn),
-		styles.DetailKeyStyle().Render(" Ingress: "), styles.TextStyle().Render(ingr))
-
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Network Details ")), "\n\n", text)
-}
-
-func getContainerView(ntw network.Summary, cntnrs []string, w int) string {
-	if len(cntnrs) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Network Details ")), "\n\n", "No Connected Containers")
-	}
-
-	ln := w - 2
-	text := lipgloss.NewStyle().Bold(true).Render(fmt.Sprintf("%-*s %-*s %-*s %-*s %-*s\n\n",
-		ln/5, "ID",
-		ln/5, "Name",
-		ln/5, "MAC",
-		ln/5, "IPv4",
-		ln/5, "IPv6",
-	))
-
-	for _, v := range cntnrs {
-		text += fmt.Sprintf("%-*s %-*s %-*s %-*s %-*s\n\n",
-			ln/5, ntw.Containers[v].EndpointID,
-			ln/5, ntw.Containers[v].Name,
-			ln/5, ntw.Containers[v].MacAddress,
-			ln/5, ntw.Containers[v].IPv4Address,
-			ln/5, ntw.Containers[v].IPv6Address,
+		return lipgloss.JoinHorizontal(lipgloss.Center,
+			lipgloss.JoinVertical(lipgloss.Center, vpmap["Network Details"].View(), vpmap["IPAM"].View()),
+			vpmap["Labels"].View(),
+			vpmap["Options"].View(),
 		)
 	}
-
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Containers ")), "\n\n", text)
 }
 
-func getLabelView(ntw network.Summary, labels []string, w int) string {
-	text := ""
-
-	if len(labels) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render("Labels")), "\n\n", "No Labels Found")
+func (s *Networks) findSize(title string) (int, int) {
+	switch title {
+	case "IPAM":
+		return s.Width / 3, s.Height / 2
+	case "Network Details":
+		return s.Width / 3, s.Height / 2
+	case "Labels":
+		return s.Width / 3, s.Height
+	case "Options":
+		return s.Width / 3, s.Height
+	default:
+		return 0, 0
 	}
-
-	for _, v := range labels {
-		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(strings.TrimPrefix(v, "com.docker."), 25))),
-			styles.TextStyle().Render(utils.Shorten(ntw.Labels[v], w-4-len(v))))
-	}
-
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Labels ")), "\n\n", text)
-}
-
-func getIPAMView(ntw network.Summary, opts []string, w int) string {
-	text := fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", "Driver")),
-		styles.TextStyle().Render(ntw.IPAM.Driver))
-
-	for _, v := range opts {
-		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(v, 25))),
-			styles.TextStyle().Render(utils.Shorten(ntw.IPAM.Options[v], w-4-len(v))))
-	}
-
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" IPAM ")), "\n\n", text)
-}
-
-func getOptionsView(ntw network.Summary, opts []string, w int) string {
-	text := ""
-
-	if len(opts) == 0 {
-		return lipgloss.JoinVertical(lipgloss.Center, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "No Options Found")
-	}
-
-	for _, v := range opts {
-		text += fmt.Sprintf("%s %s\n\n", styles.DetailKeyStyle().Render(fmt.Sprintf(" %s: ", utils.Shorten(v, 25))),
-			styles.TextStyle().Render(utils.Shorten(ntw.Options[v], w-4-len(v))))
-	}
-
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(w, lipgloss.Center, styles.TitleStyle().Render(" Options ")), "\n\n", "Check")
 }
