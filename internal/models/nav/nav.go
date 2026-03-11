@@ -66,12 +66,10 @@ func NewNav(w, h int) *Nav {
 
 func (s *Nav) Init() tea.Cmd { return nil }
 
-func (s *Nav) Update(msg tea.Msg) (*Nav, tea.Cmd) {
+func (s *Nav) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, s.Keymap.Dashboard):
-			return s, func() tea.Msg { return messages.ChangePg{Pg: enums.Home, Exited: false} }
 		case key.Matches(msg, s.Keymap.Dashboard):
 			return s, func() tea.Msg { return messages.ChangePg{Pg: enums.Home, Exited: false} }
 		case key.Matches(msg, s.Keymap.Containers):

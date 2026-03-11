@@ -156,7 +156,7 @@ func (s *ImageList) View() string {
 }
 
 func (s *ImageList) UpdateList() {
-	w := (s.Width-2)/9 - 1
+	w := (s.Width-2)/5 - 1
 
 	text := lipgloss.NewStyle().Bold(true).Render(runtimes.ImageHeaders(w)+"\n") + "\n"
 
