@@ -19,6 +19,7 @@ import (
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/page"
 	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
 )
@@ -56,7 +57,7 @@ func (s *Containers) Init() tea.Cmd {
 	return s.List.Init()
 }
 
-func (s *Containers) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s *Containers) Update(msg tea.Msg) (page.Page, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.ContainerDetailsMonitorReady:
 		if s.ShowDetail {
@@ -240,3 +241,5 @@ func (s *Containers) GetListText() string {
 
 	return lipgloss.NewStyle().Render(s.List.View())
 }
+
+func (s *Containers) Cleanup() {}

@@ -18,6 +18,7 @@ import (
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/page"
 	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
 )
@@ -54,7 +55,7 @@ func (s *Images) Init() tea.Cmd {
 	return s.List.Init()
 }
 
-func (s *Images) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s *Images) Update(msg tea.Msg) (page.Page, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.ImagesReadyMsg:
 		s.IsLoading = false
@@ -164,3 +165,5 @@ func (s *Images) UpdateImages() tea.Cmd {
 		return messages.UpdateImagesMsg{Items: imgs}
 	})
 }
+
+func (s *Images) Cleanup() {}

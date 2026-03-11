@@ -22,6 +22,7 @@ var tickCmd = func() tea.Cmd {
 }
 
 type Logs struct {
+	Ctx          context.Context
 	Width        int
 	Height       int
 	Events       []types.Log
@@ -30,20 +31,21 @@ type Logs struct {
 	Length       int
 }
 
-func NewLogs(w int, h int) *Logs {
+func NewLogs(ctx context.Context, w int, h int) *Logs {
 	return &Logs{
 		Width:     w,
 		Height:    h,
 		IsLoading: true,
 		Length:    h - 6,
 		Events:    make([]types.Log, 0),
+		Ctx:       ctx,
 	}
 }
 
 func (s *Logs) Init() tea.Cmd {
 	return tea.Batch(tickCmd(),
 		func() tea.Msg {
-			m, err := runtimes.RuntimeSrv.RuntimeLogs(context.Background())
+			m, err := runtimes.RuntimeSrv.RuntimeLogs(s.Ctx)
 			if err != nil {
 				return messages.ErrorMsg{Msg: err.Error()}
 			}

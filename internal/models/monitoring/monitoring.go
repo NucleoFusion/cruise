@@ -19,6 +19,7 @@ import (
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/colors"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/page"
 	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
 	"github.com/cruise-org/cruise/pkg/types"
@@ -28,6 +29,8 @@ import (
 type Monitoring struct {
 	Width     int
 	Height    int
+	Ctx       context.Context
+	Cancel    context.CancelFunc
 	Vp        viewport.Model
 	Ti        textinput.Model
 	Keymap    keymap.MonitorMap
@@ -50,6 +53,8 @@ func NewMonitoring(w int, h int) *Monitoring {
 	vp.Style = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(colors.Load().FocusedBorder).
 		Padding(1).Foreground(colors.Load().Text)
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	ti := textinput.New()
 	ti.Width = w - 14
 	ti.Prompt = " Search: "
@@ -60,6 +65,8 @@ func NewMonitoring(w int, h int) *Monitoring {
 	ti.TextStyle = styles.TextStyle()
 
 	return &Monitoring{
+		Ctx:       ctx,
+		Cancel:    cancel,
 		Width:     w,
 		Height:    h,
 		Help:      styledhelp.NewStyledHelp(keymap.NewMonitorMap().Bindings(), w-2),
@@ -83,7 +90,7 @@ func (s *Monitoring) Init() tea.Cmd {
 		})
 }
 
-func (s *Monitoring) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s *Monitoring) Update(msg tea.Msg) (page.Page, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.MonitoringMonitor:
 		s.Monitor = msg.Monitor
@@ -202,4 +209,8 @@ func (s *Monitoring) Filter(val string) {
 	}
 
 	s.Filtered = result
+}
+
+func (s *Monitoring) Cleanup() {
+	s.Cancel()
 }

@@ -259,3 +259,5 @@
 2026/03/11 17:00:56 [ROOT MSG] messages.ChangePg
 2026/03/11 17:00:56 [ROOT MSG] messages.ImagesReadyMsg
 2026/03/11 17:00:57 [ROOT MSG] tea.KeyMsg
+2026/03/11 17:16:07 [ROOT MSG] tea.WindowSizeMsg
+2026/03/11 17:16:08 [ROOT MSG] tea.KeyMsg

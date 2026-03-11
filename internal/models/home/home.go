@@ -4,12 +4,15 @@
 package home
 
 import (
+	"context"
+
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/cruise-org/cruise/internal/messages"
 	styledhelp "github.com/cruise-org/cruise/internal/models/help"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/page"
 	"github.com/cruise-org/cruise/pkg/styles"
 )
 
@@ -20,15 +23,20 @@ type Home struct {
 	Stats  *QuickStats
 	Logs   *Logs
 	Help   styledhelp.StyledHelp
+	Ctx    context.Context
+	Cancel context.CancelFunc
 }
 
 func NewHome(w int, h int) *Home {
+	ctx, cancel := context.WithCancel(context.Background())
 	return &Home{
+		Ctx:    ctx,
+		Cancel: cancel,
 		Width:  w,
 		Height: h,
 		SysRes: NewSysRes(2*w/3, (h-11)/2-2),
 		Stats:  NewQuickStats(w/3, (h-11)/2-2),
-		Logs:   NewLogs(2*w/3, (h-11)/2),
+		Logs:   NewLogs(ctx, 2*w/3, (h-11)/2),
 		Help:   styledhelp.NewStyledHelp([]key.Binding{}, w-2),
 	}
 }
@@ -37,7 +45,7 @@ func (s *Home) Init() tea.Cmd {
 	return tea.Batch(s.SysRes.Init(), s.Stats.Init(), s.Logs.Init())
 }
 
-func (s *Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s *Home) Update(msg tea.Msg) (page.Page, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.SysResReadyMsg:
 		sr, cmd := s.SysRes.Update(msg)
@@ -87,4 +95,8 @@ func (s *Home) View() string {
 		s.Help.View(),
 	)
 	return styles.SceneStyle().Render(view)
+}
+
+func (s *Home) Cleanup() {
+	s.Cancel()
 }
