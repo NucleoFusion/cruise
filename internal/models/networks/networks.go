@@ -16,6 +16,7 @@ import (
 	styledhelp "github.com/cruise-org/cruise/internal/models/help"
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/page"
 	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
 )
@@ -47,7 +48,7 @@ func (s *Networks) Init() tea.Cmd {
 	return s.List.Init()
 }
 
-func (s *Networks) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s *Networks) Update(msg tea.Msg) (page.Page, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.NetworksReadyMsg:
 		s.IsLoading = false
@@ -143,3 +144,5 @@ func (s *Networks) GetListText() string {
 
 	return lipgloss.NewStyle().Render(s.List.View())
 }
+
+func (s *Networks) Cleanup() {}

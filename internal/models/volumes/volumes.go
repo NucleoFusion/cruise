@@ -17,6 +17,7 @@ import (
 	styledhelp "github.com/cruise-org/cruise/internal/models/help"
 	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/page"
 	"github.com/cruise-org/cruise/pkg/runtimes"
 	"github.com/cruise-org/cruise/pkg/styles"
 )
@@ -48,7 +49,7 @@ func (s *Volumes) Init() tea.Cmd {
 	return s.List.Init()
 }
 
-func (s *Volumes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s *Volumes) Update(msg tea.Msg) (page.Page, tea.Cmd) {
 	switch msg := msg.(type) {
 	case messages.VolumesReadyMsg:
 		s.IsLoading = false
@@ -155,3 +156,5 @@ func (s *Volumes) Refresh() tea.Cmd {
 		return messages.VolumesReadyMsg{Items: vols}
 	})
 }
+
+func (s *Volumes) Cleanup() {}

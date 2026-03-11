@@ -13,6 +13,7 @@ import (
 	"github.com/cruise-org/cruise/internal/messages"
 	"github.com/cruise-org/cruise/pkg/enums"
 	"github.com/cruise-org/cruise/pkg/keymap"
+	"github.com/cruise-org/cruise/pkg/page"
 	"github.com/cruise-org/cruise/pkg/styles"
 )
 
@@ -66,7 +67,7 @@ func NewNav(w, h int) *Nav {
 
 func (s *Nav) Init() tea.Cmd { return nil }
 
-func (s *Nav) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s *Nav) Update(msg tea.Msg) (page.Page, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -125,3 +126,5 @@ func (s *Nav) GetPages(w, h int, category string) string {
 	return lipgloss.Place(w, h/5, lipgloss.Left, lipgloss.Center, lipgloss.JoinVertical(lipgloss.Left, title, "\n",
 		lipgloss.NewStyle().PaddingLeft(10).Render(keybinds)))
 }
+
+func (s *Nav) Cleanup() {}

@@ -71,7 +71,7 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s.IsShowingError = true
 		s.ErrorPopup = errorpopup.NewErrorPopup(s.Width, s.Height, msg.Msg, msg.Title, msg.Locn)
 
-		var curr tea.Model
+		var curr page.Page
 		curr = s.PageMap[s.CurrentPage]
 
 		s.Overlay = overlay.New(s.ErrorPopup, curr, overlay.Right, overlay.Top, 2, 2)
@@ -84,7 +84,7 @@ func (s *Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		s.IsShowingMsg = true
 		s.MsgPopup = msgpopup.NewMsgPopup(s.Width, s.Height, msg.Msg, msg.Title, msg.Locn)
 
-		var curr tea.Model
+		var curr page.Page
 		curr = s.PageMap[s.CurrentPage]
 
 		s.Overlay = overlay.New(s.MsgPopup, curr, overlay.Right, overlay.Top, 2, 2)
