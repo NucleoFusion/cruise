@@ -13,6 +13,7 @@ const (
 	Monitoring
 	Networks
 	Volumes
+	Nav
 )
 
 type ErrorType int
