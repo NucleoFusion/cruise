@@ -21,12 +21,6 @@ import (
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
-type LogStreamer struct {
-	ctx    context.Context
-	cancel context.CancelFunc
-	lines  chan string
-}
-
 type ContainerList struct {
 	Width         int
 	Height        int

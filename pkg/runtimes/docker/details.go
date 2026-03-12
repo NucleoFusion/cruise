@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright The cruise-org Authors
+
 package dockerruntime
 
 import (
@@ -78,7 +81,13 @@ func NewContainerResourceDetails(ctx context.Context, id string, cli *client.Cli
 	}
 
 	var stats container.StatsResponse
-	json.Unmarshal(data, &stats)
+	err = json.Unmarshal(data, &stats)
+	if err != nil {
+		s.data = &map[string]string{
+			"error": err.Error(),
+		}
+		return &s
+	}
 
 	r, w := GetBlkio(stats, res.OSType)
 

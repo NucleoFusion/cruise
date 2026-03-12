@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright The cruise-org Authors
+
 package vuln
 
 import (
@@ -22,7 +25,7 @@ func ScanImage(image, provider string) (*[]types.Vulnerability, error) {
 }
 
 func ScannerAvailable(scanner string) bool {
-	_, err := exec.Command("bash", "-c", scanner+" --version").CombinedOutput() // TODO: Config file based checker
+	_, err := exec.Command(scanner, " --version").CombinedOutput() // TODO: Config file based checker
 	return err == nil
 }
 
