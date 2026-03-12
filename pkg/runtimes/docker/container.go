@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright The cruise-org Authors
+
 package dockerruntime
 
 import (
@@ -6,7 +9,6 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/cruise-org/cruise/pkg/types"
 	"github.com/docker/docker/api/types/container"
 )
@@ -137,7 +139,7 @@ func (s *DockerRuntime) RestartContainer(ctx context.Context, id string) error {
 }
 
 func (s *DockerRuntime) ExecContainer(ctx context.Context, id string) *exec.Cmd {
-	return exec.Command(config.Cfg.Global.Term, "-e", fmt.Sprintf("docker exec -it %s %s", id, "sh"))
+	return exec.Command("docker", "exec", "-it", id, "sh")
 }
 
 func (s *DockerRuntime) PortsMap(ctx context.Context, id string) ([]string, error) {

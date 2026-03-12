@@ -24,7 +24,6 @@ func (s *Volumes) detailsRenderFunc() func(map[string]map[string]string) string 
 	return func(m map[string]map[string]string) string {
 		vpmap := map[string]viewport.Model{}
 		for k, v := range m {
-
 			w, h := s.findSize(k)
 
 			if len(v) == 0 {
