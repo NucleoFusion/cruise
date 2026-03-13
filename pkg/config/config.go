@@ -16,7 +16,7 @@ var Cfg Config
 
 func SetCfg() error {
 	cfg := utils.GetCfgDir()
-	p := filepath.Join(cfg, "config.toml")
+	p := filepath.Join(cfg, "config.yaml")
 
 	if _, err := os.Stat(p); os.IsNotExist(err) {
 		if err := os.MkdirAll(cfg, 0o755); err != nil {

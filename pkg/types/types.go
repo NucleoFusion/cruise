@@ -3,6 +3,10 @@
 
 package types
 
+import (
+	"time"
+)
+
 type ContainerState = string
 
 const (
@@ -65,4 +69,17 @@ type Volume struct {
 	Driver     string
 	Mountpoint string
 	CreatedAt  string
+}
+
+type RegistryImage struct {
+	Provider string
+	Domain   string
+	Project  string
+	Name     string
+	Tag      string
+	// Row details
+	Digest   string // "sha256:a1b2c3..."
+	Size     int64  // bytes
+	PushedAt time.Time
+	Arch     string // "amd64", "arm64"
 }
