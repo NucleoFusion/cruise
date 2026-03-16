@@ -3,18 +3,18 @@ package dockerhub
 import (
 	"fmt"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/zalando/go-keyring"
 )
 
-func (s *DockerHub) Login() (tea.Cmd, error) {
-	secret, err := keyring.Get("cruise", fmt.Sprintf("%s/%s", s.Provider(), s.Domain()))
+func (s *DockerHub) Login(pass string) error {
+	token, err := s.ping(pass)
 	if err != nil {
-		if err == keyring.ErrNotFound {
-			return func() tea.Msg {
-				return nil
-			}
-		}
-		return nil, err
+		return err
 	}
+
+	return keyring.Set("cruise", fmt.Sprintf("%s/%s", s.Provider(), s.Domain()), token)
+}
+
+func (s *DockerHub) Logout() error {
+	return keyring.Delete("cruise", fmt.Sprintf("%s/%s", s.Provider(), s.Domain()))
 }

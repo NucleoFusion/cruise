@@ -3,10 +3,6 @@
 
 package types
 
-import (
-	"time"
-)
-
 type ContainerState = string
 
 const (
@@ -72,14 +68,11 @@ type Volume struct {
 }
 
 type RegistryImage struct {
-	Provider string
-	Domain   string
-	Project  string
-	Name     string
-	Tag      string
-	// Row details
-	Digest   string // "sha256:a1b2c3..."
-	Size     int64  // bytes
-	PushedAt time.Time
-	Arch     string // "amd64", "arm64"
+	Domain      string `json:"domain"`
+	Provider    string `json:"provider"`
+	Name        string `json:"name"`
+	Project     string `json:"project"`
+	Description string `json:"description"`
+	IsPrivate   bool   `json:"is_private"`
+	PullCount   int64  `json:"pull_count"`
 }
