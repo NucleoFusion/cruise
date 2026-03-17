@@ -20,5 +20,5 @@ type RegistryConfig struct {
 	Provider string `mapstructure:"provider" yaml:"provider"`
 	Username string `mapstructure:"username" yaml:"username"`
 	Domain   string `mapstructure:"domain" yaml:"domain"`
-	Ignore   string `mapstructure:"ignore" yaml:"ignore"`
+	Ignore   bool   `mapstructure:"ignore" yaml:"ignore"`
 }

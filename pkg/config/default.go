@@ -26,6 +26,7 @@ func Default() Config {
 			ExportDir: expDir,
 			Term:      DetectTerminal(),
 			Runtimes:  []string{"docker"},
+			Registry:  []RegistryConfig{},
 		},
 		Keybinds: Keybinds{
 			Global: GlobalKeybinds{

@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cruise-org/cruise/internal/utils"
 	"github.com/cruise-org/cruise/pkg/config"
 	"github.com/spf13/cobra"
 	"go.yaml.in/yaml/v3"
@@ -46,7 +45,7 @@ var dumpCmd = &cobra.Command{
 
 func init() {
 	dumpCmd.Flags().StringVarP(&dumpPath, "path", "p",
-		filepath.Join(utils.GetCfgDir(), "dump.yaml"), // changed
+		filepath.Join(config.GetCfgDir(), "dump.yaml"), // changed
 		"filepath to dump the config")
 	rootCmd.AddCommand(dumpCmd)
 }
