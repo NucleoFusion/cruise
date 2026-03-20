@@ -9,6 +9,7 @@ import (
 )
 
 type Registry interface {
+	Username() string
 	Provider() string // "Harbor", "DockerHub"
 	Domain() string   // "harbor.local", "docker.io"
 

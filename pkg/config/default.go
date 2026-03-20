@@ -46,6 +46,7 @@ func Default() Config {
 				Volumes:       "v",
 				Monitoring:    "m",
 				Vulnerability: "s",
+				Registry:      "r",
 			},
 			Fzf: FzfKeybinds{
 				Up:    "up",

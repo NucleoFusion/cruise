@@ -10,17 +10,18 @@ import (
 type DockerHub struct {
 	RegistryProvider string
 	RegistryDomain   string
-	Username         string
+	RegistryUsername string
 }
 
 func NewDockerHubProvider(domain, username string) *DockerHub {
 	return &DockerHub{
 		RegistryProvider: "docker",
 		RegistryDomain:   domain,
-		Username:         username,
+		RegistryUsername: username,
 	}
 }
 
+func (s *DockerHub) Username() string { return s.RegistryUsername }
 func (s *DockerHub) Provider() string { return s.RegistryProvider }
 func (s *DockerHub) Domain() string   { return s.RegistryDomain }
 
@@ -33,7 +34,7 @@ func (s *DockerHub) ping(pass string) (string, error) {
 
 	resp, err := client.R().
 		SetBody(map[string]string{
-			"username": s.Username,
+			"username": s.Username(),
 			"password": pass,
 		}).
 		SetResult(&result).

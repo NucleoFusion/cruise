@@ -16,6 +16,7 @@ type (
 	ParsedRegistries     struct{ Registries []registry.Registry }
 	RegistryLoginMessage struct{ Registry registry.Registry }
 	PendingRegistryLogin struct{ Ch chan RegistryLoginMessage }
+	CloseLoginMessage    struct{}
 
 	HomeStatContainer struct{ Containers *[]types.Container }
 	HomeStatImage     struct{ Images *[]types.Image }
