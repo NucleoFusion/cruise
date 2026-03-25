@@ -14,6 +14,73 @@ import (
 	"github.com/docker/docker/api/types/container"
 )
 
+func DistributeWidth(w, parts int) []int {
+	if parts <= 0 {
+		return nil
+	}
+
+	base := w / parts
+	rem := w % parts
+
+	result := make([]int, parts)
+
+	// Fill with base width
+	for i := range result {
+		result[i] = base
+	}
+
+	// Distribute remainder centered
+	mid := parts / 2
+
+	if parts%2 == 1 {
+		// Odd → start exactly at center
+		left := mid
+		right := mid + 1
+
+		for rem > 0 {
+			result[left]++
+			rem--
+			if rem == 0 {
+				break
+			}
+
+			if right < parts {
+				result[right]++
+				rem--
+			}
+
+			left--
+			right++
+			if left < 0 {
+				left = 0
+			}
+		}
+	} else {
+		// Even → start from middle pair
+		left := mid - 1
+		right := mid
+
+		for rem > 0 {
+			if left >= 0 {
+				result[left]++
+				rem--
+			}
+			if rem == 0 {
+				break
+			}
+			if right < parts {
+				result[right]++
+				rem--
+			}
+
+			left--
+			right++
+		}
+	}
+
+	return result
+}
+
 func ReturnError(loc, title string, err error) tea.Cmd {
 	return func() tea.Msg {
 		return messages.ErrorMsg{
