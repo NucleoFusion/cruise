@@ -53,7 +53,7 @@ func (s *RegistryModel) Update(msg tea.Msg) (page.Page, tea.Cmd) {
 		return s, nil
 	case messages.RegistryLoginMessage:
 		log.Printf("[REG] Registry Login Msg Came for: %+v", msg.Registry)
-		s.LoginModel = loginmodel.NewLoginModel(s.Width/3, msg.Registry)
+		s.LoginModel = loginmodel.NewLoginModel(s.Width, s.Height, msg.Registry)
 		return s, nil
 	case tea.KeyMsg:
 		if s.LoginModel != nil {

@@ -13,6 +13,7 @@ type Keybinds struct {
 	Network       NetworkKeybinds       `mapstructure:"network" yaml:"network"`
 	Volumes       VolumeKeybinds        `mapstructure:"volume" yaml:"volume"`
 	Vulnerability VulnerabilityKeybinds `mapstructure:"vulnerability" yaml:"vulnerability"`
+	RegistryLogin RegistryLoginKeybinds `mapstructure:"registry_login" yaml:"registry_login"`
 }
 
 type GlobalKeybinds struct {
@@ -91,4 +92,10 @@ type VulnerabilityKeybinds struct {
 	FocusScanners string `mapstructure:"focus_scanners" yaml:"focus_scanners"`
 	FocusList     string `mapstructure:"focus_list" yaml:"focus_list"`
 	Export        string `mapstructure:"export" yaml:"export"`
+}
+
+type RegistryLoginKeybinds struct {
+	Left  string `mapstructure:"left" yaml:"left"`
+	Right string `mapstructure:"right" yaml:"right"`
+	Enter string `mapstructure:"enter" yaml:"enter"`
 }

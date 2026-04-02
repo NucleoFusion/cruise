@@ -17,6 +17,11 @@ type (
 	RegistryLoginMessage struct{ Registry registry.Registry }
 	PendingRegistryLogin struct{ Ch chan RegistryLoginMessage }
 	CloseLoginMessage    struct{}
+	IgnoreLoginMessage   struct{ Registry registry.Registry }
+	LoginMessage         struct {
+		Registry registry.Registry
+		Pass     string
+	}
 
 	HomeStatContainer struct{ Containers *[]types.Container }
 	HomeStatImage     struct{ Images *[]types.Image }

@@ -95,6 +95,11 @@ func Default() Config {
 				Search:     "/",
 				ExitSearch: "esc",
 			},
+			RegistryLogin: RegistryLoginKeybinds{
+				Left:  "ctrl+left",
+				Right: "ctrl+right",
+				Enter: "enter",
+			},
 		},
 		Styles: Styles{
 			Text:             "#cdd6f4",
