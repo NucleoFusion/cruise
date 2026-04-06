@@ -21,7 +21,7 @@ import (
 type LoginModel struct {
 	Width       int
 	Height      int
-	Registry    registry.Registry
+	Registry    *registry.Registry
 	PassTi      textinput.Model
 	Opts        []string
 	SelectedOpt int
@@ -30,7 +30,7 @@ type LoginModel struct {
 	Help   styledhelp.StyledHelp
 }
 
-func NewLoginModel(w, h int, r registry.Registry) *LoginModel {
+func NewLoginModel(w, h int, r *registry.Registry) *LoginModel {
 	ti := textinput.New()
 	ti.Prompt = ""
 	ti.EchoMode = textinput.EchoPassword
@@ -72,12 +72,11 @@ func (s *LoginModel) Update(msg tea.Msg) (*LoginModel, tea.Cmd) {
 			case "Return":
 				return s, func() tea.Msg { return messages.ChangePg{Pg: enums.Home} }
 			case "Ignore":
-				return s, func() tea.Msg { return messages.IgnoreLoginMessage{Registry: s.Registry} }
+				return s, func() tea.Msg { return messages.IgnoreLoginMessage{} }
 			case "Login":
 				return s, func() tea.Msg {
 					return messages.LoginMessage{
-						Registry: s.Registry,
-						Pass:     s.PassTi.Value(),
+						Pass: s.PassTi.Value(),
 					}
 				}
 			}
@@ -92,9 +91,9 @@ func (s *LoginModel) Update(msg tea.Msg) (*LoginModel, tea.Cmd) {
 
 func (s *LoginModel) View() string {
 	view := lipgloss.JoinVertical(lipgloss.Left,
-		fmt.Sprintf("Username : %s", s.Registry.Username()),
-		fmt.Sprintf("Provider : %s", s.Registry.Provider()),
-		fmt.Sprintf("Domain   : %s", utils.Shorten(s.Registry.Domain(), 30)),
+		fmt.Sprintf("Username : %s", (*s.Registry).Username()),
+		fmt.Sprintf("Provider : %s", (*s.Registry).Provider()),
+		fmt.Sprintf("Domain   : %s", utils.Shorten((*s.Registry).Domain(), 30)),
 		lipgloss.JoinHorizontal(lipgloss.Left,
 			"Password : ", s.renderInput(),
 		),

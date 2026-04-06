@@ -13,14 +13,14 @@ import (
 
 type (
 	// Registries
-	ParsedRegistries     struct{ Registries []registry.Registry }
-	RegistryLoginMessage struct{ Registry registry.Registry }
+	ParsedRegistries     struct{ Registries []*registry.Registry }
+	RegistryLoginMessage struct{ Registry *registry.Registry }
+	RegistryLoginError   struct{ Err error }
 	PendingRegistryLogin struct{ Ch chan RegistryLoginMessage }
 	CloseLoginMessage    struct{}
-	IgnoreLoginMessage   struct{ Registry registry.Registry }
+	IgnoreLoginMessage   struct{}
 	LoginMessage         struct {
-		Registry registry.Registry
-		Pass     string
+		Pass string
 	}
 
 	HomeStatContainer struct{ Containers *[]types.Container }

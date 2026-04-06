@@ -11,10 +11,23 @@ import (
 	"github.com/cruise-org/cruise/pkg/registry"
 )
 
+func (s *RegistryModel) nextLogin() tea.Cmd {
+	s.CurrLogin = nil
+	s.LoginModel = nil
+
+	v, ok := <-s.LoginChan
+	if ok {
+		return func() tea.Msg { return v }
+	}
+
+	s.State = 4
+	return nil
+}
+
 func (s *RegistryModel) parseRegistries() tea.Cmd {
 	return func() tea.Msg {
 		cfgRegistries := config.Cfg.Global.Registry
-		registries := make([]registry.Registry, 0)
+		registries := make([]*registry.Registry, 0)
 		for _, v := range cfgRegistries {
 			if v.Ignore {
 				continue
@@ -25,7 +38,7 @@ func (s *RegistryModel) parseRegistries() tea.Cmd {
 				continue
 			}
 
-			registries = append(registries, r)
+			registries = append(registries, &r)
 		}
 
 		return messages.ParsedRegistries{Registries: registries}
@@ -41,9 +54,9 @@ func (s *RegistryModel) authenticateRegistries() tea.Cmd {
 
 		for _, v := range s.Registries {
 			wg.Add(1)
-			go func(v registry.Registry) {
+			go func(v *registry.Registry) {
 				defer wg.Done()
-				if !registry.IsLoggedIn(fmt.Sprintf("%s/%s", v.Provider(), v.Domain())) {
+				if !registry.IsLoggedIn(fmt.Sprintf("%s/%s", (*v).Provider(), (*v).Domain())) {
 					ch <- messages.RegistryLoginMessage{Registry: v}
 				}
 				log.Printf("[REG AUTH] Checked Auth for %+v \n", v)
